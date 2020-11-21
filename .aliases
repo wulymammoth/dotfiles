@@ -1,0 +1,8 @@
+alias cat='bat'
+alias desk='cd ~/Desktop'
+alias dotfiles='cd ~/.dotfiles'
+alias ls='exa -1a --group-directories-first --icons'
+alias make='mmake'
+alias newsboat='newsboat -C ~/.newsboat/config'
+alias til='cd ~/Desktop/til'
+alias vim='nvim'

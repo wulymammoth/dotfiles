@@ -1,0 +1,9 @@
+.DS_Store
+.envrc
+.tags
+.tags_sorted_by_file
+__pycache__/
+node_modules/
+tags
+TAGS
+Session.vim

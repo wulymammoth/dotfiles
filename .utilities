@@ -1,0 +1,24 @@
+# asdf
+BREW_PREFIX=/usr/local/opt # because $(brew --prefix asdf) is SLOW AS SHIT
+. $BREW_PREFIX/asdf/asdf.sh
+. $BREW_PREFIX/asdf/etc/bash_completion.d/asdf.bash
+
+# bash completion
+if type brew &>/dev/null; then
+  if [[ -r "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
+    source "${HOMEBREW_PREFIX}/etc/profile.d/bash_completion.sh"
+  else
+    for COMPLETION in "${HOMEBREW_PREFIX}/etc/bash_completion.d/"*; do
+      [[ -r "$COMPLETION" ]] && source "$COMPLETION"
+    done
+  fi
+fi
+
+# direnv
+eval "$(direnv hook bash)"
+
+# fzf
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# zoxide
+eval "$(zoxide init bash)"

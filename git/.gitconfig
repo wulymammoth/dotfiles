@@ -1,0 +1,33 @@
+[alias]
+  # delete merged branches
+  dmb = !sh -c 'git branch --merged | egrep -v \"(^\\*|master|dev)\" | xargs git branch -d' -
+  # copy current branch name
+  cb = rev-parse --abbrev-ref HEAD
+  # Clean deleted branches on remote
+  rpo = remote prune origin
+
+[branch]
+  autoSetupRebase = always
+  sort = -authordate
+
+[core]
+  excludesfile = ~/.gitignore_global
+
+[credential]
+  helper = osxkeychain
+
+[grep]
+  lineNumber = true
+
+[init]
+  defaultBranch = main
+
+[rerere]
+  enabled = true
+
+[user]
+  email = 861147+wulymammoth@users.noreply.github.com
+  name = wulymammoth
+
+[includeIf "gitdir:~/Desktop/work/"]
+  path = ~/Desktop/work/.gitconfig
