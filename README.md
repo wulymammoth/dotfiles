@@ -2,6 +2,10 @@
 
 ![](./shellshot.png)
 
+## why are my directories structured the way that they are?
+
+I'm using [GNU Stow](https://www.gnu.org/software/stow/) to symlink my dotfiles and each directory that you see here mirrors that of my `$HOME` directory -- some application and utility configurations typically go under `$XDG_CONFIG` (`~/.config`).
+
 ## some of my favorite tools and utilities:
 
 - [Alacritty](https://github.com/alacritty/alacritty) : terminal
@@ -16,4 +20,4 @@
 - [zoxide](https://github.com/ajeetdsouza/zoxide) : a faster way to navigate the filesystem
 - tree : Display directories as trees (with optional color/HTML output)
 
-My other utilities and applications (primarily macOS) can be found in my [Brewfile](./Brewfile)
+My other utilities and applications (primarily macOS) can be found in my [Brewfile](./homebrew/Brewfile)
