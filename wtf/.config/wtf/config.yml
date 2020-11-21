@@ -1,0 +1,107 @@
+wtf:
+  colors:
+    border:
+      focusable: white
+      focused:   white
+      normal:    white
+    title: cornflowerblue
+  grid:
+    columns: [32, 32, 32, 32, 90]
+    rows: [12, 9, 9, 9, 4, 90]
+  refreshInterval: 1
+  mods:
+    clocks_a:
+      enabled: true
+      locations:
+        Hawaii  : "Pacific/Honolulu"
+        SF      : "America/Vancouver"
+        NY      : "America/New York"
+        Toronto : "America/Toronto"
+        Saigon  : "Asia/Ho_Chi_Minh"
+        Taipei  : "Asia/Taipei"
+        Tokyo   : "Asia/Tokyo"
+      position:
+        top: 2
+        left: 0
+        height: 1
+        width: 2
+      sort: "chronological"
+      refreshInterval: 15
+      title: "time"
+      type: "clocks"
+    hackernews:
+      enabled: true
+      numberOfStories: 20
+      position:
+        top: 0
+        left: 0
+        height: 1
+        width: 3
+      storyType: top
+      refreshInterval: 900
+    ipinfo:
+      enabled: true
+      position:
+        top: 3
+        left: 0
+        height: 1
+        width: 2
+      refreshInterval: 150
+    pagerduty:
+      enabled: true
+      escalationFilter:
+      - "Infrastructure Engineering"
+      position:
+        top: 1
+        left: 2
+        height: 1
+        width: 1
+      scheduleIDs:
+      - "PS8KJDF"
+      - "P0ECGKP"
+      showIncidents: false
+      showSchedules: true
+    power:
+      enabled: true
+      position:
+        top: 2
+        left: 2
+        height: 1
+        width: 1
+      refreshInterval: 15
+      title: "⚡️"
+    prettyweather:
+      enabled: true
+      city: "San Francisco"
+      position:
+        top: 1
+        left: 0
+        height: 1
+        width: 2
+      refreshInterval: 300
+      unit: "u"
+      view: 0
+      language: "en"
+    security:
+      enabled: true
+      position:
+        top: 3
+        left: 2
+        height: 1
+        width: 1
+      refreshInterval: 3600
+    uptime:
+      args: [""]
+      cmd: "uptime"
+      colors:
+        border:
+          focusable: white
+      enabled: true
+      position:
+        top: 4
+        left: 0
+        height: 1
+        width: 3
+      refreshInterval: 30
+      type: cmdrunner
+  term: "xterm-256color"

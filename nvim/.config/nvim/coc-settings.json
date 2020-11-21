@@ -1,0 +1,33 @@
+{
+  "codeLens.enable": true,
+  "elixir.pathToElixirLS": "~/.elixir-ls/release/language_server.sh",
+  "jedi.enable": true,
+  "jedi.startupMessage": true,
+  "jedi.markupKindPreferred": "plaintext",
+  "jedi.trace.server": true,
+  "jedi.jediSettings.autoImportModules": [],
+  "jedi.executable.args": [],
+  "jedi.completion.disableSnippets": false,
+  "jedi.diagnostics.enable": true,
+  "jedi.diagnostics.didOpen": true,
+  "jedi.diagnostics.didChange": true,
+  "jedi.diagnostics.didSave": true,
+  "languageserver": {
+    "go": {
+      "command": "gopls",
+      "args": ["serve", "-debug", "0.0.0.0:8484", "-rpc.trace"],
+      "rootPatterns": ["go.mod"],
+      "trace.server": "verbose",
+      "filetypes": ["go"]
+    }
+  },
+  "solargraph.commandPath": "~/.asdf/shims/solargraph",
+  "solargraph.promptDownload": true,
+  "solargraph.diagnostics": true,
+  "solargraph.completion": true,
+  "solargraph.formatting": true,
+  "solargraph.definitions": true,
+  "solargraph.references": true,
+  "solargraph.folding": true,
+  "solargraph.userBundler": false
+}
