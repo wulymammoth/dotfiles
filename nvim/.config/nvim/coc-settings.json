@@ -1,6 +1,5 @@
 {
   "codeLens.enable": true,
-  "elixir.pathToElixirLS": "~/.elixir-ls/release/language_server.sh",
   "python.jediEnabled": false,
   "rust-analyzer.updates.prompt": false,
   "solargraph.commandPath": "~/.asdf/shims/solargraph",
