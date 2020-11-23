@@ -2,13 +2,11 @@
   "codeLens.enable": true,
   "python.jediEnabled": false,
   "rust-analyzer.updates.prompt": false,
-  "solargraph.commandPath": "~/.asdf/shims/solargraph",
   "solargraph.promptDownload": true,
   "solargraph.diagnostics": true,
   "solargraph.completion": true,
   "solargraph.formatting": true,
   "solargraph.definitions": true,
   "solargraph.references": true,
-  "solargraph.folding": true,
-  "solargraph.userBundler": false
+  "solargraph.folding": true
 }
