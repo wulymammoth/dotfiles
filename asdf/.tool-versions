@@ -2,6 +2,6 @@ elixir master-otp-23
 erlang 23.1.1
 golang 1.14.2
 nodejs 13.12.0 14.2.0 14.13.1
-python 3.8.3
-ruby 2.6.3 system
+python 3.8.2 3.8.3 system
+ruby 2.7.0 2.5.7 system
 rust 1.45.0 1.44.1
