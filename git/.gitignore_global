@@ -2,8 +2,9 @@
 .envrc
 .tags
 .tags_sorted_by_file
+.tool-versions
+Session.vim
+TAGS
 __pycache__/
 node_modules/
 tags
-TAGS
-Session.vim
