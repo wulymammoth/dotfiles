@@ -1,5 +1,4 @@
 {
-  "codeLens.enable": true,
   "python.jediEnabled": false,
   "rust-analyzer.updates.prompt": false,
   "solargraph.promptDownload": true,
