@@ -1,11 +1,11 @@
 {
   "python.jediEnabled": false,
   "rust-analyzer.updates.prompt": false,
-  "solargraph.promptDownload": true,
-  "solargraph.diagnostics": true,
   "solargraph.completion": true,
-  "solargraph.formatting": true,
   "solargraph.definitions": true,
-  "solargraph.references": true,
-  "solargraph.folding": true
+  "solargraph.diagnostics": true,
+  "solargraph.folding": true,
+  "solargraph.formatting": true,
+  "solargraph.promptDownload": true,
+  "solargraph.references": true
 }
