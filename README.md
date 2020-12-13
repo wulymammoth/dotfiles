@@ -18,6 +18,6 @@ I'm using [GNU Stow](https://www.gnu.org/software/stow/) to symlink my dotfiles 
 - [ripgrep](https://github.com/BurntSushi/ripgrep) : command-line search utility (faster than grep and ag)
 - [tmux](https://github.com/tmux/tmux) : terminal multiplexer for project/session management and restore, because re-opening projects is 😭
 - [zoxide](https://github.com/ajeetdsouza/zoxide) : a faster way to navigate the filesystem
-- tree : Display directories as trees (with optional color/HTML output)
+- [tree](http://mama.indstate.edu/users/ice/tree) : Display directories as trees (with optional color/HTML output)
 
 My other utilities and applications (primarily macOS) can be found in my [Brewfile](./homebrew/Brewfile)
