@@ -13,7 +13,7 @@ brew 'gh'                         # GitHub command-line tool
 brew 'glow'                       # markdown reader
 brew 'gnupg'                      # GNU (Pretty Good Privacy)
 brew 'htop'                       # improved top (interactive process viewer)
-brew 'hugo'                       # improved top (interactive process viewer)
+brew 'hugo'                       # Configurable static site generator
 brew 'jq'                         # command-line JSON processor
 brew 'koekeishiya/formulae/skhd'  # hotkey daemon for macOS
 brew 'koekeishiya/formulae/yabai' # tiling window manager
