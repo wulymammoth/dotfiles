@@ -8,3 +8,5 @@ TAGS
 __pycache__/
 node_modules/
 tags
+tags.lock
+tags.temp
