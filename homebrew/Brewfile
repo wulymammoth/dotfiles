@@ -17,6 +17,7 @@ brew 'hugo'                       # Configurable static site generator
 brew 'jq'                         # command-line JSON processor
 brew 'koekeishiya/formulae/skhd'  # hotkey daemon for macOS
 brew 'koekeishiya/formulae/yabai' # tiling window manager
+brew 'ncdu'                       # NCurses Disk Usage
 brew 'neofetch'                   # command-line system info tool
 brew 'newsboat'                   # RSS/Atom feed reader for text terminals
 brew 'ngrep'                      # Network grep
