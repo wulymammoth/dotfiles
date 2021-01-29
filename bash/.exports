@@ -22,7 +22,12 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
   --color pointer:#BF616A,info:#4C566A,spinner:#4C566A,header:#4C566A,prompt:#81A1C1,marker:#EBCB8B'
 
 # homebrew
-HOMEBREW_PREFIX=$(brew --prefix)
+export HOMEBREW_PREFIX="/opt/homebrew"; # `$(brew --prefix)` # BEFORE
+export HOMEBREW_CELLAR="/opt/homebrew/Cellar";
+export HOMEBREW_REPOSITORY="/opt/homebrew";
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}";
+export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:";
+export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
 
 ## neovim
 export EDITOR=nvim
