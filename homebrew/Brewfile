@@ -3,6 +3,7 @@
 
 ## brews
 brew 'asdf'      # language version manager (one to rule them all)
+brew 'bash'      # Bourne again shell
 brew 'bat'       # cat alternative (rust)
 brew 'direnv'    # manage per-directory environment variables
 brew 'entr'      # Run arbitrary commands when files change
