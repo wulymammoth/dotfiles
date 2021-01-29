@@ -37,20 +37,20 @@ brew 'zoxide'    # faster way to navigate the filesystem (stack-based)
 tap 'homebrew/cask'
 cask_args appdir: "~/Applications", require_sha: true
 
-cask 'alacritty'
+cask 'alacritty' # terminal (emulator)
 cask 'brave-browser'
 cask 'discord'
 cask 'docker'
-cask 'font-hack-nerd-font' # preferred font
+cask 'font-hack-nerd-font'
 cask 'graphql-playground'
-cask 'ngrok'
-cask 'postman'
-cask 'rectangle'
+cask 'ngrok'     # tunneling
+cask 'postman'   # HTTP REST client
+cask 'rectangle' # window manager
 cask 'spotify'
 
 ## App Store
 mas '1Password',   id: 1333542190
-mas 'Alfred',      id: 405843582
-mas 'Authy',       id: 1538761576
-mas 'Fantastical', id: 975937182
+mas 'Alfred',      id: 405843582  # a better "Spotlight" w/ dev tool integrations
+mas 'Authy',       id: 1538761576 # MFA
+mas 'Fantastical', id: 975937182  # calendar
 mas 'Slack',       id: 803453959
