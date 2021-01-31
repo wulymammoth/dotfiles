@@ -2,37 +2,38 @@
 ## $ brew bundle
 
 ## brews
-brew 'asdf'      # language version manager (one to rule them all)
-brew 'bash'      # Bourne again shell
-brew 'bat'       # cat alternative (rust)
-brew 'direnv'    # manage per-directory environment variables
-brew 'entr'      # Run arbitrary commands when files change
-brew 'exa'       # Modern replacement for 'ls'
-brew 'fd'        # fast alternative to find
-brew 'fzf'       # CLI fuzzy finder
-brew 'gh'        # GitHub CLI
-brew 'glow'      # markdown reader
-brew 'gnupg'     # GNU (Pretty Good Privacy)
-brew 'htop'      # improved top (interactive process viewer)
-brew 'hugo'      # Configurable static site generator
-brew 'jq'        # CLI JSON processor
-brew 'mas'       # CLI for Mac App Store
-brew 'ncdu'      # NCurses Disk Usage
-brew 'neofetch'  # system info tool CLI
-brew 'newsboat'  # RSS/Atom feed reader for text terminals
-brew 'ngrep'     # Network grep
-brew 'nvim'      # NeoVim
-brew 'pastel'    # CLI to generate, analyze, convert and manipulate colors
-brew 'ripgrep'   # Rust implementation of grep (faster than Ag aka the Silver Searcher)
-brew 'sloccount' # Count lines of code in many languages
-brew 'starship'  # Cross-shell prompt for astronauts
-brew 'stow'      # dotfiles linker
-brew 'tmux'      # terminal multiplexer
-brew 'tree'      # display directories as trees
+brew 'asdf'              # language version manager (one to rule them all)
+brew 'bash'              # Bourne again shell
+brew 'bat'               # cat alternative (rust)
+brew 'direnv'            # manage per-directory environment variables
+brew 'entr'              # Run arbitrary commands when files change
+brew 'exa'               # Modern replacement for 'ls'
+brew 'fd'                # fast alternative to find
+brew 'fzf'               # CLI fuzzy finder
+brew 'gh'                # GitHub CLI
+brew 'glow'              # markdown reader
+brew 'gnupg'             # GNU (Pretty Good Privacy)
+brew 'htop'              # improved top (interactive process viewer)
+brew 'hugo'              # Configurable static site generator
+brew 'jq'                # CLI JSON processor
+brew 'mas'               # CLI for Mac App Store
+brew 'ncdu'              # NCurses Disk Usage
+brew 'neofetch'          # system info tool CLI
+brew 'newsboat'          # RSS/Atom feed reader for text terminals
+brew 'ngrep'             # Network grep
+brew 'nvim'              # NeoVim
+brew 'pastel'            # CLI to generate, analyze, convert and manipulate colors
+brew 'ripgrep'           # Rust implementation of grep (faster than Ag aka the Silver Searcher)
+brew 'sloccount'         # Count lines of code in many languages
+brew 'starship'          # Cross-shell prompt for astronauts
+brew 'stow'              # dotfiles linker
+brew 'terminal-notifier' # Send macOS User Notifications from the command-line
+brew 'tmux'              # terminal multiplexer
+brew 'tree'              # display directories as trees
 brew 'universal-ctags/universal-ctags/universal-ctags'
-brew 'wget'      # Internet file retriever
-brew 'wtfutil'   # The personal information dashboard for your terminal
-brew 'zoxide'    # faster way to navigate the filesystem (stack-based)
+brew 'wget'              # Internet file retriever
+brew 'wtfutil'           # The personal information dashboard for your terminal
+brew 'zoxide'            # faster way to navigate the filesystem (stack-based)
 
 ## casks
 tap 'homebrew/cask'
