@@ -1,6 +1,6 @@
 [alias]
   # delete merged branches
-  dmb = !sh -c 'git branch --merged | egrep -v \"(^\\*|master|dev)\" | xargs git branch -d' -
+  dmb = !sh -c 'git branch --merged | egrep -v \"(^\\*|main|master|dev)\" | xargs git branch -d' -
   # copy current branch name
   cb = rev-parse --abbrev-ref HEAD
   # Clean deleted branches on remote
