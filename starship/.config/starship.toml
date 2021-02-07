@@ -1,3 +1,6 @@
+[character]
+success_symbol = "[⚡︎](yellow)"
+
 [aws]
 symbol = " "
 
