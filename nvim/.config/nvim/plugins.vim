@@ -16,6 +16,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'mattn/emmet-vim'
   Plug 'neoclide/coc.nvim', { 'branch': 'release' }
   Plug 'ntpeters/vim-better-whitespace'
+  Plug 'ojroques/vim-oscyank'
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
   Plug 'scrooloose/nerdcommenter'
   Plug 'sheerun/vim-polyglot'
