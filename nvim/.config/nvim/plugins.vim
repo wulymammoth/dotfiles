@@ -7,7 +7,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'editorconfig/editorconfig-vim'
   Plug 'gkeep/iceberg-dark'
   Plug 'godlygeek/tabular'
-  Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install'  }
+  Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
   Plug 'junegunn/fzf'
   Plug 'junegunn/fzf.vim'
   Plug 'junegunn/goyo.vim'
