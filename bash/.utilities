@@ -1,5 +1,5 @@
 # asdf
-LOCAL_BREW_PREFIX=/opt/homebrew/opt # because $(brew --prefix asdf) is SLOW AS SHIT
+LOCAL_BREW_PREFIX=/usr/local/opt # because $(brew --prefix asdf) is SLOW AS SHIT
 . $LOCAL_BREW_PREFIX/asdf/asdf.sh
 . $LOCAL_BREW_PREFIX/asdf/etc/bash_completion.d/asdf.bash
 
