@@ -168,10 +168,10 @@ call s:HL("PmenuSbar",     -1, -1)
 call s:HL("PmenuThumb",     0,  0)
 
 " spelling
-call s:HL("SpellBad",      -1,  1, 'underline')
-call s:HL("SpellCap",      -1,  2, 'underline')
-call s:HL("SpellLocal",    -1,  3, 'underline')
-call s:HL("SpellRare",     -1,  3, 'underline')
+call s:HL("SpellBad",      -1,  6, 'underline')
+call s:HL("SpellCap",      -1,  6, 'underline')
+call s:HL("SpellLocal",    -1,  6, 'underline')
+call s:HL("SpellRare",     -1,  6, 'underline')
 
 " netrw
 call s:HL("netrwClassify", -1,  7)

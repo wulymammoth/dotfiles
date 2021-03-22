@@ -1,6 +1,4 @@
 {
-  "elixir.pathToElixirLS": "$HOME/.elixir-ls/release/language_server.sh",
-  "elixirLS.dialyzerEnabled": false,
   "python.jediEnabled": false,
   "rust-analyzer.updates.prompt": false,
   "solargraph.completion": true,
