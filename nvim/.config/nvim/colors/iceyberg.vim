@@ -114,7 +114,7 @@ call s:HL("Whitespace",    -1,  8)
 
 " variable types
 call s:HL("Constant",      -1,  1)
-call s:HL("String",        -1,  6)
+call s:HL("String",        -1,  5)
 call s:HL("Character",     -1,  3)
 call s:HL("Number",        -1,  5)
 call s:HL("Boolean",       -1, 11)
