@@ -27,6 +27,7 @@ brew 'ripgrep'           # Rust implementation of grep (faster than Ag aka the S
 brew 'sloccount'         # Count lines of code in many languages
 brew 'starship'          # Cross-shell prompt for astronauts
 brew 'stow'              # dotfiles linker
+brew 'tldr'              # Simplified and community-driven man pages
 brew 'terminal-notifier' # Send macOS User Notifications from the command-line
 brew 'tmux'              # terminal multiplexer
 brew 'tree'              # display directories as trees
