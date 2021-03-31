@@ -1,12 +1,15 @@
+# Homebrew
+BREW_PREFIX=$(brew --prefix)
+
 # asdf
-LOCAL_BREW_PREFIX=$(HOMEBREW_PREFIX) # because $(brew --prefix asdf) is SLOW AS SHIT
-. $LOCAL_BREW_PREFIX/asdf/asdf.sh
-. $LOCAL_BREW_PREFIX/asdf/etc/bash_completion.d/asdf.bash
+ASDF_LOCAL_BREW_PREFIX=$(brew --prefix asdf) # because $(brew --prefix asdf) is SLOW AS SHIT
+. $ASDF_LOCAL_BREW_PREFIX/asdf.sh
+. $ASDF_LOCAL_BREW_PREFIX/etc/bash_completion.d/asdf.bash
 
 # bash completion
 if type brew &>/dev/null; then
-  if [[ -r "${LOCAL_BREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
-    source "${LOCAL_BREW_PREFIX}/etc/profile.d/bash_completion.sh"
+  if [[ -r "${BREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
+    source "${BREW_PREFIX}/etc/profile.d/bash_completion.sh"
   else
     for COMPLETION in "${BREW_PREFIX}/etc/bash_completion.d/"*; do
       [[ -r "$COMPLETION" ]] && source "$COMPLETION"
