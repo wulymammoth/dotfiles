@@ -5,6 +5,7 @@ source $HOME/.config/nvim/plugins.vim
 
 " ----- SETTINGS -----
 autocmd FocusGained * :checktime " check if buffers changed outside of vim - required for `set autoread` and `set autoindent`
+autocmd OptionSet guicursor noautocmd set guicursor=
 
 colorscheme iceyberg
 
