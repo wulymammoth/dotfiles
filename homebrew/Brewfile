@@ -2,40 +2,40 @@
 ## $ brew bundle
 
 ## brews
-brew 'asdf'              # language version manager (one to rule them all)
-brew 'bash'              # Bourne again shell
-brew 'bat'               # cat alternative (rust)
+brew 'asdf'              # language platform (VM) version manager (one to rule them all)
+brew 'bash'              # Bourne Again SHell
+brew 'bat'               # cat alternative (Rust)
 brew 'direnv'            # manage per-directory environment variables
-brew 'entr'              # Run arbitrary commands when files change
-brew 'exa'               # Modern replacement for 'ls'
-brew 'fd'                # fast alternative to find
+brew 'entr'              # run arbitrary commands on file change (watcher)
+brew 'exa'               # modern replacement for 'ls' (Rust)
+brew 'fd'                # fast alternative to find (Rust)
 brew 'fzf'               # CLI fuzzy finder
 brew 'gh'                # GitHub CLI
 brew 'glow'              # markdown reader
-brew 'gnupg'             # GNU (Pretty Good Privacy)
+brew 'gnupg'             # GNU PGP (Pretty Good Privacy)
 brew 'htop'              # improved top (interactive process viewer)
-brew 'hugo'              # Configurable static site generator
+brew 'hugo'              # configurable static site generator
 brew 'jq'                # CLI JSON processor
 brew 'macos-trash'       # macOS-specific trash-cli to move files to trash when using `rm`
 brew 'mas'               # CLI for Mac App Store
-brew 'navi'              # Interactive cheatsheet tool for the command-line
+brew 'navi'              # interactive cheatsheet tool for the command-line
 brew 'ncdu'              # NCurses Disk Usage
 brew 'neofetch'          # system info tool CLI
 brew 'newsboat'          # RSS/Atom feed reader for text terminals
-brew 'ngrep'             # Network grep
-brew 'nvim'              # NeoVim
+brew 'ngrep'             # network grep
+brew 'nvim'              # NeoVim (Vim fork that employs LUA JIT)
 brew 'pastel'            # CLI to generate, analyze, convert and manipulate colors
-brew 'ripgrep'           # Rust implementation of grep (faster than Ag aka the Silver Searcher)
-brew 'sloccount'         # Count lines of code in many languages
-brew 'starship'          # Cross-shell prompt for astronauts
+brew 'ripgrep'           # parallel grep (faster than Ag aka the Silver Searcher implemented in Rust)
+brew 'sloccount'         # count lines of code in many languages
+brew 'starship'          # cross-shell prompt for astronauts
 brew 'stow'              # dotfiles linker
-brew 'terminal-notifier' # Send macOS User Notifications from the command-line
-brew 'tldr'              # Simplified and community-driven man pages
-brew 'tmux'              # terminal multiplexer
+brew 'terminal-notifier' # send macOS user notifications from the command-line
+brew 'tldr'              # simplified and community-driven man pages
+brew 'tmux'              # terminal multiplexer (for session and project management)
 brew 'tree'              # display directories as trees
 brew 'universal-ctags/universal-ctags/universal-ctags'
-brew 'wget'              # Internet file retriever
-brew 'wtfutil'           # The personal information dashboard for your terminal
+brew 'wget'              # internet file retriever
+brew 'wtfutil'           # the personal information dashboard for your terminal
 brew 'zoxide'            # faster way to navigate the filesystem (stack-based)
 
 ## casks
