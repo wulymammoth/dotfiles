@@ -16,6 +16,7 @@ brew 'gnupg'             # GNU (Pretty Good Privacy)
 brew 'htop'              # improved top (interactive process viewer)
 brew 'hugo'              # Configurable static site generator
 brew 'jq'                # CLI JSON processor
+brew 'macos-trash'       # macOS-specific trash-cli to move files to trash when using `rm`
 brew 'mas'               # CLI for Mac App Store
 brew 'navi'              # Interactive cheatsheet tool for the command-line
 brew 'ncdu'              # NCurses Disk Usage
