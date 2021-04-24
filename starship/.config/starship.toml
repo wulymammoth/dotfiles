@@ -15,7 +15,7 @@ disabled = true
 [conda]
 symbol = " "
 
-[docker]
+[docker_context]
 symbol = " "
 
 [elixir]
@@ -29,9 +29,6 @@ symbol = " "
 
 [golang]
 symbol = " "
-
-[haskell]
-symbol = " "
 
 [hg_branch]
 symbol = " "
