@@ -3,4 +3,4 @@ for file in ~/.{exports,exports_local,bashrc,profile,aliases,aliases_work,functi
 done;
 
 # do we need this?
-source "$HOME/.cargo/env"
+. "$HOME/.cargo/env"
