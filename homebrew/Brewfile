@@ -46,7 +46,7 @@ cask 'alacritty' # terminal (emulator)
 cask 'brave-browser'
 cask 'discord'
 cask 'docker'
-cask 'font-hack-nerd-font'
+cask 'homebrew/cask-fonts/font-hack-nerd-font'
 cask 'graphql-playground'
 cask 'ngrok'     # tunneling
 cask 'postman'   # HTTP REST client
