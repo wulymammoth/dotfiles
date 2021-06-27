@@ -20,6 +20,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
   Plug 'scrooloose/nerdcommenter'
   Plug 'sheerun/vim-polyglot'
+  Plug 'tomlion/vim-solidity'
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-obsession'
   Plug 'vim-test/vim-test'
