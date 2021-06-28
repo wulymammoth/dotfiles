@@ -4,11 +4,6 @@ success_symbol = "[⚡︎](yellow)"
 [aws]
 symbol = " "
 
-[battery]
-full_symbol = ""
-charging_symbol = ""
-discharging_symbol = ""
-
 [cmd_duration]
 disabled = true
 
