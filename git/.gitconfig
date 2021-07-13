@@ -33,4 +33,4 @@
   name = wulymammoth
 
 [includeIf "gitdir:~/Desktop/work/"]
-  path = ~/Desktop/work/.gitconfig
+  path = ~/work/.gitconfig
