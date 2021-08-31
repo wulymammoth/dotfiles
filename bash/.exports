@@ -34,7 +34,6 @@ export EDITOR=nvim
 
 ## languages/platforms
 export CARGOBINS_PATH=$HOME/.cargo/bin
-export GOPATH=$HOME/Desktop/go
 export LLVM_PATH=/usr/local/opt/llvm/bin
 
 export PATH=$PATH:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH
