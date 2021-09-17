@@ -1,4 +1,3 @@
-source $HOME/.config/nvim/coc-settings.vim
 source $HOME/.config/nvim/key-mappings.vim
 source $HOME/.config/nvim/language-settings.vim
 source $HOME/.config/nvim/plugins.vim
