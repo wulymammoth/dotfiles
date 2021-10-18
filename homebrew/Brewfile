@@ -11,6 +11,7 @@ brew 'exa'               # modern replacement for 'ls' (Rust)
 brew 'fd'                # fast alternative to find (Rust)
 brew 'fzf'               # CLI fuzzy finder
 brew 'gh'                # GitHub CLI
+brew 'git-diff'          # syntax-highlighting pager for git and diff output
 brew 'glow'              # markdown reader
 brew 'gnupg'             # GNU PGP (Pretty Good Privacy)
 brew 'htop'              # improved top (interactive process viewer)
