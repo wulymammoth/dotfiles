@@ -1,9 +1,11 @@
 [alias]
+  # color words
+  diffw = diff --color-words=.
   # delete merged branches
   dmb = !sh -c 'git branch --merged | egrep -v \"(^\\*|main|master|dev)\" | xargs git branch -d' -
   # copy current branch name
   cb = rev-parse --abbrev-ref HEAD
-  # Clean deleted branches on remote
+  # clean deleted branches on remote
   rpo = remote prune origin
 
 [branch]
@@ -12,15 +14,33 @@
 
 [core]
   excludesfile = ~/.gitignore_global
+  pager = delta
 
 [credential]
   helper = osxkeychain
 
+[delta]
+  navigate = true
+  syntax-theme = ansi
+
+[delta "interactive"]
+  keep-plus-minus-markers = false
+
+[diff]
+  colorMoved = default
+  colorWords = true
+
 [grep]
   lineNumber = true
 
+[include]
+  path = ~/.themes.gitconfig
+
 [init]
   defaultBranch = main
+
+[interactive]
+  diffFilter = delta --color-only --features=interactive
 
 [pull]
   rebase = true
