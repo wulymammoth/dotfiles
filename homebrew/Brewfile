@@ -2,7 +2,6 @@
 ## $ brew bundle
 
 ## brews
-brew 'git-delta'         # Syntax-highlighting pager for git and diff output
 brew 'asdf'              # language platform (VM) version manager (one to rule them all)
 brew 'bash'              # Bourne Again SHell
 brew 'bat'               # cat alternative (Rust)
@@ -12,6 +11,7 @@ brew 'exa'               # modern replacement for 'ls' (Rust)
 brew 'fd'                # fast alternative to find (Rust)
 brew 'fzf'               # CLI fuzzy finder
 brew 'gh'                # GitHub CLI
+brew 'git-delta'         # Syntax-highlighting pager for git and diff output
 brew 'git-diff'          # syntax-highlighting pager for git and diff output
 brew 'glow'              # markdown reader
 brew 'gnupg'             # GNU PGP (Pretty Good Privacy)
