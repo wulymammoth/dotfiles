@@ -47,11 +47,9 @@ cask_args appdir: "~/Applications", require_sha: true
 cask 'alacritty' # terminal (emulator)
 cask 'brave-browser'
 cask 'discord'
-cask 'docker'
 cask 'homebrew/cask-fonts/font-hack-nerd-font'
-cask 'graphql-playground'
+cask 'homebrew/cask/docker'
 cask 'ngrok'     # tunneling
-cask 'postman'   # HTTP REST client
 cask 'rectangle' # window manager
 cask 'spotify'
 
