@@ -9,10 +9,6 @@ if type brew &>/dev/null; then
   fi
 fi
 
-# asdf
-. "$(brew --prefix asdf)/libexec/asdf.sh)"
-. "$(brew --prefix asdf)/etc/bash_completion.d/asdf.bash"
-
 # direnv
 eval "$(direnv hook bash)"
 
