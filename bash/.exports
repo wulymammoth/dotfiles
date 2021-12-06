@@ -15,12 +15,6 @@ export HISTTIMEFORMAT='%F '
 export BAT_THEME="ansi-dark"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
-# fzf
-export FZF_DEFAULT_COMMAND='fd --type f'
-export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
-  --color fg:#D8DEE9,hl:#89b8c2,fg+:#D8DEE9,hl+:#e27878
-  --color pointer:#BF616A,info:#4C566A,spinner:#4C566A,header:#4C566A,prompt:#81A1C1,marker:#EBCB8B'
-
 # homebrew
 export HOMEBREW_PREFIX="/opt/homebrew"; # `$(brew --prefix)` # BEFORE
 export HOMEBREW_CELLAR="/opt/homebrew/Cellar";
@@ -29,8 +23,17 @@ export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}";
 export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:";
 export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
 
-## neovim
+# neovim
 export EDITOR=nvim
+
+# fzf
+export FZF_DEFAULT_COMMAND='fd --type f'
+export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+  --color fg:#D8DEE9,hl:#89b8c2,fg+:#D8DEE9,hl+:#e27878
+  --color pointer:#BF616A,info:#4C566A,spinner:#4C566A,header:#4C566A,prompt:#81A1C1,marker:#EBCB8B'
+
+## ripgrep
+export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 
 ## languages/platforms
 export CARGOBINS_PATH=$HOME/.cargo/bin
@@ -38,8 +41,4 @@ export LLVM_PATH=/usr/local/opt/llvm/bin
 export NODE_OPTIONS=--openssl-legacy-provider # FOR: ganache-cli
 
 export PATH=$PATH:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH
-
-## utilities
-export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
-
 export XDG_CONFIG_HOME=$HOME/.config

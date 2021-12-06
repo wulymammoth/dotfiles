@@ -1,11 +1,3 @@
-# Homebrew
-BREW_PREFIX=$(brew --prefix)
-
-# asdf
-ASDF_LOCAL_BREW_PREFIX=$(brew --prefix asdf) # because $(brew --prefix asdf) is SLOW AS SHIT
-. $ASDF_LOCAL_BREW_PREFIX/asdf.sh
-. $ASDF_LOCAL_BREW_PREFIX/etc/bash_completion.d/asdf.bash
-
 # bash completion
 if type brew &>/dev/null; then
   if [[ -r "${BREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
@@ -16,6 +8,11 @@ if type brew &>/dev/null; then
     done
   fi
 fi
+
+# asdf
+ASDF_LOCAL_BREW_PREFIX=$(brew --prefix asdf) # because $(brew --prefix asdf) is SLOW AS SHIT
+. $ASDF_LOCAL_BREW_PREFIX/asdf.sh
+. $ASDF_LOCAL_BREW_PREFIX/etc/bash_completion.d/asdf.bash
 
 # direnv
 eval "$(direnv hook bash)"
