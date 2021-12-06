@@ -10,9 +10,8 @@ if type brew &>/dev/null; then
 fi
 
 # asdf
-ASDF_LOCAL_BREW_PREFIX=$(brew --prefix asdf) # because $(brew --prefix asdf) is SLOW AS SHIT
-. $ASDF_LOCAL_BREW_PREFIX/asdf.sh
-. $ASDF_LOCAL_BREW_PREFIX/etc/bash_completion.d/asdf.bash
+. "$(brew --prefix asdf)/libexec/asdf.sh)"
+. "$(brew --prefix asdf)/etc/bash_completion.d/asdf.bash"
 
 # direnv
 eval "$(direnv hook bash)"

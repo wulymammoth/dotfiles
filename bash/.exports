@@ -16,12 +16,7 @@ export BAT_THEME="ansi-dark"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 # homebrew
-export HOMEBREW_PREFIX="/opt/homebrew"; # `$(brew --prefix)` # BEFORE
-export HOMEBREW_CELLAR="/opt/homebrew/Cellar";
-export HOMEBREW_REPOSITORY="/opt/homebrew";
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin${PATH+:$PATH}";
-export MANPATH="/opt/homebrew/share/man${MANPATH+:$MANPATH}:";
-export INFOPATH="/opt/homebrew/share/info:${INFOPATH:-}";
+export HOMEBREW_PREFIX="$(brew --prefix)"
 
 # neovim
 export EDITOR=nvim
@@ -40,5 +35,8 @@ export CARGOBINS_PATH=$HOME/.cargo/bin
 export LLVM_PATH=/usr/local/opt/llvm/bin
 export NODE_OPTIONS=--openssl-legacy-provider # FOR: ganache-cli
 
-export PATH=$PATH:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH
+export PATH=$PATH:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH:$HOMEBREW_PREFIX/sbin
 export XDG_CONFIG_HOME=$HOME/.config
+
+## TODO: remove when asdf fixes path issues
+export ASDF_DIR='/usr/local/opt/asdf/libexec'
