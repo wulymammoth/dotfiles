@@ -2,6 +2,7 @@
 ## $ brew bundle
 
 ## brews
+brew 'alacritty'         # terminal (emulator)
 brew 'asdf'              # language platform (VM) version manager (one to rule them all)
 brew 'bash'              # Bourne Again SHell
 brew 'bat'               # cat alternative (Rust)
@@ -41,12 +42,11 @@ brew 'zoxide'            # faster way to navigate the filesystem (stack-based)
 
 ## casks
 tap 'homebrew/cask'
-cask_args appdir: "~/Applications", require_sha: true
+cask_args appdir: '/Applications', require_sha: true
 
-cask 'alacritty' # terminal (emulator)
 cask 'brave-browser'
 cask 'discord'
-cask 'homebrew/cask-fonts/font-hack-nerd-font'
+cask 'font-hack-nerd-font'
 cask 'homebrew/cask/docker'
 cask 'ngrok'     # tunneling
 cask 'rectangle' # window manager
