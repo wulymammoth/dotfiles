@@ -3,7 +3,6 @@
 
 ## brews
 brew 'alacritty'         # terminal (emulator)
-brew 'asdf'              # language platform (VM) version manager (one to rule them all)
 brew 'bash'              # Bourne Again SHell
 brew 'bat'               # cat alternative (Rust)
 brew 'direnv'            # manage per-directory environment variables
