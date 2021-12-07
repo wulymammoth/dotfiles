@@ -23,7 +23,6 @@ brew 'mas'               # CLI for Mac App Store
 brew 'navi'              # interactive cheatsheet tool for the command-line
 brew 'ncdu'              # NCurses Disk Usage
 brew 'neofetch'          # system info tool CLI
-brew 'newsboat'          # RSS/Atom feed reader for text terminals
 brew 'ngrep'             # network grep
 brew 'nvim'              # NeoVim (Vim fork that employs LUA JIT)
 brew 'pastel'            # CLI to generate, analyze, convert and manipulate colors
