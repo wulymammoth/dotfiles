@@ -1,6 +1,6 @@
-# asdf (installed using bash & git instructions [not Homebrew // issues with M1])
-. $HOME/.asdf/asdf.sh
-. $HOME/.asdf/completions/asdf.bash
+# asdf
+. $(brew --prefix asdf)/libexec/asdf.sh
+. $(brew --prefix asdf)/etc/bash_completion.d/asdf.bash
 
 # bash completion
 if type brew &>/dev/null; then
