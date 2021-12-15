@@ -1,7 +1,3 @@
-# asdf (installed using bash & git instructions [not Homebrew // issues with M1])
-. $HOME/.asdf/asdf.sh
-. $HOME/.asdf/completions/asdf.bash
-
 # bash completion
 if type brew &>/dev/null; then
   if [[ -r "${BREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
