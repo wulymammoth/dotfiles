@@ -1,6 +1,14 @@
 ### to install...
 ## $ brew bundle
 
+tap 'ethereum/ethereum'
+tap 'golangci/tap'
+tap 'homebrew/bundle'
+tap 'homebrew/cask'
+tap 'homebrew/cask-fonts'
+tap 'homebrew/core'
+tap 'universal-ctags/universal-ctags'
+
 ## brews
 brew 'alacritty'         # terminal (emulator)
 brew 'bash'              # Bourne Again SHell
@@ -27,27 +35,27 @@ brew 'nvim'              # NeoVim (Vim fork that employs LUA JIT)
 brew 'pastel'            # CLI to generate, analyze, convert and manipulate colors
 brew 'ripgrep'           # parallel grep (faster than Ag aka the Silver Searcher implemented in Rust)
 brew 'sloccount'         # count lines of code in many languages
+brew 'solidity'          # Contract-oriented programming language
 brew 'starship'          # cross-shell prompt for astronauts
 brew 'stow'              # dotfiles linker
 brew 'terminal-notifier' # send macOS user notifications from the command-line
 brew 'tldr'              # simplified and community-driven man pages
 brew 'tmux'              # terminal multiplexer (for session and project management)
 brew 'tree'              # display directories as trees
-brew 'universal-ctags/universal-ctags/universal-ctags'
+brew 'universal-ctags/universal-ctags/universal-ctags', args: ['HEAD']
 brew 'wget'              # internet file retriever
 brew 'wtfutil'           # the personal information dashboard for your terminal
 brew 'zoxide'            # faster way to navigate the filesystem (stack-based)
 
 ## casks
-tap 'homebrew/cask'
-cask_args appdir: '/Applications', require_sha: true
+cask_args appdir: '~/Applications', require_sha: true
 
 cask 'brave-browser'
 cask 'discord'
 cask 'font-hack-nerd-font'
 cask 'homebrew/cask/docker'
-cask 'ngrok'     # tunneling
-cask 'rectangle' # window manager
+cask 'ngrok'             # tunneling
+cask 'rectangle'         # window manager
 cask 'spotify'
 
 ## App Store
@@ -56,3 +64,4 @@ mas 'Alfred',      id: 405843582  # a better "Spotlight" w/ dev tool integration
 mas 'Authy',       id: 1538761576 # MFA
 mas 'Fantastical', id: 975937182  # calendar
 mas 'Slack',       id: 803453959
+mas 'Xcode',       id: 497799835
