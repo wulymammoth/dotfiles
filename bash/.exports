@@ -38,3 +38,6 @@ export NODE_OPTIONS=--openssl-legacy-provider # FOR: ganache-cli
 
 export PATH=$PATH:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH:$HOMEBREW_PREFIX/sbin
 export XDG_CONFIG_HOME=$HOME/.config
+
+## FIXME: remove when asdf fixes path issues
+export ASDF_DIR="$(brew --prefix asdf)"

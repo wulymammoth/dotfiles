@@ -89,6 +89,10 @@ let g:goyo_height = 100
 let g:goyo_linenr = 1
 let g:goyo_width  = 120
 
+" ----- markdown preview -----
+let g:mkdp_browser          = 'brave'
+let g:mkdp_echo_preview_url = 1
+
 " ----- ripgrep -----
 nmap <Leader>/ :Rg<SPACE>
 " search for word under visual selection
