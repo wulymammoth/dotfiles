@@ -14,14 +14,17 @@ brew 'alacritty'         # terminal (emulator)
 brew 'bash'              # Bourne Again SHell
 brew 'bat'               # cat alternative (Rust)
 brew 'direnv'            # manage per-directory environment variables
+brew 'dog'               # Command-line DNS client
 brew 'entr'              # run arbitrary commands on file change (watcher)
 brew 'exa'               # modern replacement for 'ls' (Rust)
 brew 'fd'                # fast alternative to find (Rust)
 brew 'fzf'               # CLI fuzzy finder
 brew 'gh'                # GitHub CLI
 brew 'git-delta'         # Syntax-highlighting pager for git and diff output
+brew 'glances'           # Alternative to top/htop
 brew 'glow'              # markdown reader
 brew 'gnupg'             # GNU PGP (Pretty Good Privacy)
+brew 'gping'             # Ping, but with a graph
 brew 'htop'              # improved top (interactive process viewer)
 brew 'hugo'              # configurable static site generator
 brew 'jq'                # CLI JSON processor
