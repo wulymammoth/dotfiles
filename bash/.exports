@@ -35,8 +35,9 @@ export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 export CARGOBINS_PATH=$HOME/.cargo/bin
 export LLVM_PATH=/usr/local/opt/llvm/bin
 export NODE_OPTIONS=--openssl-legacy-provider # FOR: ganache-cli
+ASDF_SHIMS=$(asdf where python)\/shims
 
-export PATH=$PATH:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH:$HOMEBREW_PREFIX/sbin
+export PATH=$PATH:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH:$HOMEBREW_PREFIX/sbin:$ASDF_SHIMS
 export XDG_CONFIG_HOME=$HOME/.config
 
 ## FIXME: remove when asdf fixes path issues
