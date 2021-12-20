@@ -9,6 +9,9 @@ brew "asdf"
 brew "bash"
 brew "bat"
 brew "direnv"
+brew "docutils"
+brew "dog"
+brew "dust"
 brew "entr"
 brew "ethereum"
 brew "exa"
@@ -16,23 +19,26 @@ brew "fd"
 brew "fzf"
 brew "gh"
 brew "git-delta"
+brew "glances"
+brew "glib"
 brew "glow"
 brew "gnupg"
 brew "go"
-brew "htop"
+brew "gping"
 brew "hugo"
+brew "hyperfine"
+brew "libheif"
 brew "imagemagick"
 brew "jq"
 brew "macos-trash"
 brew "mas"
 brew "navi"
-brew "ncdu"
 brew "neofetch"
 brew "neovim"
-brew "newsboat"
 brew "ngrep"
 brew "pastel"
 brew "ripgrep"
+brew "ruby"
 brew "sloccount"
 brew "solidity"
 brew "starship"
@@ -53,7 +59,11 @@ cask "font-hack-nerd-font"
 cask "graphql-playground", args: { appdir: "~/Applications" }
 cask "postman", args: { appdir: "~/Applications" }
 cask "rectangle", args: { appdir: "~/Applications" }
-mas "Alfred", id: 405843582
 mas "Fantastical", id: 975937182
+mas "ImageOne", id: 1237328432
+mas "Kindle", id: 405399194
+mas "NordVPN", id: 905953485
 mas "Slack", id: 803453959
+mas "Telegram", id: 747648890
+mas "WhatsApp", id: 1147396723
 mas "Xcode", id: 497799835
