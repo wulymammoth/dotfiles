@@ -1,15 +1,11 @@
-source $HOME/.config/nvim/coc-settings.vim
 source $HOME/.config/nvim/key-mappings.vim
-source $HOME/.config/nvim/language-settings.vim
-source $HOME/.config/nvim/plugins.vim
 
 " ----- SETTINGS -----
+
 autocmd FocusGained * :checktime " check if buffers changed outside of vim - required for `set autoread` and `set autoindent`
 autocmd OptionSet guicursor noautocmd set guicursor=
 
 colorscheme iceyberg
-
-filetype plugin indent on " detection for filetype plugin and indentation
 
 set background=dark
 set clipboard+=unnamedplus   " To ALWAYS use the clipboard for ALL operations (instead of registers)
@@ -45,4 +41,32 @@ set tabstop=2                " Render tabs using n number of spaces
 set tags=tags,./tags,$HOME/tags
 set title                    " Set the title of the iTerm tab
 
-syntax enable
+call plug#begin('~/.config/nvim/plugged')
+  Plug 'airblade/vim-gitgutter'
+  Plug 'airblade/vim-rooter'
+  Plug 'bling/vim-airline'
+  Plug 'cocopon/iceberg.vim'
+  Plug 'dhruvasagar/vim-table-mode'
+  Plug 'editorconfig/editorconfig-vim'
+  Plug 'gkeep/iceberg-dark'
+  Plug 'godlygeek/tabular'
+  Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+  Plug 'junegunn/fzf'
+  Plug 'junegunn/fzf.vim'
+  Plug 'junegunn/goyo.vim'
+  Plug 'junegunn/vim-easy-align'
+  Plug 'ludovicchabant/vim-gutentags'
+  Plug 'mattn/emmet-vim'
+  Plug 'neoclide/coc.nvim', { 'branch': 'release' }
+  Plug 'ntpeters/vim-better-whitespace'
+  Plug 'ojroques/vim-oscyank'
+  Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
+  Plug 'scrooloose/nerdcommenter'
+  Plug 'sheerun/vim-polyglot'
+  Plug 'tomlion/vim-solidity'
+  Plug 'tpope/vim-fugitive'
+  Plug 'tpope/vim-obsession'
+  Plug 'vim-test/vim-test'
+  Plug 'vimwiki/vimwiki'
+call plug#end()
+
