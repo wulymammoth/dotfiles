@@ -68,6 +68,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'ntpeters/vim-better-whitespace'
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
   Plug 'ojroques/vim-oscyank'
+  Plug 'onsails/lspkind-nvim'
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
   Plug 'scrooloose/nerdcommenter'
   Plug 'tpope/vim-fugitive'
