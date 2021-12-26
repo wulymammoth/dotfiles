@@ -25,6 +25,7 @@ set lazyredraw               " Aid in slow redrawing because of 'cursorline'
 set linespace=1              " Line spacing
 set mouse=a                  " Allow mouse usage in all modes
 set noerrorbells             " No beeps
+set nofoldenable             " disable code folding by default
 set nohlsearch               " Highlight search (OFF)
 set nojoinspaces             " Prevents insertion of two spaces after punctuation on line join (J)
 set noswapfile               " Don't make backups before overwriting
