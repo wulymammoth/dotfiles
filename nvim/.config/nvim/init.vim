@@ -1,5 +1,40 @@
 source $HOME/.config/nvim/keybinds.vim
 
+" ------ PLUGINS -----
+
+call plug#begin('~/.config/nvim/plugged')
+  Plug 'airblade/vim-gitgutter'
+  Plug 'airblade/vim-rooter'
+  Plug 'bling/vim-airline'
+  Plug 'cocopon/iceberg.vim'
+  Plug 'dhruvasagar/vim-table-mode'
+  Plug 'editorconfig/editorconfig-vim'
+  Plug 'gkeep/iceberg-dark'
+  Plug 'hrsh7th/cmp-buffer'
+  Plug 'hrsh7th/cmp-cmdline'
+  Plug 'hrsh7th/cmp-nvim-lsp'
+  Plug 'hrsh7th/cmp-path'
+  Plug 'hrsh7th/nvim-cmp'
+  Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+  Plug 'junegunn/fzf'
+  Plug 'junegunn/fzf.vim'
+  Plug 'junegunn/goyo.vim'
+  Plug 'junegunn/vim-easy-align'
+  Plug 'ludovicchabant/vim-gutentags'
+  Plug 'mattn/emmet-vim'
+  Plug 'neovim/nvim-lspconfig'
+  Plug 'ntpeters/vim-better-whitespace'
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+  Plug 'ojroques/vim-oscyank'
+  Plug 'onsails/lspkind-nvim'
+  Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
+  Plug 'scrooloose/nerdcommenter'
+  Plug 'tpope/vim-fugitive'
+  Plug 'tpope/vim-obsession'
+  Plug 'vim-test/vim-test'
+  Plug 'williamboman/nvim-lsp-installer'
+call plug#end()
+
 " ----- SETTINGS -----
 
 autocmd FocusGained * :checktime " check if buffers changed outside of vim - required for `set autoread` and `set autoindent`
@@ -44,36 +79,3 @@ set tabstop=2                " Render tabs using n number of spaces
 set tags=tags,./tags,$HOME/tags
 set termguicolors            " true color
 set title                    " Set the title of the iTerm tab
-
-call plug#begin('~/.config/nvim/plugged')
-  Plug 'airblade/vim-gitgutter'
-  Plug 'airblade/vim-rooter'
-  Plug 'bling/vim-airline'
-  Plug 'cocopon/iceberg.vim'
-  Plug 'dhruvasagar/vim-table-mode'
-  Plug 'editorconfig/editorconfig-vim'
-  Plug 'gkeep/iceberg-dark'
-  Plug 'hrsh7th/cmp-buffer'
-  Plug 'hrsh7th/cmp-cmdline'
-  Plug 'hrsh7th/cmp-nvim-lsp'
-  Plug 'hrsh7th/cmp-path'
-  Plug 'hrsh7th/nvim-cmp'
-  Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
-  Plug 'junegunn/fzf'
-  Plug 'junegunn/fzf.vim'
-  Plug 'junegunn/goyo.vim'
-  Plug 'junegunn/vim-easy-align'
-  Plug 'ludovicchabant/vim-gutentags'
-  Plug 'mattn/emmet-vim'
-  Plug 'neovim/nvim-lspconfig'
-  Plug 'ntpeters/vim-better-whitespace'
-  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-  Plug 'ojroques/vim-oscyank'
-  Plug 'onsails/lspkind-nvim'
-  Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
-  Plug 'scrooloose/nerdcommenter'
-  Plug 'tpope/vim-fugitive'
-  Plug 'tpope/vim-obsession'
-  Plug 'vim-test/vim-test'
-  Plug 'williamboman/nvim-lsp-installer'
-call plug#end()
