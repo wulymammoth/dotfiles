@@ -49,7 +49,6 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'dhruvasagar/vim-table-mode'
   Plug 'editorconfig/editorconfig-vim'
   Plug 'gkeep/iceberg-dark'
-  Plug 'godlygeek/tabular'
   Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
   Plug 'junegunn/fzf'
   Plug 'junegunn/fzf.vim'
@@ -57,16 +56,12 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'junegunn/vim-easy-align'
   Plug 'ludovicchabant/vim-gutentags'
   Plug 'mattn/emmet-vim'
-  Plug 'neoclide/coc.nvim', { 'branch': 'release' }
   Plug 'ntpeters/vim-better-whitespace'
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
   Plug 'ojroques/vim-oscyank'
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
   Plug 'scrooloose/nerdcommenter'
-  Plug 'sheerun/vim-polyglot'
-  Plug 'tomlion/vim-solidity'
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-obsession'
   Plug 'vim-test/vim-test'
-  Plug 'vimwiki/vimwiki'
 call plug#end()
-
