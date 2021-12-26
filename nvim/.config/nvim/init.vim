@@ -1,4 +1,4 @@
-source $HOME/.config/nvim/key-mappings.vim
+source $HOME/.config/nvim/keybinds.vim
 
 " ----- SETTINGS -----
 
