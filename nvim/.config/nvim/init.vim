@@ -59,6 +59,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'junegunn/vim-easy-align'
   Plug 'ludovicchabant/vim-gutentags'
   Plug 'mattn/emmet-vim'
+  Plug 'neovim/nvim-lspconfig'
   Plug 'ntpeters/vim-better-whitespace'
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
   Plug 'ojroques/vim-oscyank'
@@ -67,4 +68,5 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-obsession'
   Plug 'vim-test/vim-test'
+  Plug 'williamboman/nvim-lsp-installer'
 call plug#end()
