@@ -52,6 +52,11 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'dhruvasagar/vim-table-mode'
   Plug 'editorconfig/editorconfig-vim'
   Plug 'gkeep/iceberg-dark'
+  Plug 'hrsh7th/cmp-buffer'
+  Plug 'hrsh7th/cmp-cmdline'
+  Plug 'hrsh7th/cmp-nvim-lsp'
+  Plug 'hrsh7th/cmp-path'
+  Plug 'hrsh7th/nvim-cmp'
   Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
   Plug 'junegunn/fzf'
   Plug 'junegunn/fzf.vim'
