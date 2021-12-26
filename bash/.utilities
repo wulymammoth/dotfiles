@@ -1,9 +1,3 @@
-## asdf
-# FIXME: remove when asdf fixes path issues
-. $ASDF_DIR/libexec/asdf.sh
-# FIXME: asdf.sh (above) reloads ASDF_DIR and completions aren't under libexec
-. /opt/homebrew/opt/asdf/etc/bash_completion.d/asdf.bash
-
 # bash completion
 if type brew &>/dev/null; then
   if [[ -r "${BREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then

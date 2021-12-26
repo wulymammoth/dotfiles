@@ -15,6 +15,8 @@ set cursorline               " Highlight cursor position (row/line)
 set encoding=utf-8
 set expandtab                " Insert space chars for TAB
 set fileencoding=utf-8
+set foldexpr=nvim_treesitter#foldexpr()
+set foldmethod=expr
 set hidden                   " Avoid persisting closed buffers
 set ignorecase               " Case-insensitive searches
 set inccommand=split         " Shows the effects of a command incrementally, as you type
