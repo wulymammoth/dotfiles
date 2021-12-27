@@ -1,4 +1,3 @@
-let g:airline#extensions#fzf#enabled          = 1
 let g:airline#extensions#lsp#enabled          = 1
 let g:airline#extensions#tabline#enabled      = 1
 let g:airline#extensions#tabline#formatter    = 'short_path'

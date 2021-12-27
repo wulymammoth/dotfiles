@@ -18,13 +18,16 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'hrsh7th/nvim-cmp'
   Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
   Plug 'junegunn/fzf'
-  Plug 'junegunn/fzf.vim'
   Plug 'junegunn/goyo.vim'
   Plug 'junegunn/vim-easy-align'
+  Plug 'kyazdani42/nvim-web-devicons'
   Plug 'ludovicchabant/vim-gutentags'
   Plug 'mattn/emmet-vim'
   Plug 'neovim/nvim-lspconfig'
   Plug 'ntpeters/vim-better-whitespace'
+  Plug 'nvim-lua/plenary.nvim'
+  Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+  Plug 'nvim-telescope/telescope.nvim'
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
   Plug 'ojroques/vim-oscyank'
   Plug 'onsails/lspkind-nvim'
