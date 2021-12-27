@@ -81,3 +81,4 @@ set tabstop=2                " Render tabs using n number of spaces
 set tags=tags,./tags,$HOME/tags
 set termguicolors            " true color
 set title                    " Set the title of the iTerm tab
+set updatetime=100
