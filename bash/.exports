@@ -16,6 +16,7 @@ export BAT_THEME="ansi-dark"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 # homebrew
+export PATH='/opt/homebrew/bin:$PATH'
 export HOMEBREW_PREFIX="$(brew --prefix)"
 
 # neovim
@@ -36,5 +37,5 @@ CARGOBINS_PATH=$HOME/.cargo/bin
 LLVM_PATH=/usr/local/opt/llvm/bin
 NODE_OPTIONS=--openssl-legacy-provider # FOR: ganache-cli
 
-export PATH="$ASDF_SHIMS:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH:$HOMEBREW_PREFIX/sbin:/opt/homebrew/bin:$PATH"
+export PATH="$ASDF_SHIMS:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH:$HOMEBREW_PREFIX/sbin:$HOMEBREW_PREFIX/bin:$PATH"
 export XDG_CONFIG_HOME=$HOME/.config
