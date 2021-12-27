@@ -2,6 +2,10 @@
 export BASH_SILENCE_DEPRECATION_WARNING=1 # stop asking to default to zsh
 export CLICOLOR=1
 
+# bat (colorizing manual)
+export BAT_THEME="ansi-dark"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
 # HISTORY
 # erasedups all previous  lines  matching  the  current remove before save
 # do not record commands that begin with pressing up/down or space
@@ -11,13 +15,8 @@ export HISTIGNORE='&:ls:[bf]g:exit:pwd:clear:mount:umount' # :[ \t]* # space pre
 export HISTSIZE=     # unlimited
 export HISTTIMEFORMAT='%F '
 
-# bat (colorizing manual)
-export BAT_THEME="ansi-dark"
-export MANPAGER="sh -c 'col -bx | bat -l man -p'"
-
 # homebrew
-export PATH='/opt/homebrew/bin:$PATH'
-export HOMEBREW_PREFIX="$(brew --prefix)"
+HOMEBREW_PREFIX='/opt/homebrew'
 
 # neovim
 export EDITOR=nvim
@@ -32,10 +31,10 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 
 ## languages/platforms
-ASDF_SHIMS=$(asdf where python)/bin
+ASDF_SHIMS='${HOMEBREW_PREFIX}/bin/asdf where python)/bin'
 CARGOBINS_PATH=$HOME/.cargo/bin
 LLVM_PATH=/usr/local/opt/llvm/bin
 NODE_OPTIONS=--openssl-legacy-provider # FOR: ganache-cli
 
-export PATH="$ASDF_SHIMS:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH:$HOMEBREW_PREFIX/sbin:$HOMEBREW_PREFIX/bin:$PATH"
+export PATH="$ASDF_SHIMS:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH:/opt/homebrew/sbin:/opt/homebrew/bin:$PATH"
 export XDG_CONFIG_HOME=$HOME/.config
