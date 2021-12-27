@@ -34,6 +34,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
   Plug 'saadparwaiz1/cmp_luasnip'
   Plug 'scrooloose/nerdcommenter'
+  Plug 'thesis/vim-solidity' " needed until treesitter parser exists
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-obsession'
   Plug 'vim-test/vim-test'
