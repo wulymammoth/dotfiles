@@ -3,6 +3,7 @@ source $HOME/.config/nvim/keybinds.vim
 " ------ PLUGINS -----
 
 call plug#begin('~/.config/nvim/plugged')
+  Plug 'L3MON4D3/LuaSnip'
   Plug 'airblade/vim-gitgutter'
   Plug 'airblade/vim-rooter'
   Plug 'bling/vim-airline'
@@ -28,6 +29,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'ojroques/vim-oscyank'
   Plug 'onsails/lspkind-nvim'
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
+  Plug 'saadparwaiz1/cmp_luasnip'
   Plug 'scrooloose/nerdcommenter'
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-obsession'
