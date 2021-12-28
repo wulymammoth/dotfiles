@@ -99,7 +99,7 @@ call s:HL("ModeMsg",       -1,  8, 'bold')
 
 " visual aid
 call s:HL("MatchParen",    -1, -1)
-call s:HL("Visual",         3,  0)
+call s:HL("Visual",         2,  0)
 call s:HL("VisualNOS",      0, -1)
 call s:HL("NonText",       -1,  8)
 
