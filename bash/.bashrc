@@ -7,8 +7,11 @@ eval $(dircolors ~/.dir_colors)
 . $HOME/.asdf/asdf.sh
 . $HOME/.asdf/completions/asdf.bash
 
-# zoxide
-eval "$(zoxide init bash)"
+# git
+. /etc/bash_completion.d/git
+
+## starship prompt
+eval "$(starship init bash)"
 
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"

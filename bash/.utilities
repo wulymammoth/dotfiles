@@ -1,2 +1,5 @@
-# fzf
+## fzf
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+## zoxide
+eval "$(zoxide init bash)"

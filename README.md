@@ -21,3 +21,34 @@ I'm using [GNU Stow](https://www.gnu.org/software/stow/) to symlink my dotfiles 
 - [tree](http://mama.indstate.edu/users/ice/tree) : Display directories as trees (with optional color/HTML output)
 
 My other utilities and applications (primarily macOS) can be found in my [Brewfile](./homebrew/Brewfile)
+
+## installation
+
+**Linux**:
+
+- asdf
+  `git clone https://github.com/asdf-vm/asdf.git ~/.asdf`
+
+- bat
+  `cargo install --locked bat`
+
+- dircolors
+  `sudo yum install coreutils`
+
+- exa
+  `cargo install exa`
+
+- fd
+  `cargo install fd-find`
+
+- git-delta
+  `cargo install git-delta`
+
+- starship
+  `sh -c "$(curl -fsSL https://starship.rs/install.sh)"`
+
+- vim-plug (nvim)
+  ```
+  sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+  ```
