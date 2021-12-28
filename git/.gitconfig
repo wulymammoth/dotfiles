@@ -52,5 +52,5 @@
   email = 861147+wulymammoth@users.noreply.github.com
   name = wulymammoth
 
-[includeIf "gitdir:~/Desktop/work/"]
+[includeIf "gitdir:~/work/"]
   path = ~/work/.gitconfig
