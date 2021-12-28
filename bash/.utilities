@@ -13,11 +13,17 @@ if type brew &>/dev/null; then
   fi
 fi
 
+# activate NORD theme (directory colors for utilities such as ls, tree, fd)
+eval $(gdircolors ~/.dir_colors)
+
 ## direnv
 eval "$(direnv hook bash)"
 
 ## fzf
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# PROMPT
+eval "$(starship init bash)"
 
 ## zoxide
 eval "$(zoxide init bash)"
