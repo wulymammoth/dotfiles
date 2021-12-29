@@ -80,6 +80,7 @@ set showmatch                " Show matching brackets
 set smartcase                " Searching with capital letters
 set smartindent
 set softtabstop=2
+set splitright               " open new splits to the right (instead of the left [default])
 set switchbuf=useopen,usetab " switch to already open buffer
 set tabstop=2                " Render tabs using n number of spaces
 set tags=tags,./tags,$HOME/tags
