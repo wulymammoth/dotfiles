@@ -23,6 +23,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'ludovicchabant/vim-gutentags'
   Plug 'mattn/emmet-vim'
+  Plug 'mickael-menu/zk-nvim'
   Plug 'neovim/nvim-lspconfig'
   Plug 'ntpeters/vim-better-whitespace'
   Plug 'nvim-lua/plenary.nvim'
