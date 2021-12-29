@@ -1,15 +1,18 @@
-tap "ethereum/ethereum"
+tap "github/gh"
 tap "golangci/tap"
 tap "homebrew/bundle"
 tap "homebrew/cask"
 tap "homebrew/cask-fonts"
+tap "homebrew/cask-versions"
 tap "homebrew/core"
+tap "teamookla/speedtest"
+tap "tj/mmake", "https://github.com/tj/mmake.git"
 tap "universal-ctags/universal-ctags"
 brew "asdf"
 brew "bash"
+brew "bash-completion@2"
 brew "bat"
 brew "direnv"
-brew "docutils"
 brew "dog"
 brew "dust"
 brew "entr"
@@ -18,6 +21,7 @@ brew "exa"
 brew "fd"
 brew "fzf"
 brew "gh"
+brew "git"
 brew "git-delta"
 brew "glances"
 brew "glib"
@@ -38,7 +42,6 @@ brew "neovim"
 brew "ngrep"
 brew "pastel"
 brew "ripgrep"
-brew "ruby"
 brew "sloccount"
 brew "solidity"
 brew "starship"
@@ -55,10 +58,11 @@ cask "alacritty", args: { appdir: "~/Applications" }
 cask "brave-browser", args: { appdir: "~/Applications" }
 cask "discord", args: { appdir: "~/Applications" }
 cask "docker", args: { appdir: "~/Applications" }
-cask "font-hack-nerd-font"
 cask "graphql-playground", args: { appdir: "~/Applications" }
 cask "postman", args: { appdir: "~/Applications" }
 cask "rectangle", args: { appdir: "~/Applications" }
+mas "1Password 7", id: 1333542190
+mas "Amphetamine", id: 937984704
 mas "Fantastical", id: 975937182
 mas "ImageOne", id: 1237328432
 mas "Kindle", id: 405399194
@@ -66,4 +70,3 @@ mas "NordVPN", id: 905953485
 mas "Slack", id: 803453959
 mas "Telegram", id: 747648890
 mas "WhatsApp", id: 1147396723
-mas "Xcode", id: 497799835
