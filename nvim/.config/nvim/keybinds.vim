@@ -1,7 +1,7 @@
 " ----- LEADER -----
 let g:mapleader="\<Space>"
 let g:maplocalleader = ","
-let localleader=","
+let maplocalleader=","
 let mapleader="\<Space>"
 
 " ----- file paths -----

@@ -1,23 +1,29 @@
-# asdf
-. $(brew --prefix asdf)/libexec/asdf.sh
-. $(brew --prefix asdf)/etc/bash_completion.d/asdf.bash
+## asdf
+. "$(brew --prefix)/opt/asdf/libexec/asdf.sh"
+. "$(brew --prefix)/opt/asdf/etc/bash_completion.d/asdf.bash"
 
 # bash completion
 if type brew &>/dev/null; then
-  if [[ -r "${BREW_PREFIX}/etc/profile.d/bash_completion.sh" ]]; then
-    source "${BREW_PREFIX}/etc/profile.d/bash_completion.sh"
+  if [[ -r "$(brew --prefix)/etc/profile.d/bash_completion.sh" ]]; then
+    source "$(brew --prefix)/etc/profile.d/bash_completion.sh"
   else
-    for COMPLETION in "${BREW_PREFIX}/etc/bash_completion.d/"*; do
+    for COMPLETION in "$(brew --prefix)/etc/bash_completion.d/"*; do
       [[ -r "$COMPLETION" ]] && source "$COMPLETION"
     done
   fi
 fi
 
-# direnv
+# activate NORD theme (directory colors for utilities such as ls, tree, fd)
+eval $(gdircolors ~/.dir_colors)
+
+## direnv
 eval "$(direnv hook bash)"
 
-# fzf
+## fzf
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-# zoxide
+# PROMPT
+eval "$(starship init bash)"
+
+## zoxide
 eval "$(zoxide init bash)"

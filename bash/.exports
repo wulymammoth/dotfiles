@@ -1,40 +1,53 @@
-## bash-specific
+## ----- bash-specific -----
+
 export BASH_SILENCE_DEPRECATION_WARNING=1 # stop asking to default to zsh
 export CLICOLOR=1
 
-# HISTORY
 # erasedups all previous  lines  matching  the  current remove before save
 # do not record commands that begin with pressing up/down or space
 export HISTCONTROL=ignoreboth:erasedups
 export HISTFILESIZE=9999
 export HISTIGNORE='&:ls:[bf]g:exit:pwd:clear:mount:umount' # :[ \t]* # space prefix ignores comment
-export HISTSIZE=     # unlimited
+export HISTSIZE= # unlimited
 export HISTTIMEFORMAT='%F '
 
-# bat (colorizing manual)
+## ----- bat (colorizing manual) -----
+
 export BAT_THEME="ansi-dark"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
-# homebrew
-export PATH="/opt/homebrew/bin:$PATH"
-export HOMEBREW_PREFIX="$(brew --prefix)"
+## ----- homebrew -----
 
-# neovim
+HOMEBREW_PREFIX='/opt/homebrew'
+
+## ----- neovim -----
+
 export EDITOR=nvim
 
-# fzf
+## ------ fzf ------
+
 export FZF_DEFAULT_COMMAND='fd --type f'
 export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
   --color fg:#D8DEE9,hl:#89b8c2,fg+:#D8DEE9,hl+:#e27878
   --color pointer:#BF616A,info:#4C566A,spinner:#4C566A,header:#4C566A,prompt:#81A1C1,marker:#EBCB8B'
 
-## ripgrep
+## ----- ripgrep -----
+
 export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 
-## languages/platforms
-export CARGOBINS_PATH=$HOME/.cargo/bin
-export LLVM_PATH=/usr/local/opt/llvm/bin
-export NODE_OPTIONS=--openssl-legacy-provider # FOR: ganache-cli
+## ------ languages/platforms ------
 
-export PATH=$PATH:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH:$HOMEBREW_PREFIX/sbin
+# asdf
+ASDF_SHIMS='${HOMEBREW_PREFIX}/bin/asdf where python)/bin'
+# rust
+CARGOBINS_PATH=$HOME/.cargo/bin
+# llvm
+LLVM_PATH=/usr/local/opt/llvm/bin
+# ganache-cli
+NODE_OPTIONS=--openssl-legacy-provider
+
+## ----- PATH VAR -----
+export PATH="$ASDF_SHIMS:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH:/opt/homebrew/sbin:/opt/homebrew/bin:$PATH"
+
+## ----- XDG -----
 export XDG_CONFIG_HOME=$HOME/.config
