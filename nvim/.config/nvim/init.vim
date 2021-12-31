@@ -9,7 +9,6 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'cocopon/iceberg.vim'
   Plug 'dhruvasagar/vim-table-mode'
   Plug 'editorconfig/editorconfig-vim'
-  Plug 'gkeep/iceberg-dark'
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/cmp-cmdline'
   Plug 'hrsh7th/cmp-nvim-lsp'
