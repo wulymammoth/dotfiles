@@ -1,3 +1,5 @@
+autocmd User TelescopePreviewerLoaded setlocal wrap
+
 " Find files using Telescope command-line sugar.
 nnoremap <leader>f/ <cmd>Telescope grep_string<cr>
 nnoremap <leader>fb <cmd>Telescope buffers<cr>
