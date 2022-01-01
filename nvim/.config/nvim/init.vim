@@ -17,6 +17,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
   Plug 'junegunn/fzf'
   Plug 'junegunn/goyo.vim'
+  Plug 'junegunn/limelight.vim'
   Plug 'junegunn/vim-easy-align'
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'lewis6991/gitsigns.nvim'
