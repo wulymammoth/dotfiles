@@ -8,6 +8,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'cocopon/iceberg.vim'
   Plug 'dhruvasagar/vim-table-mode'
   Plug 'editorconfig/editorconfig-vim'
+  Plug 'folke/twilight.nvim'
   Plug 'folke/which-key.nvim'
   Plug 'folke/zen-mode.nvim'
   Plug 'hrsh7th/cmp-buffer'
@@ -18,7 +19,6 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
   Plug 'junegunn/fzf'
   Plug 'junegunn/goyo.vim'
-  Plug 'junegunn/limelight.vim'
   Plug 'junegunn/vim-easy-align'
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'lewis6991/gitsigns.nvim'
