@@ -4,7 +4,6 @@ source $HOME/.config/nvim/keybinds.vim
 
 call plug#begin('~/.config/nvim/plugged')
   Plug 'L3MON4D3/LuaSnip'
-  Plug 'airblade/vim-gitgutter'
   Plug 'airblade/vim-rooter'
   Plug 'cocopon/iceberg.vim'
   Plug 'dhruvasagar/vim-table-mode'
@@ -15,25 +14,29 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'hrsh7th/cmp-path'
   Plug 'hrsh7th/nvim-cmp'
   Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
-  Plug 'nvim-lualine/lualine.nvim'
   Plug 'junegunn/fzf'
   Plug 'junegunn/goyo.vim'
   Plug 'junegunn/vim-easy-align'
   Plug 'kyazdani42/nvim-web-devicons'
+  Plug 'lewis6991/gitsigns.nvim'
   Plug 'ludovicchabant/vim-gutentags'
+  Plug 'lukas-reineke/indent-blankline.nvim'
   Plug 'mattn/emmet-vim'
   Plug 'mickael-menu/zk-nvim'
   Plug 'neovim/nvim-lspconfig'
   Plug 'ntpeters/vim-better-whitespace'
+  Plug 'numToStr/Comment.nvim'
   Plug 'nvim-lua/plenary.nvim'
+  Plug 'nvim-lualine/lualine.nvim'
   Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
   Plug 'nvim-telescope/telescope.nvim'
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+  Plug 'nvim-treesitter/nvim-treesitter-refactor'
   Plug 'ojroques/vim-oscyank'
   Plug 'onsails/lspkind-nvim'
+  Plug 'p00f/nvim-ts-rainbow'
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
   Plug 'saadparwaiz1/cmp_luasnip'
-  Plug 'scrooloose/nerdcommenter'
   Plug 'thesis/vim-solidity' " needed until treesitter parser exists
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-obsession'
