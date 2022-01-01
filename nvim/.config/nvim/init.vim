@@ -9,6 +9,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'dhruvasagar/vim-table-mode'
   Plug 'editorconfig/editorconfig-vim'
   Plug 'folke/which-key.nvim'
+  Plug 'folke/zen-mode.nvim'
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/cmp-cmdline'
   Plug 'hrsh7th/cmp-nvim-lsp'
