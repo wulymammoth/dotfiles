@@ -37,7 +37,6 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'nvim-treesitter/nvim-treesitter-refactor'
   Plug 'ojroques/vim-oscyank'
   Plug 'onsails/lspkind-nvim'
-  Plug 'p00f/nvim-ts-rainbow'
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
   Plug 'saadparwaiz1/cmp_luasnip'
   Plug 'thesis/vim-solidity' " needed until treesitter parser exists
