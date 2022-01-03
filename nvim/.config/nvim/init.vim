@@ -1,7 +1,4 @@
-source $HOME/.config/nvim/keybinds.vim
-
 " ------ PLUGINS -----
-
 call plug#begin('~/.config/nvim/plugged')
   Plug 'L3MON4D3/LuaSnip'
   Plug 'airblade/vim-rooter'
