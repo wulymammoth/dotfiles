@@ -20,6 +20,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'junegunn/fzf'
   Plug 'junegunn/goyo.vim'
   Plug 'junegunn/vim-easy-align'
+  Plug 'kosayoda/nvim-lightbulb' " display lightbulb icon when a code-action is available
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'lewis6991/gitsigns.nvim'
   Plug 'ludovicchabant/vim-gutentags'
