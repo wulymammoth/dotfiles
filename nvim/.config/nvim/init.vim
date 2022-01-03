@@ -5,46 +5,45 @@ source $HOME/.config/nvim/keybinds.vim
 call plug#begin('~/.config/nvim/plugged')
   Plug 'L3MON4D3/LuaSnip'
   Plug 'airblade/vim-rooter'
-  Plug 'cocopon/iceberg.vim'
+  Plug 'cocopon/iceberg.vim' " theme
   Plug 'dhruvasagar/vim-table-mode'
   Plug 'editorconfig/editorconfig-vim'
-  Plug 'folke/twilight.nvim'
-  Plug 'folke/which-key.nvim'
-  Plug 'folke/zen-mode.nvim'
+  Plug 'folke/twilight.nvim' " dim inactive segments of code
+  Plug 'folke/which-key.nvim' "pop-up with available key-bindings
+  Plug 'folke/zen-mode.nvim' " distraction-free coding
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/cmp-cmdline'
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/cmp-path'
-  Plug 'hrsh7th/nvim-cmp'
+  Plug 'hrsh7th/nvim-cmp' " auto-completion engine
   Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
-  Plug 'junegunn/fzf'
-  Plug 'junegunn/goyo.vim'
+  Plug 'junegunn/fzf' " general-purpose command-line fuzzy-finder
   Plug 'junegunn/vim-easy-align'
   Plug 'kosayoda/nvim-lightbulb' " display lightbulb icon when a code-action is available
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'lewis6991/gitsigns.nvim'
-  Plug 'ludovicchabant/vim-gutentags'
-  Plug 'lukas-reineke/indent-blankline.nvim'
-  Plug 'mattn/emmet-vim'
-  Plug 'mickael-menu/zk-nvim'
-  Plug 'neovim/nvim-lspconfig'
-  Plug 'ntpeters/vim-better-whitespace'
+  Plug 'ludovicchabant/vim-gutentags' "tag file management in vim
+  Plug 'lukas-reineke/indent-blankline.nvim' " indentation guides
+  Plug 'mattn/emmet-vim' " abbreviation expansion (webdev)
+  Plug 'mickael-menu/zk-nvim' " plugin for zk (Zettelkasten)
+  Plug 'neovim/nvim-lspconfig' " common configs for nvim's LSP client
+  Plug 'ntpeters/vim-better-whitespace' " highlight and strip whitespace
   Plug 'numToStr/Comment.nvim'
-  Plug 'nvim-lua/plenary.nvim'
-  Plug 'nvim-lualine/lualine.nvim'
-  Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
-  Plug 'nvim-telescope/telescope.nvim'
-  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
-  Plug 'nvim-treesitter/nvim-treesitter-refactor'
-  Plug 'ojroques/vim-oscyank'
-  Plug 'onsails/lspkind-nvim'
+  Plug 'nvim-lua/plenary.nvim' " common Lua functions (dependency for many nvim plugins)
+  Plug 'nvim-lualine/lualine.nvim' " status line
+  Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' } " C port of fzf
+  Plug 'nvim-telescope/telescope.nvim' " list fuzzy-finder
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'} " nvim treesitter interface // parse-generation and incremental parsing library
+  Plug 'nvim-treesitter/nvim-treesitter-refactor' " clutch plugin providing clutch things like renaming all variables of the same name and type (powered by treesitter)
+  Plug 'ojroques/vim-oscyank' " a vim / neovim plugin to copy text to the system clipboard from anywhere using the ansi osc52 sequence
+  Plug 'onsails/lspkind-nvim' " vsc-like pictograms in nvim
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
   Plug 'saadparwaiz1/cmp_luasnip'
   Plug 'thesis/vim-solidity' " needed until treesitter parser exists
   Plug 'tpope/vim-fugitive'
-  Plug 'tpope/vim-obsession'
+  Plug 'tpope/vim-obsession' " coupled with tmux-resurrect for saving and restoring vim sessions
   Plug 'vim-test/vim-test'
-  Plug 'williamboman/nvim-lsp-installer'
+  Plug 'williamboman/nvim-lsp-installer' " manage LSP servers
 call plug#end()
 
 " ----- SETTINGS -----
