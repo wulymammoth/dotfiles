@@ -46,9 +46,11 @@ CARGOBINS_PATH=$HOME/.cargo/bin
 LLVM_PATH=/usr/local/opt/llvm/bin
 # ganache-cli
 NODE_OPTIONS=--openssl-legacy-provider
+# python binaries - installed via `$ python3 -m pip install --user <package>`
+PYTHON_BINS=$HOME/.local/bin
 
 ## ----- PATH VAR -----
-export PATH="$ASDF_SHIMS:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH:/opt/homebrew/sbin:/opt/homebrew/bin:$PATH"
+export PATH="$ASDF_SHIMS:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH:/opt/homebrew/sbin:/opt/homebrew/bin:$PYTHON_BINS:$PATH"
 
 ## ----- XDG -----
 export XDG_CONFIG_HOME=$HOME/.config
