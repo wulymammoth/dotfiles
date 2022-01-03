@@ -39,7 +39,7 @@ export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 ## ------ languages/platforms ------
 
 # asdf
-ASDF_SHIMS='${HOMEBREW_PREFIX}/bin/asdf where python)/bin'
+ASDF_SHIMS=$HOME/.asdf/shims
 # rust
 CARGOBINS_PATH=$HOME/.cargo/bin
 # llvm
