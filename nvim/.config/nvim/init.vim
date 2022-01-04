@@ -5,6 +5,8 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'cocopon/iceberg.vim' " theme
   Plug 'dhruvasagar/vim-table-mode'
   Plug 'editorconfig/editorconfig-vim'
+  Plug 'folke/todo-comments.nvim' " extending trouble.nvim with highlight and search for TODOs
+  Plug 'folke/trouble.nvim' " pretty list for displaying diagnostics
   Plug 'folke/twilight.nvim' " dim inactive segments of code
   Plug 'folke/which-key.nvim' "pop-up with available key-bindings
   Plug 'folke/zen-mode.nvim' " distraction-free coding
@@ -22,6 +24,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'ludovicchabant/vim-gutentags' "tag file management in vim
   Plug 'lukas-reineke/indent-blankline.nvim' " indentation guides
   Plug 'mattn/emmet-vim' " abbreviation expansion (webdev)
+  Plug 'mfussenegger/nvim-dap' " debug adapter protocol (DAP) client
   Plug 'mickael-menu/zk-nvim' " plugin for zk (Zettelkasten)
   Plug 'neovim/nvim-lspconfig' " common configs for nvim's LSP client
   Plug 'ntpeters/vim-better-whitespace' " highlight and strip whitespace
@@ -36,6 +39,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'onsails/lspkind-nvim' " vsc-like pictograms in nvim
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
   Plug 'saadparwaiz1/cmp_luasnip'
+  Plug 'simrat39/rust-tools.nvim' " extending rust analyzer with additional functionality
   Plug 'thesis/vim-solidity' " needed until treesitter parser exists
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-obsession' " coupled with tmux-resurrect for saving and restoring vim sessions
