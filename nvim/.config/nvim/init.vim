@@ -5,6 +5,8 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'cocopon/iceberg.vim' " theme
   Plug 'dhruvasagar/vim-table-mode'
   Plug 'editorconfig/editorconfig-vim'
+  Plug 'folke/todo-comments.nvim'
+  Plug 'folke/trouble.nvim'
   Plug 'folke/twilight.nvim' " dim inactive segments of code
   Plug 'folke/which-key.nvim' "pop-up with available key-bindings
   Plug 'folke/zen-mode.nvim' " distraction-free coding
