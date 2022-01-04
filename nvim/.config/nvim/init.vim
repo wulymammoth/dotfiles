@@ -22,6 +22,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'ludovicchabant/vim-gutentags' "tag file management in vim
   Plug 'lukas-reineke/indent-blankline.nvim' " indentation guides
   Plug 'mattn/emmet-vim' " abbreviation expansion (webdev)
+  Plug 'mfussenegger/nvim-dap'
   Plug 'mickael-menu/zk-nvim' " plugin for zk (Zettelkasten)
   Plug 'neovim/nvim-lspconfig' " common configs for nvim's LSP client
   Plug 'ntpeters/vim-better-whitespace' " highlight and strip whitespace
@@ -36,6 +37,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'onsails/lspkind-nvim' " vsc-like pictograms in nvim
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
   Plug 'saadparwaiz1/cmp_luasnip'
+  Plug 'simrat39/rust-tools.nvim'
   Plug 'thesis/vim-solidity' " needed until treesitter parser exists
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-obsession' " coupled with tmux-resurrect for saving and restoring vim sessions
