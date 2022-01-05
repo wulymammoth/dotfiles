@@ -86,4 +86,4 @@ set title                    " Set the title of the iTerm tab
 syntax enable
 
 " ----- GLOBAL SETTINGS -----
-let g:coq_settings = { 'auto_start': v:true } " autostart the fast AF auto-completion engine
+let g:coq_settings = { 'auto_start': 'shut-up' } " autostart the fast AF auto-completion engine
