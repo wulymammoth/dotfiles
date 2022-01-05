@@ -22,14 +22,12 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'mfussenegger/nvim-dap' " debug adapter protocol (DAP) client
   Plug 'mickael-menu/zk-nvim' " plugin for zk (Zettelkasten)
   Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'}
-  Plug 'ms-jpq/coq_nvim'
+  Plug 'ms-jpq/coq_nvim' " fast AF auto-completion engine
   Plug 'neovim/nvim-lspconfig' " common configs for nvim's LSP client
   Plug 'ntpeters/vim-better-whitespace' " highlight and strip whitespace
   Plug 'numToStr/Comment.nvim'
   Plug 'nvim-lua/plenary.nvim' " common Lua functions (dependency for many nvim plugins)
   Plug 'nvim-lualine/lualine.nvim' " status line
-  Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' } " C port of fzf
-  Plug 'nvim-telescope/telescope.nvim' " list fuzzy-finder
   Plug 'ojroques/vim-oscyank' " a vim / neovim plugin to copy text to the system clipboard from anywhere using the ansi osc52 sequence
   Plug 'onsails/lspkind-nvim' " vsc-like pictograms in nvim
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
@@ -84,3 +82,6 @@ set tags=tags,./tags,$HOME/tags
 set title                    " Set the title of the iTerm tab
 
 syntax enable
+
+" ----- GLOBAL SETTINGS -----
+let g:coq_settings = { 'auto_start': v:true } " autostart the fast AF auto-completion engine
