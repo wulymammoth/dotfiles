@@ -12,10 +12,10 @@ lsp_installer.settings {
 
 -- diagnostics
 vim.diagnostic.config {
-    float        = { border = 'single' },
-    signs        = true,
-    underline    = false,
-    virtual_text = false,
+  float        = { border = 'single' },
+  signs        = true,
+  underline    = false,
+  virtual_text = false,
 }
 
 local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
@@ -59,20 +59,20 @@ local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protoco
 -- Register a handler that will be called for all installed servers.
 -- Alternatively, you may also register handlers on specific server instances instead (see example below).
 lsp_installer.on_server_ready(function(server)
-    local opts = { capabilities = capabilities, flags = { debounce_text_changes = 150 }, on_attach = on_attach }
+  local opts = { capabilities = capabilities, flags = { debounce_text_changes = 150 }, on_attach = on_attach }
 
-    if server.name == 'sumneko_lua' then
-      opts.settings = {
-        Lua = {
-          diagnostics = { globals = { 'vim' } },
-          runtime     = { version = 'LuaJIT' },
-          telemetry   = { enable = false },
-          workspace   = { library = vim.api.nvim_get_runtime_file("", true) },
-        },
-      }
-    end
+  if server.name == 'sumneko_lua' then
+    opts.settings = {
+      Lua = {
+        diagnostics = { globals = { 'vim' } },
+        runtime     = { version = 'LuaJIT' },
+        telemetry   = { enable = false },
+        workspace   = { library = vim.api.nvim_get_runtime_file("", true) },
+      },
+    }
+  end
 
-    -- This setup() function is exactly the same as lspconfig's setup function.
-    -- Refer to https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
-    server:setup(opts)
+  -- This setup() function is exactly the same as lspconfig's setup function.
+  -- Refer to https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
+  server:setup(opts)
 end)
