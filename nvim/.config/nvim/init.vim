@@ -1,6 +1,44 @@
-source $HOME/.config/nvim/key-mappings.vim
-source $HOME/.config/nvim/language-settings.vim
-source $HOME/.config/nvim/plugins.vim
+" ----- PLUGINS -----
+call plug#begin('~/.config/nvim/plugged')
+  Plug 'L3MON4D3/LuaSnip'
+  Plug 'airblade/vim-rooter'
+  Plug 'cocopon/iceberg.vim'
+  Plug 'dhruvasagar/vim-table-mode'
+  Plug 'editorconfig/editorconfig-vim'
+  Plug 'folke/trouble.nvim' " pretty list for displaying diagnostics
+  Plug 'folke/twilight.nvim' " dim inactive segments of code
+  Plug 'folke/which-key.nvim' "pop-up with available key-bindings
+  Plug 'folke/zen-mode.nvim' " distraction-free coding
+  Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
+  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+  Plug 'junegunn/fzf.vim'
+  Plug 'junegunn/vim-easy-align'
+  Plug 'kosayoda/nvim-lightbulb' " display lightbulb icon when a code-action is available
+  Plug 'kyazdani42/nvim-web-devicons'
+  Plug 'lewis6991/gitsigns.nvim'
+  Plug 'ludovicchabant/vim-gutentags'
+  Plug 'lukas-reineke/indent-blankline.nvim' " indentation guides
+  Plug 'mattn/emmet-vim'
+  Plug 'mfussenegger/nvim-dap' " debug adapter protocol (DAP) client
+  Plug 'mickael-menu/zk-nvim' " plugin for zk (Zettelkasten)
+  Plug 'ms-jpq/coq.artifacts', {'branch': 'artifacts'}
+  Plug 'ms-jpq/coq_nvim'
+  Plug 'neovim/nvim-lspconfig' " common configs for nvim's LSP client
+  Plug 'ntpeters/vim-better-whitespace' " highlight and strip whitespace
+  Plug 'numToStr/Comment.nvim'
+  Plug 'nvim-lua/plenary.nvim' " common Lua functions (dependency for many nvim plugins)
+  Plug 'nvim-lualine/lualine.nvim' " status line
+  Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' } " C port of fzf
+  Plug 'nvim-telescope/telescope.nvim' " list fuzzy-finder
+  Plug 'ojroques/vim-oscyank' " a vim / neovim plugin to copy text to the system clipboard from anywhere using the ansi osc52 sequence
+  Plug 'onsails/lspkind-nvim' " vsc-like pictograms in nvim
+  Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
+  Plug 'simrat39/rust-tools.nvim' " extending rust analyzer with additional functionality
+  Plug 'tpope/vim-fugitive'
+  Plug 'tpope/vim-obsession' " coupled with tmux-resurrect for saving and restoring vim sessions
+  Plug 'vim-test/vim-test'
+  Plug 'williamboman/nvim-lsp-installer'
+call plug#end()
 
 " ----- SETTINGS -----
 autocmd FocusGained * :checktime " check if buffers changed outside of vim - required for `set autoread` and `set autoindent`
