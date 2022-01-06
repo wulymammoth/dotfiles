@@ -11,7 +11,7 @@ eval $(dircolors ~/.dir_colors)
 . /etc/bash_completion.d/git
 
 ## starship prompt
-eval "$(starship init bash)"
+# eval "$(starship init bash)"
 
 # Generated for envman. Do not edit.
 [ -s "$HOME/.config/envman/load.sh" ] && source "$HOME/.config/envman/load.sh"
