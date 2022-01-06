@@ -1,3 +1,6 @@
+-- Use a sharp border with `FloatBorder` highlights
+vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'double' })
+
 local lsp_installer = require('nvim-lsp-installer')
 
 lsp_installer.settings {
