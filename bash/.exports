@@ -44,8 +44,6 @@ ASDF_SHIMS=$HOME/.asdf/shims
 CARGOBINS_PATH=$HOME/.cargo/bin
 # llvm
 LLVM_PATH=/usr/local/opt/llvm/bin
-# ganache-cli
-NODE_OPTIONS=--openssl-legacy-provider
 # python binaries - installed via `$ python3 -m pip install --user <package>`
 PYTHON_BINS=$HOME/.local/bin
 
