@@ -1,16 +1,19 @@
 require'lualine'.setup {
   options = {
-    icons_enabled = true,
-    theme = 'iceberg',
+    icons_enabled        = true,
+    theme                = 'iceberg',
     component_separators = { left = '', right = ''},
-    section_separators = { left = '', right = ''},
-    disabled_filetypes = {},
+    section_separators   = { left = '', right = ''},
+    disabled_filetypes   = {},
     always_divide_middle = true,
   },
   sections = {
-    lualine_a = { 'mode' },
-    lualine_b = {'branch', 'diff', 'diagnostics'},
+    lualine_a = {'mode'},
+    lualine_b = {'branch'},
     lualine_c = {
+      {'filename'},
+      {'diff'},
+      {'diagnostics'},
       {
         'buffers',
         show_filename_only = true,   -- Shows shortened relative path when set to false
@@ -23,10 +26,10 @@ require'lualine'.setup {
         -- the value of `max_length` dynamically.
         filetype_names = {
           TelescopePrompt = 'Telescope',
-          dashboard = 'Dashboard',
-          packer = 'Packer',
-          fzf = 'FZF',
-          alpha = 'Alpha'
+          alpha           = 'Alpha',
+          dashboard       = 'Dashboard',
+          fzf             = 'FZF',
+          packer          = 'Packer',
         }, -- Shows specific buffer name for that filetype ( { `filetype` = `buffer_name`, ... } )
         buffers_color = {
           -- Same values like general color option can be used here.
@@ -42,7 +45,7 @@ require'lualine'.setup {
   inactive_sections = {
     lualine_a = {},
     lualine_b = {},
-    lualine_c = {'filename'},
+    lualine_c = { {'filename', path = 1} },
     lualine_x = {'location'},
     lualine_y = {},
     lualine_z = {}
