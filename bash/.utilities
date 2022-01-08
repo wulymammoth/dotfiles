@@ -1,5 +1,7 @@
-## fzf
-[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+## completions
+for COMPLETION in "/etc/bash_completion.d/"*; do
+  [[ -r "$COMPLETION" ]] && source "$COMPLETION"
+done
 
 ## zoxide
 eval "$(zoxide init bash)"
