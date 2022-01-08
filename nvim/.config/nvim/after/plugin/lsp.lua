@@ -1,31 +1,47 @@
 -- Use a sharp border with `FloatBorder` highlights
 vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'double' })
 
-local coq = require("coq")
-local lsp_installer = require('nvim-lsp-installer')
-
-lsp_installer.settings {
-  ui = {
-    icons = {
-      server_installed   = "✓",
-      server_pending     = "➜",
-      server_uninstalled = "✗"
-    }
-  }
-}
-
 -- diagnostics
 vim.diagnostic.config {
-    float        = { border = 'single' },
-    signs        = true,
-    underline    = false,
-    virtual_text = false,
+  float        = { border = 'single' },
+  signs        = true,
+  underline    = false,
+  virtual_text = false,
 }
 
-local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
-for type, icon in pairs(signs) do
+for type, icon in pairs({ Error = " ", Warn = " ", Hint = " ", Info = " " }) do
   local hl = "DiagnosticSign" .. type
   vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+end
+
+local servers = {
+  -- 'solargraph',
+  -- 'sumneko_lua',
+}
+local lspconfig = require('lspconfig')
+for _, server in ipairs(servers) do
+  local opts = require("coq").lsp_ensure_capabilities{
+    flags = { debounce_text_changes = 150 },
+    on_attach = on_attach
+  }
+
+  if server.name == 'solargraph' then
+    opts.bundlerPath = os.getenv('ASDF_DIR/shims')
+    opts.commandPath = os.getenv('RUBYBINS_PATH')
+  end
+
+  if server.name == 'sumneko_lua' then
+    opts.settings = {
+      Lua = {
+        diagnostics = { globals = { 'vim' } },
+        runtime     = { version = 'LuaJIT' },
+        telemetry   = { enable = false },
+        workspace   = { library = vim.api.nvim_get_runtime_file("", true) },
+      },
+    }
+  end
+
+  lspconfig[server].setup(opts)
 end
 
 local on_attach = function(_client, bufnr)
@@ -57,27 +73,3 @@ local on_attach = function(_client, bufnr)
   buf_set_keymap('n', '<space>q', '<cmd>lua vim.diagnostic.setloclist()<CR>', opts)
   buf_set_keymap('n', '<space>f', '<cmd>lua vim.lsp.buf.formatting()<CR>', opts)
 end
-
--- Register a handler that will be called for all installed servers.
--- Alternatively, you may also register handlers on specific server instances instead (see example below).
-lsp_installer.on_server_ready(function(server)
-  local opts = coq.lsp_ensure_capabilities({
-    flags = { debounce_text_changes = 150 },
-    on_attach = on_attach
-  })
-
-  if server.name == 'sumneko_lua' then
-    opts.settings = {
-      Lua = {
-        diagnostics = { globals = { 'vim' } },
-        runtime     = { version = 'LuaJIT' },
-        telemetry   = { enable = false },
-        workspace   = { library = vim.api.nvim_get_runtime_file("", true) },
-      },
-    }
-  end
-
-  -- This setup() function is exactly the same as lspconfig's setup function.
-  -- Refer to https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
-  server:setup(opts)
-end)
