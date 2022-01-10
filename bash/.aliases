@@ -1,6 +1,7 @@
 alias cat='bat'
 alias desk='cd ~/Desktop'
 alias dotfiles='cd ~/dotfiles'
+alias hist='history | tail -n 9'
 alias ls='exa -1a --group-directories-first --icons'
 alias til='cd ~/til'
 alias vim='nvim'
