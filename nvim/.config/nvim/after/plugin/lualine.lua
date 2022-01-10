@@ -1,11 +1,11 @@
 require'lualine'.setup {
   options = {
-    icons_enabled = true,
-    theme = 'iceberg',
-    component_separators = { left = '', right = ''},
-    section_separators = { left = '', right = ''},
-    disabled_filetypes = {},
     always_divide_middle = true,
+    component_separators = { left = '', right = ''},
+    disabled_filetypes   = {},
+    icons_enabled        = true,
+    section_separators   = { left = '', right = ''},
+    theme                = 'iceberg',
   },
   sections = {
     lualine_a = {'mode'},
