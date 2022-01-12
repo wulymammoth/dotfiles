@@ -2,7 +2,6 @@
 call plug#begin('~/.config/nvim/plugged')
   Plug 'L3MON4D3/LuaSnip'
   Plug 'airblade/vim-rooter'
-  Plug 'cocopon/iceberg.vim'
   Plug 'dhruvasagar/vim-table-mode'
   Plug 'editorconfig/editorconfig-vim'
   Plug 'folke/trouble.nvim' " pretty list for displaying diagnostics
