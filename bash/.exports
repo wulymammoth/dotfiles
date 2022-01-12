@@ -36,19 +36,21 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 
 export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 
+## ----- XDG -----
+export XDG_CONFIG_HOME=$HOME/.config
+
 ## ------ languages/platforms ------
 
 # asdf
 ASDF_SHIMS=$HOME/.asdf/shims
 # rust
-CARGOBINS_PATH=$HOME/.cargo/bin
+CARGO_BINS=$HOME/.cargo/bin
+# deno
+DENO_BINS=$(asdf where deno)/.deno/bin
 # llvm
 LLVM_PATH=/usr/local/opt/llvm/bin
 # python binaries - installed via `$ python3 -m pip install --user <package>`
 PYTHON_BINS=$HOME/.local/bin
 
 ## ----- PATH VAR -----
-export PATH="$ASDF_SHIMS:$CARGOBINS_PATH:$GOPATH/bin:$LLVM_PATH:/opt/homebrew/sbin:/opt/homebrew/bin:$PYTHON_BINS:$PATH"
-
-## ----- XDG -----
-export XDG_CONFIG_HOME=$HOME/.config
+export PATH="$ASDF_SHIMS:$CARGO_BINS:$DENO_BINS:$GOPATH/bin:$LLVM_PATH:$PYTHON_BINS:$PATH:/opt/homebrew/sbin:/opt/homebrew/bin"
