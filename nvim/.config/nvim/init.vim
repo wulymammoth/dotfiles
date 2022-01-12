@@ -27,6 +27,8 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'numToStr/Comment.nvim'
   Plug 'nvim-lua/plenary.nvim' " common Lua functions (dependency for many nvim plugins)
   Plug 'nvim-lualine/lualine.nvim' " status line
+  Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+  Plug 'nvim-treesitter/nvim-treesitter-refactor'
   Plug 'ojroques/vim-oscyank' " a vim / neovim plugin to copy text to the system clipboard from anywhere using the ansi osc52 sequence
   Plug 'onsails/lspkind-nvim' " vsc-like pictograms in nvim
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
