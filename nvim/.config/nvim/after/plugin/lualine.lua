@@ -1,17 +1,17 @@
 require'lualine'.setup {
   options = {
-    always_divide_middle = true,
-    component_separators = { left = '', right = ''},
-    disabled_filetypes   = {},
     icons_enabled        = true,
+    theme                = 'auto',
+    component_separators = { left = '', right = ''},
     section_separators   = { left = '', right = ''},
-    theme                = 'iceberg',
+    disabled_filetypes   = {},
+    always_divide_middle = true,
   },
   sections = {
     lualine_a = {'mode'},
     lualine_b = {'branch'},
     lualine_c = {
-      {'filename', path = 1},
+      {'filename'},
       {'diff'},
       {'diagnostics'},
       {
