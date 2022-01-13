@@ -18,7 +18,10 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 ## ----- homebrew -----
 
-HOMEBREW_PREFIX='/opt/homebrew'
+BREW_PREFIX='/opt/homebrew'
+BREW_BINS='/opt/homebrew/bin:/usr/local/bin'
+BREW_SBINS='/opt/homebrew/sbin:/usr/local/sbin'
+BREW_PATHS="${BREW_SBINS}:${BREW_BINS}"
 
 ## ----- neovim -----
 
@@ -53,4 +56,4 @@ LLVM_PATH=/usr/local/opt/llvm/bin
 PYTHON_BINS=$HOME/.local/bin
 
 ## ----- PATH VAR -----
-export PATH="$ASDF_SHIMS:$CARGO_BINS:$DENO_BINS:$GOPATH/bin:$LLVM_PATH:$PYTHON_BINS:$PATH:/opt/homebrew/sbin:/opt/homebrew/bin"
+export PATH="$ASDF_SHIMS:$CARGO_BINS:$DENO_BINS:$GOPATH/bin:$LLVM_PATH:$PYTHON_BINS:$BREW_PATHS:$PATH"
