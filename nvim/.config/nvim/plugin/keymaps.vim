@@ -15,3 +15,7 @@ nmap <Leader>ffy :let @*=expand("%:p") <bar> :echo @*<CR>
 " Shift + J/K moves selected lines down/up in visual mode
 vnoremap J :m '>+1<CR>gv=gv
 vnoremap K :m '<-2<CR>gv=gv
+
+" <C-c> issue with todo-comment plugin
+" (https://github.com/folke/todo-comments.nvim/issues/73)
+inoremap <C-c> <Esc>
