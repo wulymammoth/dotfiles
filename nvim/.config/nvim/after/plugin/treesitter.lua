@@ -14,7 +14,8 @@ require'nvim-treesitter.configs'.setup {
   },
 
   indent = {
-    enable = false
+    disable = {'python'},
+    enable  = false
   },
 
   refactor = {
