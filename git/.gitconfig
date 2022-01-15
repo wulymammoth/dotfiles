@@ -1,12 +1,8 @@
 [alias]
-  # color words
-  diffw = diff --color-words=.
-  # delete merged branches
-  dmb = !sh -c 'git branch --merged | egrep -v \"(^\\*|main|master|dev)\" | xargs git branch -d' -
-  # copy current branch name
-  cb = rev-parse --abbrev-ref HEAD
-  # clean deleted branches on remote
-  rpo = remote prune origin
+  cb = rev-parse --abbrev-ref HEAD # copy current branch name
+  diffw = diff --color-words=. # color words
+  dmb = !sh -c 'git branch --merged | egrep -v \"(^\\*|main|master|dev)\" | xargs git branch -d' - # delete merged branches
+  rpo = remote prune origin # clean deleted branches on remote
 
 [branch]
   autoSetupRebase = always
@@ -24,7 +20,7 @@
   syntax-theme = ansi
 
 [delta "interactive"]
-  keep-plus-minus-markers = false
+  keep-plus-minus-markers = true
 
 [diff]
   colorMoved = default
