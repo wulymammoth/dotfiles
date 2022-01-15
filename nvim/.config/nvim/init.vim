@@ -54,6 +54,14 @@ autocmd OptionSet guicursor noautocmd set guicursor=
 
 colorscheme iceyberg
 
+" python
+" autocmd Filetype python inoremap # X<C-h>#
+let g:python2_host_prog = expand('~/.asdf/shims/python')
+let g:python3_host_prog = expand('~/.asdf/shims/python3')
+
+" ruby
+let g:ruby_host_prog = expand('~/.asdf/shims/ruby')
+
 set background=dark
 set clipboard+=unnamedplus   " To ALWAYS use the clipboard for ALL operations (instead of registers)
 set completeopt=longest,menuone,preview
