@@ -20,7 +20,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'kosayoda/nvim-lightbulb' " display lightbulb icon when a code-action is available
   Plug 'kyazdani42/nvim-web-devicons'
   Plug 'lewis6991/gitsigns.nvim'
-  Plug 'ludovicchabant/vim-gutentags' "tag file management in vim
+  Plug 'ludovicchabant/vim-gutentags' " tag file management in vim
   Plug 'lukas-reineke/indent-blankline.nvim' " indentation guides
   Plug 'mattn/emmet-vim' " abbreviation expansion (webdev)
   Plug 'mfussenegger/nvim-dap' " debug adapter protocol (DAP) client
