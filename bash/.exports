@@ -49,7 +49,7 @@ ASDF_SHIMS=$HOME/.asdf/shims
 # rust
 CARGO_BINS=$HOME/.cargo/bin
 # deno
-DENO_BINS=$(asdf where deno)/.deno/bin
+DENO_BINS=$(/opt/homebrew/opt/asdf/libexec/bin/asdf where deno)/.deno/bin
 # llvm
 LLVM_PATH=/usr/local/opt/llvm/bin
 # python binaries - installed via `$ python3 -m pip install --user <package>`
