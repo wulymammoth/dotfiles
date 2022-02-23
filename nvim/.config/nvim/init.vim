@@ -55,7 +55,6 @@ autocmd OptionSet guicursor noautocmd set guicursor=
 colorscheme iceyberg
 
 " python
-" autocmd Filetype python inoremap # X<C-h>#
 let g:python2_host_prog = expand('~/.asdf/shims/python2')
 let g:python3_host_prog = expand('~/.asdf/shims/python3')
 
