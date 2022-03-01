@@ -4,6 +4,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'airblade/vim-rooter'
   Plug 'dhruvasagar/vim-table-mode'
   Plug 'editorconfig/editorconfig-vim'
+  Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
   Plug 'folke/todo-comments.nvim' " extending trouble.nvim with highlight and search for TODOs
   Plug 'folke/trouble.nvim' " pretty list for displaying diagnostics
   Plug 'folke/twilight.nvim' " dim inactive segments of code
