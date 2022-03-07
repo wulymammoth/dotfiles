@@ -48,12 +48,10 @@ export XDG_CONFIG_HOME=$HOME/.config
 ASDF_SHIMS=$HOME/.asdf/shims
 # rust
 CARGO_BINS=$HOME/.cargo/bin
-# deno
-DENO_BINS=$ASDF_SHIMS/.deno/bin
 # llvm
 LLVM_PATH=/usr/local/opt/llvm/bin
 # python binaries - installed via `$ python3 -m pip install --user <package>`
 PYTHON_BINS=$HOME/.local/bin
 
 ## ----- PATH VAR -----
-export PATH="$ASDF_SHIMS:$CARGO_BINS:$DENO_BINS:$GOPATH/bin:$LLVM_PATH:$PYTHON_BINS:$BREW_PATHS:$PATH"
+export PATH="$ASDF_SHIMS:$CARGO_BINS:$GOPATH/bin:$LLVM_PATH:$PYTHON_BINS:$BREW_PATHS:$PATH"
