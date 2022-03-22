@@ -6,6 +6,7 @@ require'lualine'.setup {
     section_separators   = { left = '', right = ''},
     disabled_filetypes   = {},
     always_divide_middle = true,
+    -- globalstatus         = true, TODO: uncomment when 0.7 is released or use nightly
   },
   sections = {
     lualine_a = {'mode'},
