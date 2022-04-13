@@ -1,6 +1,7 @@
 require'nvim-treesitter.configs'.setup {
   -- One of "all", "maintained" (parsers with maintainers), or a list of languages
   ensure_installed = "all",
+  ignore_install = { "phpdoc" },
 
   highlight = {
     -- `false` will disable the whole extension
