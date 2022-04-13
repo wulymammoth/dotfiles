@@ -9,3 +9,9 @@ mkd() {
   mkdir -p "$@"
   cd "$@" || exit
 }
+
+# gitignore.io
+# `$ gi python >> .gitignore`
+function gi() {
+  curl -sL "https://www.toptal.com/developers/gitignore/api/$@"
+}
