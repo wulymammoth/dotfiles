@@ -77,6 +77,7 @@ set hidden                   " Avoid persisting closed buffers
 set ignorecase               " Case-insensitive searches
 set inccommand=split         " Shows the effects of a command incrementally, as you type
 set incsearch                " Incremental highlighting while searching
+set laststatus=3             " global statusline
 set lazyredraw               " Aid in slow redrawing because of 'cursorline'
 set linespace=1              " Line spacing
 set mouse=a                  " Allow mouse usage in all modes
