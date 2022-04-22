@@ -1,6 +1,7 @@
 ## bash-specific
 export BASH_SILENCE_DEPRECATION_WARNING=1 # stop asking to default to zsh
 export CLICOLOR=1
+export TERM=xterm-256color
 
 # HISTORY
 # erasedups all previous  lines  matching  the  current remove before save
