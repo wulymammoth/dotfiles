@@ -3,5 +3,5 @@ erlang 23.2.2
 golang 1.17
 nodejs 15.14.0
 purescript 0.14.0
-python 3.9.5 3.9.1
-ruby 3.0.0 2.7.5 2.7.0 2.5.7 system
+python 3.9.12
+ruby 2.7.5
