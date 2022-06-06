@@ -10,8 +10,13 @@ set -o errexit
 echo -e '\n--- SSH ---'
 if [ ! -f ~/.ssh/id_rsa ]; then
   echo 'setting up SSH key';
-  ssh-keygen -t rsa -b 4096 -C "$(scutil --get ComputerName)"
-  ssh-add -K ~/.ssh/id_rsa
+  ssh-keygen -t ed25519 -C "$(scutil --get ComputerName)"
+  # WARNING: The -K and -A flags are deprecated and have been replaced
+  # by the --apple-use-keychain and --apple-load-keychain
+  # flags, respectively.  To suppress this warning, set the
+  # environment variable APPLE_SSH_ADD_BEHAVIOR as described in
+  # the ssh-add(1) manual page.
+  ssh-add -K ~/.ssh/id_ed25519
 else
   echo 'SSH key already exists';
 fi
