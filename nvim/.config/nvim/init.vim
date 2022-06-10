@@ -39,7 +39,6 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'ojroques/vim-oscyank' " a vim / neovim plugin to copy text to the system clipboard from anywhere using the ansi osc52 sequence
   Plug 'onsails/lspkind-nvim' " vsc-like pictograms in nvim
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
-  Plug 'romgrk/barbar.nvim'
   Plug 'saadparwaiz1/cmp_luasnip'
   Plug 'simrat39/rust-tools.nvim' " extending rust analyzer with additional functionality
   Plug 'thesis/vim-solidity' " needed until treesitter parser exists
@@ -102,4 +101,5 @@ set tabstop=2                " Render tabs using n number of spaces
 set tags=tags,./tags,$HOME/tags
 set termguicolors            " true color
 set title                    " Set the title of the iTerm tab
+set winbar=%=%m\ %f
 set updatetime=100
