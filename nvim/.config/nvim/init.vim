@@ -64,6 +64,7 @@ let g:ruby_host_prog = expand('~/.asdf/shims/ruby')
 
 set background=dark
 set clipboard+=unnamedplus   " To ALWAYS use the clipboard for ALL operations (instead of registers)
+set cmdheight=0 " remove unnecessary command line when not in use
 set completeopt=longest,menuone,preview
 set copyindent
 set cursorline               " Highlight cursor position (row/line)
@@ -101,5 +102,5 @@ set tabstop=2                " Render tabs using n number of spaces
 set tags=tags,./tags,$HOME/tags
 set termguicolors            " true color
 set title                    " Set the title of the iTerm tab
-set winbar=%=%m\ %f
 set updatetime=100
+set winbar=%=%m\ %f
