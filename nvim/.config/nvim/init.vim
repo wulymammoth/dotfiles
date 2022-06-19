@@ -26,7 +26,6 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'lukas-reineke/indent-blankline.nvim' " indentation guides
   Plug 'mattn/emmet-vim' " abbreviation expansion (webdev)
   Plug 'mfussenegger/nvim-dap' " debug adapter protocol (DAP) client
-  Plug 'mickael-menu/zk-nvim' " plugin for zk (Zettelkasten)
   Plug 'neovim/nvim-lspconfig' " common configs for nvim's LSP client
   Plug 'ntpeters/vim-better-whitespace' " highlight and strip whitespace
   Plug 'numToStr/Comment.nvim'
@@ -41,7 +40,6 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
   Plug 'saadparwaiz1/cmp_luasnip'
   Plug 'simrat39/rust-tools.nvim' " extending rust analyzer with additional functionality
-  Plug 'thesis/vim-solidity' " needed until treesitter parser exists
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-obsession' " coupled with tmux-resurrect for saving and restoring vim sessions
   Plug 'vim-test/vim-test'
@@ -64,7 +62,6 @@ let g:ruby_host_prog = expand('~/.asdf/shims/ruby')
 
 set background=dark
 set clipboard+=unnamedplus   " To ALWAYS use the clipboard for ALL operations (instead of registers)
-set cmdheight=0 " remove unnecessary command line when not in use
 set completeopt=longest,menuone,preview
 set copyindent
 set cursorline               " Highlight cursor position (row/line)
