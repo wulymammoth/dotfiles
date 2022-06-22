@@ -11,10 +11,11 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'folke/twilight.nvim' " dim inactive segments of code
   Plug 'folke/which-key.nvim' "pop-up with available key-bindings
   Plug 'folke/zen-mode.nvim' " distraction-free coding
+  Plug 'github/copilot.vim'
   Plug 'hrsh7th/cmp-buffer'
   Plug 'hrsh7th/cmp-cmdline'
+  Plug 'hrsh7th/cmp-copilot'
   Plug 'hrsh7th/cmp-nvim-lsp'
-  Plug 'hrsh7th/cmp-path'
   Plug 'hrsh7th/nvim-cmp' " auto-completion engine
   Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
   Plug 'junegunn/fzf' " general-purpose command-line fuzzy-finder
