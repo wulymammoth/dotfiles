@@ -5,6 +5,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'danymat/neogen' " language-specific annotation/documentation generator
   Plug 'dhruvasagar/vim-table-mode'
   Plug 'editorconfig/editorconfig-vim'
+  Plug 'elixir-editors/vim-elixir'
   Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
   Plug 'folke/todo-comments.nvim' " extending trouble.nvim with highlight and search for TODOs
   Plug 'folke/trouble.nvim' " pretty list for displaying diagnostics
