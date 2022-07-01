@@ -4,6 +4,15 @@ let g:maplocalleader = ","
 let maplocalleader=","
 let mapleader="\<Space>"
 
+" ----- nvim-dap ----
+nmap <silent> <Leader>b :lua require('dap').toggle_breakpoint()<CR>
+nmap <silent> <Leader>B :lua require('dap').set_breakpoint(vim.fn.input('Breakpoint condition: '))<CR>
+nmap <silent> <Leader>dr :lua require('dap').repl.open()<CR>
+
+nnoremap <silent> <Leader>dn :lua require('dap-python').test_method()<CR>
+nnoremap <silent> <Leader>df :lua require('dap-python').test_class()<CR>
+vnoremap <silent> <Leader>ds <ESC>:lua require('dap-python').debug_selection()<CR>
+
 " ----- file paths -----
 " copy file name
 nmap <Leader>fn :let @*=expand("%") <bar> :echo @*<CR>

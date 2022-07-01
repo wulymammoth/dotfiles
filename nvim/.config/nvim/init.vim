@@ -27,11 +27,13 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'lukas-reineke/indent-blankline.nvim' " indentation guides
   Plug 'mattn/emmet-vim' " abbreviation expansion (webdev)
   Plug 'mfussenegger/nvim-dap' " debug adapter protocol (DAP) client
+  Plug 'mfussenegger/nvim-dap-python'
   Plug 'neovim/nvim-lspconfig' " common configs for nvim's LSP client
   Plug 'ntpeters/vim-better-whitespace' " highlight and strip whitespace
   Plug 'numToStr/Comment.nvim'
   Plug 'nvim-lua/plenary.nvim' " common Lua functions (dependency for many nvim plugins)
   Plug 'nvim-lualine/lualine.nvim' " status line
+  Plug 'nvim-telescope/telescope-dap.nvim'
   Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' } " C port of fzf
   Plug 'nvim-telescope/telescope.nvim' " list fuzzy-finder
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'} " nvim treesitter interface // parse-generation and incremental parsing library
@@ -39,8 +41,11 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'ojroques/vim-oscyank' " a vim / neovim plugin to copy text to the system clipboard from anywhere using the ansi osc52 sequence
   Plug 'onsails/lspkind-nvim' " vsc-like pictograms in nvim
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
+  Plug 'rcarriga/cmp-dap'
+  Plug 'rcarriga/nvim-dap-ui' " UI for nvim-dap
   Plug 'saadparwaiz1/cmp_luasnip'
   Plug 'simrat39/rust-tools.nvim' " extending rust analyzer with additional functionality
+  Plug 'theHamsta/nvim-dap-virtual-text' " visual hints providing current variable state, etc
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-obsession' " coupled with tmux-resurrect for saving and restoring vim sessions
   Plug 'vim-test/vim-test'

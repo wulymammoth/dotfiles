@@ -8,6 +8,12 @@ local has_words_before = function()
 end
 
 cmp.setup {
+  -- nvim-dap (nvim-cmp by defaults disables autocomplete for prompt buffers)
+  enabled = function ()
+    return vim.api.nvim_buf_get_option(0, "buftype") ~= "prompt"
+      or require("cmp_dap").is_dap_buffer()
+  end,
+
   formatting = {
     format = lspkind.cmp_format({
       menu = {
@@ -71,6 +77,7 @@ cmp.setup {
   sources = cmp.config.sources({
     { name = 'buffer', keyword_length = 3 },
     { name = 'nvim_lsp' },
-    { name = 'luasnip' }
+    { name = 'luasnip' },
+    { name = 'dap' },
   })
 }

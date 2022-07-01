@@ -98,6 +98,7 @@ telescope.setup {
 -- To get fzf loaded and working with telescope, you need to call
 -- load_extension, somewhere after setup function:
 telescope.load_extension('fzf')
+telescope.load_extension('dap')
 
 -- falling back to find_files if git_files can't find a .git directory
 -- https://github.com/nvim-telescope/telescope.nvim/wiki/Configuration-Recipes#falling-back-to-find_files-if-git_files-cant-find-a-git-directory
