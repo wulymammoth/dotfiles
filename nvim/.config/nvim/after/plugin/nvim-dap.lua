@@ -75,7 +75,7 @@ end
 -- elixir
 dap.adapters.mix_task = {
   type = 'executable',
-  command = '/path/to/elixir-ls/debugger.sh', -- debugger.bat for windows
+  command = '~/.elixir-ls/apps/elixir_ls_utils/priv/debugger.sh',
   args = {}
 }
 
