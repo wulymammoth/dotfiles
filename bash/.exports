@@ -35,6 +35,10 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
   --color fg:#D8DEE9,hl:#89b8c2,fg+:#D8DEE9,hl+:#e27878
   --color pointer:#BF616A,info:#4C566A,spinner:#4C566A,header:#4C566A,prompt:#81A1C1,marker:#EBCB8B'
 
+## ----- openssl -----
+export LDFLAGS="-L/usr/local/opt/openssl@3/lib"
+export CPPFLAGS="-I/usr/local/opt/openssl@3/include"
+
 ## ----- ripgrep -----
 
 export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
@@ -50,8 +54,10 @@ ASDF_SHIMS=$HOME/.asdf/shims
 CARGO_BINS=$HOME/.cargo/bin
 # llvm
 LLVM_PATH=/usr/local/opt/llvm/bin
+# openssl
+OPENSSL_PATH=/usr/local/opt/openssl@3/bin
 # python binaries - installed via `$ python3 -m pip install --user <package>`
 PYTHON_BINS=$HOME/.local/bin
 
 ## ----- PATH VAR -----
-export PATH="$ASDF_SHIMS:$CARGO_BINS:$GOPATH/bin:$LLVM_PATH:$PYTHON_BINS:$BREW_PATHS:$PATH"
+export PATH="$ASDF_SHIMS:$CARGO_BINS:$GOPATH/bin:$LLVM_PATH:$PYTHON_BINS:$BREW_PATHS:$OPENSSL_PATH:$PATH"
