@@ -2,6 +2,9 @@
 vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'double' })
 
 local lsp_installer = require('nvim-lsp-installer')
+local lspconfig = require('lspconfig')
+
+lsp_installer.setup {}
 
 lsp_installer.settings {
   ui = {
@@ -58,24 +61,25 @@ local on_attach = function(_client, bufnr)
 end
 
 local capabilities = require('cmp_nvim_lsp').update_capabilities(vim.lsp.protocol.make_client_capabilities())
+local default_opts = {
+  capabilities = capabilities,
+  flags = { debounce_text_changes = 150 },
+  on_attach = on_attach,
+}
 
--- Register a handler that will be called for all installed servers.
--- Alternatively, you may also register handlers on specific server instances instead (see example below).
-lsp_installer.on_server_ready(function(server)
-  local opts = { capabilities = capabilities, flags = { debounce_text_changes = 150 }, on_attach = on_attach }
-
-  if server.name == 'sumneko_lua' then
-    opts.settings = {
-      Lua = {
-        diagnostics = { globals = { 'vim' } },
-        runtime     = { version = 'LuaJIT' },
-        telemetry   = { enable = false },
-        workspace   = { library = vim.api.nvim_get_runtime_file("", true) },
-      },
-    }
-  end
-
-  -- This setup() function is exactly the same as lspconfig's setup function.
-  -- Refer to https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
-  server:setup(opts)
-end)
+lspconfig.sumneko_lua.setup {
+  capabilities = capabilities,
+  flags = { debounce_text_changes = 150 },
+  on_attach = on_attach,
+  settings = {
+    Lua = {
+      diagnostics = { globals = { 'vim' } },
+      runtime     = { version = 'LuaJIT' },
+      telemetry   = { enable = false },
+      workspace   = { library = vim.api.nvim_get_runtime_file("", true) },
+    },
+  }
+}
+lspconfig.pyright.setup(default_opts)
+lspconfig.solargraph.setup(default_opts)
+lspconfig.tsserver.setup(default_opts)
