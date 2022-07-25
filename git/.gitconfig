@@ -5,8 +5,9 @@
   rpo = remote prune origin # clean deleted branches on remote
 
 [branch]
-  autoSetupRebase = always
-  sort = -authordate
+  autosetupmerge = always
+  autosetuprebase = always
+  sort = authordate
 
 [core]
   excludesfile = ~/.gitignore_global
