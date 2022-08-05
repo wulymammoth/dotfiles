@@ -16,12 +16,12 @@ cmp.setup {
 
   formatting = {
     format = lspkind.cmp_format({
-      menu = {
-        buffer   = '[buf]',
-        luasnip  = '[luasnip]',
-        nvim_lsp = '[LSP]',
-        path     = '[path]',
-      },
+      -- menu = {
+      --   buffer   = '[buf]',
+      --   luasnip  = '[luasnip]',
+      --   nvim_lsp = '[LSP]',
+      --   path     = '[path]',
+      -- },
       maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
       with_text = true,
     })
