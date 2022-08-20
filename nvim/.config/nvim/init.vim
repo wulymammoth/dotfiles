@@ -49,7 +49,8 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-obsession' " coupled with tmux-resurrect for saving and restoring vim sessions
   Plug 'vim-test/vim-test'
-  Plug 'williamboman/nvim-lsp-installer' " manage LSP servers
+  Plug 'williamboman/mason-lspconfig.nvim'
+  Plug 'williamboman/mason.nvim'
 call plug#end()
 
 " ----- SETTINGS -----
