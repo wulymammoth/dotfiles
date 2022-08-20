@@ -1,20 +1,21 @@
--- Use a sharp border with `FloatBorder` highlights
-vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'double' })
-
-local lsp_installer = require('nvim-lsp-installer')
+local mason = require("mason")
+local masonconfig = require("mason-lspconfig")
 local lspconfig = require('lspconfig')
 
-lsp_installer.setup {}
-
-lsp_installer.settings {
-  ui = {
-    icons = {
-      server_installed   = "✓",
-      server_pending     = "➜",
-      server_uninstalled = "✗"
-    }
-  }
+mason.setup()
+masonconfig.setup {
+  automatic_installation = true,
+  ensure_installed = {
+    'elixirls',
+    'pyright',
+    'rust_analyzer',
+    'sumneko_lua',
+    'tsserver',
+  },
 }
+
+-- Use a sharp border with `FloatBorder` highlights
+vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, { border = 'double' })
 
 -- diagnostics
 vim.diagnostic.config {
