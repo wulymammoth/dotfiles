@@ -45,7 +45,7 @@ cmp.setup {
       end
     end),
 
-    ['<c-k>'] = cmp.mapping(function(fallback)
+    ['<c-j>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_next_item()
       elseif luasnip.expand_or_jumpable() then
@@ -57,7 +57,7 @@ cmp.setup {
       end
     end, { "i", "s" }),
 
-    ['<c-j>'] = cmp.mapping(function(fallback)
+    ['<c-k>'] = cmp.mapping(function(fallback)
       if cmp.visible() then
         cmp.select_prev_item()
       elseif luasnip.jumpable(-1) then
@@ -75,9 +75,9 @@ cmp.setup {
   },
 
   sources = cmp.config.sources({
-    { name = 'buffer', keyword_length = 3 },
-    { name = 'nvim_lsp' },
-    { name = 'luasnip' },
-    { name = 'dap' },
+    -- { name = 'buffer', keyword_length = 3 },
+    { name = 'nvim_lsp', keyword_length = 3 },
+    -- { name = 'luasnip', keyword_length = 3 },
+    -- { name = 'dap', keyword_length = 3 },
   })
 }
