@@ -6,7 +6,6 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'dhruvasagar/vim-table-mode'
   Plug 'editorconfig/editorconfig-vim'
   Plug 'elixir-editors/vim-elixir'
-  Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
   Plug 'folke/todo-comments.nvim' " extending trouble.nvim with highlight and search for TODOs
   Plug 'folke/trouble.nvim' " pretty list for displaying diagnostics
   Plug 'folke/twilight.nvim' " dim inactive segments of code
@@ -45,6 +44,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'rcarriga/nvim-dap-ui' " UI for nvim-dap
   Plug 'saadparwaiz1/cmp_luasnip'
   Plug 'simrat39/rust-tools.nvim' " extending rust analyzer with additional functionality
+  Plug 'slashmili/alchemist.vim' " ElixirSense
   Plug 'theHamsta/nvim-dap-virtual-text' " visual hints providing current variable state, etc
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-obsession' " coupled with tmux-resurrect for saving and restoring vim sessions
