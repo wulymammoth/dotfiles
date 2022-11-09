@@ -16,7 +16,7 @@ if [ ! -f ~/.ssh/id_rsa ]; then
   # flags, respectively.  To suppress this warning, set the
   # environment variable APPLE_SSH_ADD_BEHAVIOR as described in
   # the ssh-add(1) manual page.
-  ssh-add -K ~/.ssh/id_ed25519
+  ssh-add ~/.ssh/id_ed25519
 else
   echo 'SSH key already exists';
 fi
