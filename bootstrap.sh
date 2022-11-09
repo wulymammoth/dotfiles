@@ -8,7 +8,7 @@ set -o nounset
 set -o errexit
 
 echo -e '\n--- SSH ---'
-if [ ! -f ~/.ssh/id_rsa ]; then
+if [ ! -f ~/.ssh/id_ed25519 ]; then
   echo 'setting up SSH key';
   ssh-keygen -t ed25519 -C "$(scutil --get ComputerName)"
   # WARNING: The -K and -A flags are deprecated and have been replaced
