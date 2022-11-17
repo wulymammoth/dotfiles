@@ -22,6 +22,9 @@ eval $(gdircolors ~/.dir_colors)
 ## fzf
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
+## git completion
+test -f ~/dotfiles/git/scripts/.git-completion.bash && . $_
+
 ## starship prompt
 eval "$(starship init bash)"
 
