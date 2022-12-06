@@ -21,6 +21,8 @@ eval $(gdircolors ~/.dir_colors)
 
 ## fzf
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+[ -f $(brew --prefix)/opt/fzf/shell/completion.bash ] && source $(brew --prefix)/opt/fzf/shell/completion.bash # Apple Silicon
+[ -f $(brew --prefix)/opt/fzf/shell/key-bindings.bash ] && source $(brew --prefix)/opt/fzf/shell/key-bindings.bash # Apple Silicon
 
 ## git completion
 test -f ~/dotfiles/git/scripts/.git-completion.bash && . $_
