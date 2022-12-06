@@ -53,7 +53,7 @@ brew "wget"
 brew "wtfutil"
 brew "zoxide"
 brew "universal-ctags/universal-ctags/universal-ctags", args: ["HEAD"]
-cask "alacritty", args: { appdir: "~/Applications" }
+cask "alacritty"
 cask "brave-browser", args: { appdir: "~/Applications" }
 cask "discord", args: { appdir: "~/Applications" }
 cask "docker", args: { appdir: "~/Applications" }
