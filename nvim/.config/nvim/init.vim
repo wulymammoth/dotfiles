@@ -1,6 +1,7 @@
 " ------ PLUGINS -----
 call plug#begin('~/.config/nvim/plugged')
   Plug 'L3MON4D3/LuaSnip'
+  Plug 'ThePrimeagen/refactoring.nvim'
   Plug 'airblade/vim-rooter'
   Plug 'danymat/neogen' " language-specific annotation/documentation generator
   Plug 'dhruvasagar/vim-table-mode'
@@ -17,6 +18,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'hrsh7th/cmp-nvim-lsp'
   Plug 'hrsh7th/nvim-cmp' " auto-completion engine
   Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
+  Plug 'jose-elias-alvarez/null-ls.nvim'
   Plug 'junegunn/fzf' " general-purpose command-line fuzzy-finder
   Plug 'junegunn/vim-easy-align'
   Plug 'kosayoda/nvim-lightbulb' " display lightbulb icon when a code-action is available
