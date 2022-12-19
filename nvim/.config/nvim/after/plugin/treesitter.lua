@@ -14,10 +14,7 @@ require'nvim-treesitter.configs'.setup {
     additional_vim_regex_highlighting = false,
   },
 
-  indent = {
-    disable = {'python'},
-    enable  = false
-  },
+  indent = {},
 
   refactor = {
     highlight_current_scope = { enable = false },
