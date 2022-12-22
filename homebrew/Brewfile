@@ -12,9 +12,13 @@ brew "asdf"
 brew "bash"
 brew "bash-completion@2"
 brew "bat"
+brew "glib"
+brew "checkmake"
 brew "direnv"
 brew "dog"
+brew "dotenv-linter"
 brew "dust"
+brew "editorconfig-checker"
 brew "entr"
 brew "exa"
 brew "fd"
@@ -22,50 +26,52 @@ brew "fzf"
 brew "gh"
 brew "git"
 brew "git-delta"
+brew "gitlint"
 brew "glances"
-brew "glib"
 brew "glow"
+brew "libidn2"
+brew "unbound"
+brew "gnutls"
 brew "gnupg"
-brew "go"
 brew "gping"
-brew "hugo"
+brew "graphviz"
+brew "hadolint"
 brew "hyperfine"
 brew "imagemagick"
 brew "jq"
-brew "libheif"
 brew "macos-trash"
 brew "mas"
 brew "navi"
 brew "neofetch"
-brew "neovim"
+brew "neovim", args: ["HEAD"]
 brew "ngrep"
 brew "pastel"
 brew "pre-commit"
 brew "ripgrep"
+brew "shellcheck"
 brew "sloccount"
+brew "sqlfluff"
 brew "starship"
 brew "stow"
-brew "terminal-notifier"
 brew "tldr"
 brew "tmux"
 brew "tree"
 brew "wget"
 brew "wtfutil"
+brew "yamllint"
 brew "zoxide"
 brew "universal-ctags/universal-ctags/universal-ctags", args: ["HEAD"]
-cask "alacritty"
 cask "brave-browser", args: { appdir: "~/Applications" }
 cask "discord", args: { appdir: "~/Applications" }
 cask "docker", args: { appdir: "~/Applications" }
-cask "graphql-playground", args: { appdir: "~/Applications" }
+cask "font-hack-nerd-font"
+cask "ngrok"
 cask "postman", args: { appdir: "~/Applications" }
 cask "rectangle", args: { appdir: "~/Applications" }
-mas "1Password 7", id: 1333542190
-mas "Amphetamine", id: 937984704
 mas "Fantastical", id: 975937182
 mas "ImageOne", id: 1237328432
 mas "Kindle", id: 405399194
-mas "NordVPN", id: 905953485
-mas "Slack", id: 803453959
 mas "Telegram", id: 747648890
+mas "TickTick", id: 966085870
 mas "WhatsApp", id: 1147396723
+mas "Xcode", id: 497799835

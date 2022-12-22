@@ -1,58 +1,71 @@
-### to install...
-## $ brew bundle
-
-## brews
-brew 'alacritty'         # terminal (emulator)
-brew 'bash'              # Bourne Again SHell
-brew 'bat'               # cat alternative (Rust)
-brew 'direnv'            # manage per-directory environment variables
-brew 'entr'              # run arbitrary commands on file change (watcher)
-brew 'exa'               # modern replacement for 'ls' (Rust)
-brew 'fd'                # fast alternative to find (Rust)
-brew 'fzf'               # CLI fuzzy finder
-brew 'gh'                # GitHub CLI
-brew 'git-delta'         # Syntax-highlighting pager for git and diff output
-brew 'glow'              # markdown reader
-brew 'gnupg'             # GNU PGP (Pretty Good Privacy)
-brew 'htop'              # improved top (interactive process viewer)
-brew 'hugo'              # configurable static site generator
-brew 'jq'                # CLI JSON processor
-brew 'macos-trash'       # macOS-specific trash-cli to move files to trash when using `rm`
-brew 'mas'               # CLI for Mac App Store
-brew 'navi'              # interactive cheatsheet tool for the command-line
-brew 'ncdu'              # NCurses Disk Usage
-brew 'neofetch'          # system info tool CLI
-brew 'ngrep'             # network grep
-brew 'nvim'              # NeoVim (Vim fork that employs LUA JIT)
-brew 'pastel'            # CLI to generate, analyze, convert and manipulate colors
-brew 'ripgrep'           # parallel grep (faster than Ag aka the Silver Searcher implemented in Rust)
-brew 'sloccount'         # count lines of code in many languages
-brew 'starship'          # cross-shell prompt for astronauts
-brew 'stow'              # dotfiles linker
-brew 'terminal-notifier' # send macOS user notifications from the command-line
-brew 'tldr'              # simplified and community-driven man pages
-brew 'tmux'              # terminal multiplexer (for session and project management)
-brew 'tree'              # display directories as trees
-brew 'universal-ctags/universal-ctags/universal-ctags'
-brew 'wget'              # internet file retriever
-brew 'wtfutil'           # the personal information dashboard for your terminal
-brew 'zoxide'            # faster way to navigate the filesystem (stack-based)
-
-## casks
-tap 'homebrew/cask'
-cask_args appdir: '/Applications', require_sha: true
-
-cask 'brave-browser'
-cask 'discord'
-cask 'font-hack-nerd-font'
-cask 'homebrew/cask/docker'
-cask 'ngrok'     # tunneling
-cask 'rectangle' # window manager
-cask 'spotify'
-
-## App Store
-mas '1Password',   id: 1333542190
-mas 'Alfred',      id: 405843582  # a better "Spotlight" w/ dev tool integrations
-mas 'Authy',       id: 1538761576 # MFA
-mas 'Fantastical', id: 975937182  # calendar
-mas 'Slack',       id: 803453959
+tap "github/gh"
+tap "golangci/tap"
+tap "homebrew/bundle"
+tap "homebrew/cask"
+tap "homebrew/cask-fonts"
+tap "homebrew/cask-versions"
+tap "homebrew/core"
+tap "teamookla/speedtest"
+tap "tj/mmake", "https://github.com/tj/mmake.git"
+tap "universal-ctags/universal-ctags"
+brew "asdf"
+brew "bash"
+brew "bash-completion@2"
+brew "bat"
+brew "direnv"
+brew "dog"
+brew "dust"
+brew "entr"
+brew "exa"
+brew "fd"
+brew "fzf"
+brew "gh"
+brew "git"
+brew "git-delta"
+brew "glances"
+brew "glib"
+brew "glow"
+brew "gnupg"
+brew "go"
+brew "gping"
+brew "hugo"
+brew "hyperfine"
+brew "imagemagick"
+brew "jq"
+brew "libheif"
+brew "macos-trash"
+brew "mas"
+brew "navi"
+brew "neofetch"
+brew "neovim"
+brew "ngrep"
+brew "pastel"
+brew "pre-commit"
+brew "ripgrep"
+brew "sloccount"
+brew "starship"
+brew "stow"
+brew "terminal-notifier"
+brew "tldr"
+brew "tmux"
+brew "tree"
+brew "wget"
+brew "wtfutil"
+brew "zoxide"
+brew "universal-ctags/universal-ctags/universal-ctags", args: ["HEAD"]
+cask "alacritty"
+cask "brave-browser", args: { appdir: "~/Applications" }
+cask "discord", args: { appdir: "~/Applications" }
+cask "docker", args: { appdir: "~/Applications" }
+cask "graphql-playground", args: { appdir: "~/Applications" }
+cask "postman", args: { appdir: "~/Applications" }
+cask "rectangle", args: { appdir: "~/Applications" }
+mas "1Password 7", id: 1333542190
+mas "Amphetamine", id: 937984704
+mas "Fantastical", id: 975937182
+mas "ImageOne", id: 1237328432
+mas "Kindle", id: 405399194
+mas "NordVPN", id: 905953485
+mas "Slack", id: 803453959
+mas "Telegram", id: 747648890
+mas "WhatsApp", id: 1147396723
