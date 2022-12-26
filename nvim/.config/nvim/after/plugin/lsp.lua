@@ -61,7 +61,6 @@ local on_attach = function(_client, bufnr)
   buf_set_keymap('n', '<space>f', '<cmd>lua vim.lsp.buf.format({ async = true })<CR>', opts)
 end
 
-local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
 local default_opts = {
   capabilities = capabilities,
   flags = { debounce_text_changes = 150 },

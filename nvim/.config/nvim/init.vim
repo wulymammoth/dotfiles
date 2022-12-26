@@ -13,10 +13,6 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'folke/which-key.nvim' "pop-up with available key-bindings
   Plug 'folke/zen-mode.nvim' " distraction-free coding
   Plug 'github/copilot.vim'
-  Plug 'hrsh7th/cmp-buffer'
-  Plug 'hrsh7th/cmp-cmdline'
-  Plug 'hrsh7th/cmp-nvim-lsp'
-  Plug 'hrsh7th/nvim-cmp' " auto-completion engine
   Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
   Plug 'jose-elias-alvarez/null-ls.nvim'
   Plug 'junegunn/fzf' " general-purpose command-line fuzzy-finder
@@ -44,9 +40,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'ojroques/vim-oscyank' " a vim / neovim plugin to copy text to the system clipboard from anywhere using the ansi osc52 sequence
   Plug 'onsails/lspkind-nvim' " vsc-like pictograms in nvim
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
-  Plug 'rcarriga/cmp-dap'
   Plug 'rcarriga/nvim-dap-ui' " UI for nvim-dap
-  Plug 'saadparwaiz1/cmp_luasnip'
   Plug 'simrat39/rust-tools.nvim' " extending rust analyzer with additional functionality
   Plug 'theHamsta/nvim-dap-virtual-text' " visual hints providing current variable state, etc
   Plug 'tpope/vim-fugitive'
