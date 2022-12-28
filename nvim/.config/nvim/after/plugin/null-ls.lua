@@ -39,15 +39,15 @@ null_ls.setup({
     -- python
     null_ls.builtins.diagnostics.mypy,
     null_ls.builtins.diagnostics.pycodestyle,
-    null_ls.builtins.diagnostics.pydocstyle,
     null_ls.builtins.diagnostics.pylint,
-    null_ls.builtins.formatting.autoflake, -- covered by ruff
-    null_ls.builtins.formatting.black, -- covered by ruff
+    null_ls.builtins.formatting.autoflake,
+    null_ls.builtins.formatting.autopep8,
+    null_ls.builtins.formatting.black,
     null_ls.builtins.formatting.reorder_python_imports,
-    null_ls.builtins.formatting.ruff, -- black + isort
+    -- null_ls.builtins.diagnostics.pydocstyle,
     -- null_ls.builtins.diagnostics.vulture, -- too noisy
-    -- null_ls.builtins.formatting.autopep8, -- covered by ruff
     -- null_ls.builtins.formatting.isort, -- covered by ruff
+    -- null_ls.builtins.formatting.ruff, -- black + isort
 
     -- ruby
     null_ls.builtins.diagnostics.standardrb,
@@ -58,18 +58,25 @@ null_ls.setup({
 
   on_attach = function(client, bufnr)
     bufnr = bufnr or vim.api.nvim_get_current_buf()
+    local timeout = 2700
 
     if client.supports_method("textDocument/formatting") then
       vim.api.nvim_clear_autocmds({ group = augroup, buffer = bufnr })
       vim.api.nvim_create_autocmd("BufWritePost", {
         group = augroup,
+
         buffer = bufnr,
+
         callback = function()
           vim.lsp.buf.format({
             bufnr = bufnr,
+
             filter = function(client)
               return client.name == "null-ls"
-            end
+            end,
+
+            timeout = timeout,
+            timeout_ms = timeout,
           })
         end,
       })
