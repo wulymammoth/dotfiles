@@ -41,11 +41,11 @@ null_ls.setup({
     null_ls.builtins.diagnostics.pycodestyle,
     null_ls.builtins.diagnostics.pydocstyle,
     null_ls.builtins.diagnostics.pylint,
+    null_ls.builtins.formatting.autoflake, -- covered by ruff
     null_ls.builtins.formatting.black, -- covered by ruff
     null_ls.builtins.formatting.reorder_python_imports,
     null_ls.builtins.formatting.ruff, -- black + isort
     -- null_ls.builtins.diagnostics.vulture, -- too noisy
-    -- null_ls.builtins.formatting.autoflake, -- covered by ruff
     -- null_ls.builtins.formatting.autopep8, -- covered by ruff
     -- null_ls.builtins.formatting.isort, -- covered by ruff
 
