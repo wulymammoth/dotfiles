@@ -10,7 +10,6 @@ null_ls.setup({
     null_ls.builtins.code_actions.refactoring,
     null_ls.builtins.completion.spell,
     null_ls.builtins.diagnostics.dotenv_linter,
-    null_ls.builtins.diagnostics.editorconfig_checker,
     null_ls.builtins.diagnostics.gitlint,
     null_ls.builtins.diagnostics.hadolint,
     null_ls.builtins.diagnostics.todo_comments,
@@ -24,10 +23,6 @@ null_ls.setup({
 
     -- elixir
     null_ls.builtins.diagnostics.credo,
-
-    -- javascript
-    null_ls.builtins.code_actions.xo,
-    null_ls.builtins.diagnostics.eslint_d,
 
     -- lua
     null_ls.builtins.completion.luasnip,
