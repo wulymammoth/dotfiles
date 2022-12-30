@@ -97,4 +97,4 @@ dap.configurations.elixir = {
 
 -- python
 dap_python.setup('~/.virtualenvs/debugpy/bin/python')
-dap_python.test_runner = 'unittest'
+dap_python.test_runner = 'pytest'
