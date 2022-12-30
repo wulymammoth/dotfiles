@@ -7,6 +7,7 @@ require("nvim-dap-virtual-text").setup()
 -- default settings for nvim-dap-ui
 dapui.setup({
   icons = { expanded = "▾", collapsed = "▸" },
+
   mappings = {
     -- Use a table to apply multiple mappings
     expand = { "<CR>", "<2-LeftMouse>" },
@@ -16,6 +17,7 @@ dapui.setup({
     repl = "r",
     toggle = "t",
   },
+
   -- Expand lines larger than the window
   -- Requires >= 0.7
   expand_lines = vim.fn.has("nvim-0.7"),
@@ -26,6 +28,7 @@ dapui.setup({
   -- Float value specifies percentage (i.e. 0.3 - 30% of available lines/columns)
   -- Elements are the elements shown in the layout (in order).
   -- Layouts are opened in order so that earlier layouts take priority in window sizing.
+
   layouts = {
     {
       elements = {
@@ -47,6 +50,7 @@ dapui.setup({
       position = "bottom",
     },
   },
+
   floating = {
     max_height = nil, -- These can be integers or a float between 0 and 1.
     max_width = nil, -- Floats will be treated as percentage of your screen.
@@ -55,7 +59,9 @@ dapui.setup({
       close = { "q", "<Esc>" },
     },
   },
+
   windows = { indent = 1 },
+
   render = {
     max_type_length = nil, -- Can be integer or nil.
   }
