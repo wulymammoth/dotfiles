@@ -1,6 +1,44 @@
 require'nvim-treesitter.configs'.setup {
   -- One of "all", "maintained" (parsers with maintainers), or a list of languages
-  ensure_installed = "all",
+  ensure_installed = {
+    "bash",
+    "c",
+    "clojure",
+    "comment",
+    "cpp",
+    "css",
+    "diff",
+    "dockerfile",
+    "dot",
+    "elixir",
+    "erlang",
+    "git_rebase",
+    "gitcommit",
+    "gitignore",
+    "go",
+    "heex",
+    "html",
+    "http",
+    "java",
+    "javascript",
+    "jq",
+    "json",
+    "kotlin",
+    "make",
+    "markdown",
+    "markdown_inline",
+    "proto",
+    "python",
+    "regex",
+    "ruby",
+    "sql",
+    "swift",
+    "toml",
+    "typescript",
+    "vim",
+    "yaml",
+  },
+
   ignore_install = { "phpdoc" },
 
   highlight = {
@@ -14,7 +52,9 @@ require'nvim-treesitter.configs'.setup {
     additional_vim_regex_highlighting = false,
   },
 
-  indent = {},
+  indent = {
+    enable = true
+  },
 
   refactor = {
     highlight_current_scope = { enable = false },
@@ -24,6 +64,8 @@ require'nvim-treesitter.configs'.setup {
       keymaps = { smart_rename = "grr", },
     },
   },
+
+  auto_install = true,
 
   -- Install languages synchronously (only applied to `ensure_installed`)
   sync_install = false,
