@@ -15,7 +15,6 @@ call plug#begin('~/.config/nvim/plugged')
 
   " debugging
   Plug 'mfussenegger/nvim-dap' " debug adapter protocol (DAP) client
-  Plug 'mfussenegger/nvim-dap-python'
   Plug 'rcarriga/nvim-dap-ui' " UI for nvim-dap
   Plug 'theHamsta/nvim-dap-virtual-text' " visual hints providing current variable state, etc
 
@@ -71,6 +70,9 @@ call plug#begin('~/.config/nvim/plugged')
     Plug 'mhanberg/elixir.nvim'
   " * markdown
     Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
+  " * python
+    Plug 'mfussenegger/nvim-dap-python'
+    Plug 'nvim-neotest/neotest-python'
   " *rust
     Plug 'simrat39/rust-tools.nvim' " extending rust analyzer with additional functionality
 call plug#end()
