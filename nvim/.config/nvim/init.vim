@@ -1,34 +1,7 @@
 " ------ PLUGINS -----
 call plug#begin('~/.config/nvim/plugged')
-  Plug 'L3MON4D3/LuaSnip'
-  Plug 'ThePrimeagen/refactoring.nvim'
-  Plug 'airblade/vim-rooter'
-  Plug 'danymat/neogen' " language-specific annotation/documentation generator
-  Plug 'dhruvasagar/vim-table-mode'
-  Plug 'editorconfig/editorconfig-vim'
-  Plug 'elixir-editors/vim-elixir'
-  Plug 'folke/todo-comments.nvim' " extending trouble.nvim with highlight and search for TODOs
-  Plug 'folke/trouble.nvim' " pretty list for displaying diagnostics
-  Plug 'folke/twilight.nvim' " dim inactive segments of code
-  Plug 'folke/which-key.nvim' "pop-up with available key-bindings
-  Plug 'folke/zen-mode.nvim' " distraction-free coding
-  Plug 'github/copilot.vim'
-  Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
-  Plug 'jose-elias-alvarez/null-ls.nvim'
+  " core plugins
   Plug 'junegunn/fzf' " general-purpose command-line fuzzy-finder
-  Plug 'junegunn/vim-easy-align'
-  Plug 'kosayoda/nvim-lightbulb' " display lightbulb icon when a code-action is available
-  Plug 'kyazdani42/nvim-web-devicons'
-  Plug 'lewis6991/gitsigns.nvim'
-  Plug 'ludovicchabant/vim-gutentags' " tag file management in vim
-  Plug 'lukas-reineke/indent-blankline.nvim' " indentation guides
-  Plug 'mattn/emmet-vim' " abbreviation expansion (webdev)
-  Plug 'mfussenegger/nvim-dap' " debug adapter protocol (DAP) client
-  Plug 'mfussenegger/nvim-dap-python'
-  Plug 'mhanberg/elixir.nvim'
-  Plug 'neovim/nvim-lspconfig' " common configs for nvim's LSP client
-  Plug 'ntpeters/vim-better-whitespace' " highlight and strip whitespace
-  Plug 'numToStr/Comment.nvim'
   Plug 'nvim-lua/plenary.nvim' " common Lua functions (dependency for many nvim plugins)
   Plug 'nvim-lualine/lualine.nvim' " status line
   Plug 'nvim-telescope/telescope-dap.nvim'
@@ -36,17 +9,70 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'nvim-telescope/telescope-live-grep-args.nvim'
   Plug 'nvim-telescope/telescope.nvim' " list fuzzy-finder
   Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'} " nvim treesitter interface // parse-generation and incremental parsing library
+
+  " (auto-)completion
+  Plug 'github/copilot.vim'
+
+  " debugging
+  Plug 'mfussenegger/nvim-dap' " debug adapter protocol (DAP) client
+  Plug 'mfussenegger/nvim-dap-python'
+  Plug 'rcarriga/nvim-dap-ui' " UI for nvim-dap
+  Plug 'theHamsta/nvim-dap-virtual-text' " visual hints providing current variable state, etc
+
+  " editing
+  Plug 'ThePrimeagen/refactoring.nvim'
+  Plug 'dhruvasagar/vim-table-mode'
+  Plug 'junegunn/vim-easy-align'
+  Plug 'ntpeters/vim-better-whitespace' " highlight and strip whitespace
+  Plug 'numToStr/Comment.nvim'
   Plug 'nvim-treesitter/nvim-treesitter-refactor' " clutch plugin providing clutch things like renaming all variables of the same name and type (powered by treesitter)
   Plug 'ojroques/vim-oscyank' " a vim / neovim plugin to copy text to the system clipboard from anywhere using the ansi osc52 sequence
-  Plug 'onsails/lspkind-nvim' " vsc-like pictograms in nvim
-  Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
-  Plug 'rcarriga/nvim-dap-ui' " UI for nvim-dap
-  Plug 'simrat39/rust-tools.nvim' " extending rust analyzer with additional functionality
-  Plug 'theHamsta/nvim-dap-virtual-text' " visual hints providing current variable state, etc
-  Plug 'tpope/vim-fugitive'
+
+  " else
+  Plug 'airblade/vim-rooter' " automatically change working directory to project root
+  Plug 'danymat/neogen' " language-specific annotation/documentation generator
+  Plug 'editorconfig/editorconfig-vim'
+  Plug 'folke/which-key.nvim' "pop-up with available key-bindings
+  Plug 'ludovicchabant/vim-gutentags' " tag file management in vim
   Plug 'tpope/vim-obsession' " coupled with tmux-resurrect for saving and restoring vim sessions
+
+  " focus
+  Plug 'folke/twilight.nvim' " dim inactive segments of code
+  Plug 'folke/zen-mode.nvim' " distraction-free coding
+
+  " git
+  Plug 'lewis6991/gitsigns.nvim' " Super fast git decorations implemented purely in lua/teal
+  Plug 'tpope/vim-fugitive'
+
+  " LSP
+  Plug 'folke/todo-comments.nvim' " extending trouble.nvim with highlight and search for TODOs
+  Plug 'folke/trouble.nvim' " pretty list for displaying diagnostics
+  Plug 'jose-elias-alvarez/null-ls.nvim'
+  Plug 'neovim/nvim-lspconfig' " common configs for nvim's LSP client
   Plug 'williamboman/mason-lspconfig.nvim'
   Plug 'williamboman/mason.nvim'
+
+  " testing
+  Plug 'nvim-neotest/neotest' " test runner for nvim
+
+  " visual indicators
+  Plug 'kosayoda/nvim-lightbulb' " display lightbulb icon when a code-action is available
+  Plug 'kyazdani42/nvim-web-devicons' " plugin icons
+  Plug 'lukas-reineke/indent-blankline.nvim' " indentation guides
+  Plug 'onsails/lspkind-nvim' " vsc-like pictograms in nvim
+
+  " web
+  Plug 'mattn/emmet-vim' " abbreviation expansion (webdev)
+  Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
+
+  " language-specific
+  " * elixir
+    Plug 'elixir-editors/vim-elixir'
+    Plug 'mhanberg/elixir.nvim'
+  " * markdown
+    Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
+  " *rust
+    Plug 'simrat39/rust-tools.nvim' " extending rust analyzer with additional functionality
 call plug#end()
 
 " ----- SETTINGS -----
