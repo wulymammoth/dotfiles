@@ -45,7 +45,6 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'theHamsta/nvim-dap-virtual-text' " visual hints providing current variable state, etc
   Plug 'tpope/vim-fugitive'
   Plug 'tpope/vim-obsession' " coupled with tmux-resurrect for saving and restoring vim sessions
-  Plug 'vim-test/vim-test'
   Plug 'williamboman/mason-lspconfig.nvim'
   Plug 'williamboman/mason.nvim'
 call plug#end()
