@@ -33,7 +33,6 @@ null_ls.setup({
 
     -- python
     null_ls.builtins.diagnostics.mypy,
-    null_ls.builtins.diagnostics.pycodestyle,
     null_ls.builtins.diagnostics.pylint,
     null_ls.builtins.formatting.autoflake,
     null_ls.builtins.formatting.autopep8,
