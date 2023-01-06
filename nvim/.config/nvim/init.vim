@@ -95,8 +95,9 @@ let g:ruby_host_prog = expand('~/.asdf/shims/ruby')
 
 set background=dark
 set clipboard+=unnamedplus   " To ALWAYS use the clipboard for ALL operations (instead of registers)
-set completeopt=longest,menuone,preview
+set completeopt=longest,menuone,preview,noselect
 set copyindent
+set cursorcolumn             " Highlight the screen column of the cursor with CursorColumn
 set cursorline               " Highlight cursor position (row/line)
 set encoding=utf-8
 set expandtab                " Insert space chars for TAB
@@ -115,6 +116,7 @@ set noerrorbells             " No beeps
 set nofoldenable             " disable code folding by default
 set nohlsearch               " Highlight search (OFF)
 set nojoinspaces             " Prevents insertion of two spaces after punctuation on line join (J)
+set noshowmode               " If in Insert, Replace or Visual mode put a message on the last line
 set noswapfile               " Don't make backups before overwriting
 set number                   " Always show line numbers
 set relativenumber           " Always show line numbers
@@ -123,9 +125,12 @@ set shiftround
 set shiftwidth=2             " Indentation amount for < and > commands
 set showcmd                  " Show (partial) command in status line
 set showmatch                " Show matching brackets
+set showtabline=1            " The value of this option specifies when the line with tab page labels will be displayed
+set signcolumn=auto          " When and how to draw the signcolumn
 set smartcase                " Searching with capital letters
 set smartindent
 set softtabstop=2
+set splitright
 set switchbuf=useopen,usetab " switch to already open buffer
 set tabstop=2                " Render tabs using n number of spaces
 set tags=tags,./tags,$HOME/tags
