@@ -1,5 +1,6 @@
 .DS_Store
 .envrc
+.null-ls*
 .tags
 .tags_sorted_by_file
 .tool-versions
