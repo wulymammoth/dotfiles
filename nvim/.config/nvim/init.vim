@@ -19,7 +19,6 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'theHamsta/nvim-dap-virtual-text' " visual hints providing current variable state, etc
 
   " editing
-  Plug 'ThePrimeagen/refactoring.nvim'
   Plug 'dhruvasagar/vim-table-mode'
   Plug 'junegunn/vim-easy-align'
   Plug 'ntpeters/vim-better-whitespace' " highlight and strip whitespace
