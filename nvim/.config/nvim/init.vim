@@ -36,6 +36,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'tpope/vim-obsession' " coupled with tmux-resurrect for saving and restoring vim sessions
 
   " focus
+  Plug 'echasnovski/mini.animate' " animated transitions
   Plug 'folke/twilight.nvim' " dim inactive segments of code
   Plug 'folke/zen-mode.nvim' " distraction-free coding
   Plug 'shortcuts/no-neck-pain.nvim' " center buffer
