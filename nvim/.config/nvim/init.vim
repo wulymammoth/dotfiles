@@ -138,3 +138,4 @@ set termguicolors            " true color
 set title                    " Set the title of the iTerm tab
 set updatetime=100
 set winbar=%=%m\ %f
+set virtualedit=all          " https://www.reddit.com/r/neovim/comments/zg44mm/comment/izfdbtw/?utm_source=share&utm_medium=ios_app&utm_name=iossmf&context=3
