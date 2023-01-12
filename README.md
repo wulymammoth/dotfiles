@@ -4,7 +4,7 @@
 
 ## why are my directories structured the way that they are?
 
-I'm using [GNU Stow](https://www.gnu.org/software/stow/) to symlink my dotfiles and each directory that you see here mirrors that of my `$HOME` directory -- some application and utility configurations typically go under `$XDG_CONFIG` (`~/.config`).
+I'm using [GNU Stow](https://www.gnu.org/software/stow/) to symlink my dotfiles and each directory that you see here mirrors that of my `$HOME` directory -- some application and utility configurations typically go under `$XDG_CONFIG_HOME` (`~/.config`).
 
 ## some of my favorite tools and utilities:
 
