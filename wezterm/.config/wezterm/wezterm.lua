@@ -6,6 +6,8 @@ return {
   font = wezterm.font("Hack Nerd Font Mono"),
   font_size = 14.5,
 
+  hide_tab_bar_if_only_one_tab = true,
+
   keys = {
     -- Give me my Vim binding
     { key = '^', mods = 'SHIFT|CTRL', action = wezterm.action.DisableDefaultAssignment },
@@ -23,5 +25,10 @@ return {
     { key="f", mods="OPT", action=wezterm.action{ SendString="\x1bf" } },
   },
 
-  window_decorations = "NONE"
+  use_fancy_tab_bar = false,
+
+  use_resize_increments = true,
+
+  window_close_confirmation = 'AlwaysPrompt',
+  window_decorations = "NONE",
 }
