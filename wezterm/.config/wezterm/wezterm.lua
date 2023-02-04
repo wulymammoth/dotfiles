@@ -2,7 +2,10 @@ local wezterm = require 'wezterm';
 
 return {
   color_scheme = "iceberg-dark",
+
+  font = wezterm.font("Hack Nerd Font Mono"),
   font_size = 14.5,
+
   keys = {
     -- Make Option-Left equivalent to Alt-b which many line editors interpret as backward-word
     { key = "_", mods = "SHIFT|CTRL", action = wezterm.action.DisableDefaultAssignment },
@@ -11,5 +14,6 @@ return {
     { key="f", mods="OPT", action=wezterm.action{ SendString="\x1bf" } },
     -- { key = 'Enter', mods = 'CTRL|OPT', action = wezterm.action.DisableDefaultAssignment },
   },
+
   window_decorations = "NONE"
 }
