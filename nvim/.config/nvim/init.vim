@@ -36,9 +36,7 @@ call plug#begin('~/.config/nvim/plugged')
 
   " focus
   Plug 'echasnovski/mini.animate' " animated transitions
-  Plug 'folke/twilight.nvim' " dim inactive segments of code
   Plug 'folke/zen-mode.nvim' " distraction-free coding
-  Plug 'shortcuts/no-neck-pain.nvim' " center buffer
 
   " git
   Plug 'lewis6991/gitsigns.nvim' " Super fast git decorations implemented purely in lua/teal
