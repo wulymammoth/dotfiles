@@ -30,5 +30,5 @@ return {
   use_resize_increments = true,
 
   window_close_confirmation = 'AlwaysPrompt',
-  window_decorations = "NONE",
+  window_decorations = "RESIZE",
 }
