@@ -7,9 +7,9 @@ masonconfig.setup {
   automatic_installation = true,
   ensure_installed = {
     'elixirls',
+    'lua_ls',
     'pyright',
     'rust_analyzer',
-    'sumneko_lua',
     'tsserver',
   },
 }
@@ -67,19 +67,6 @@ local default_opts = {
   on_attach = on_attach,
 }
 
-lspconfig.sumneko_lua.setup {
-  capabilities = capabilities,
-  flags = { debounce_text_changes = 150 },
-  on_attach = on_attach,
-  settings = {
-    Lua = {
-      diagnostics = { globals = { 'vim' } },
-      runtime     = { version = 'LuaJIT' },
-      telemetry   = { enable = false },
-      workspace   = { library = vim.api.nvim_get_runtime_file("", true) },
-    },
-  }
-}
 lspconfig.pyright.setup(default_opts)
 lspconfig.solargraph.setup(default_opts)
 lspconfig.tsserver.setup(default_opts)
