@@ -13,6 +13,9 @@ if type brew &>/dev/null; then
   fi
 fi
 
+## cargo
+. "$HOME/.cargo/env"
+
 ## direnv
 eval "$(direnv hook bash)"
 
