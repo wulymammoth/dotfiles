@@ -31,16 +31,13 @@ null_ls.setup({
     null_ls.builtins.diagnostics.checkmake,
 
     -- python
-    null_ls.builtins.diagnostics.mypy,
-    null_ls.builtins.diagnostics.pylint,
+    null_ls.builtins.diagnostics.ruff,
+
     null_ls.builtins.formatting.autoflake,
     null_ls.builtins.formatting.autopep8,
     null_ls.builtins.formatting.black,
     null_ls.builtins.formatting.reorder_python_imports,
-    -- null_ls.builtins.diagnostics.pydocstyle,
-    -- null_ls.builtins.diagnostics.vulture, -- too noisy
-    -- null_ls.builtins.formatting.isort, -- covered by ruff
-    -- null_ls.builtins.formatting.ruff, -- black + isort
+    null_ls.builtins.formatting.yapf, -- similar to ruff
 
     -- ruby
     null_ls.builtins.diagnostics.standardrb,
