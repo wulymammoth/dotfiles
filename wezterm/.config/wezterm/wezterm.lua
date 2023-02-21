@@ -3,7 +3,9 @@ local wezterm = require 'wezterm';
 return {
   color_scheme = "iceberg-dark",
 
-  font = wezterm.font("Hack Nerd Font Mono"),
+  font = wezterm.font("Hack Nerd Font Mono", {
+    weight="DemiBold",
+  }),
   font_size = 14.5,
 
   hide_tab_bar_if_only_one_tab = true,
