@@ -5,9 +5,11 @@ local lspconfig = require('lspconfig')
 mason.setup()
 masonconfig.setup {
   automatic_installation = true,
+
+  -- https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md
   ensure_installed = {
     'elixirls',
-    'lua_ls',
+    -- 'lua_ls', -- currently busted (2023-02-21)
     'pyright',
     'rust_analyzer',
     'tsserver',
