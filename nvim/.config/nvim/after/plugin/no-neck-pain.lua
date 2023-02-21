@@ -5,5 +5,5 @@ require("no-neck-pain").setup({
       right = { enabled = false },
     },
 
-    width = 120,
+    width = 125,
 })
