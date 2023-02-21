@@ -64,9 +64,6 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'prettier/vim-prettier', { 'do': 'npm install', 'for': ['javascript', 'typescript', 'css', 'scss', 'json', 'graphql'] }
 
   " language-specific
-  " * elixir
-    Plug 'elixir-editors/vim-elixir'
-    Plug 'mhanberg/elixir.nvim'
   " * markdown
     Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug'] }
   " * python
