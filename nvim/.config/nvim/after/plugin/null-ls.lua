@@ -8,17 +8,12 @@ null_ls.setup({
     -- language agnostic
     null_ls.builtins.code_actions.gitsigns,
     null_ls.builtins.completion.spell,
-    null_ls.builtins.diagnostics.dotenv_linter,
-    null_ls.builtins.diagnostics.gitlint,
     null_ls.builtins.diagnostics.hadolint,
     null_ls.builtins.diagnostics.todo_comments,
     null_ls.builtins.diagnostics.trail_space,
     null_ls.builtins.diagnostics.sqlfluff.with({
       extra_args = { "--dialect", "postgres" },
     }),
-
-    -- bash
-    null_ls.builtins.formatting.beautysh,
 
     -- elixir
     null_ls.builtins.diagnostics.credo,
@@ -38,9 +33,6 @@ null_ls.setup({
     null_ls.builtins.formatting.black,
     null_ls.builtins.formatting.reorder_python_imports,
     null_ls.builtins.formatting.yapf, -- similar to ruff
-
-    -- ruby
-    null_ls.builtins.diagnostics.standardrb,
 
     -- shell
     null_ls.builtins.code_actions.shellcheck,
