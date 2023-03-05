@@ -5,7 +5,7 @@ function set_win_title() {
 starship_precmd_user_func="set_win_title"
 
 # make new directory and change into it
-mkd() {
+function mkd() {
   mkdir -p "$@"
   cd "$@" || exit
 }
