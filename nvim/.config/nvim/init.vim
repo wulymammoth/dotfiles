@@ -28,6 +28,7 @@ call plug#begin('~/.config/nvim/plugged')
 
   " else
   Plug 'airblade/vim-rooter' " automatically change working directory to project root
+  Plug 'cocopon/iceberg.vim'
   Plug 'danymat/neogen' " language-specific annotation/documentation generator
   Plug 'editorconfig/editorconfig-vim'
   Plug 'folke/which-key.nvim' "pop-up with available key-bindings
@@ -78,7 +79,7 @@ call plug#end()
 autocmd FocusGained * :checktime " check if buffers changed outside of vim - required for `set autoread` and `set autoindent`
 autocmd OptionSet guicursor noautocmd set guicursor=
 
-colorscheme iceyberg
+colorscheme iceberg
 
 " python
 let g:python2_host_prog = expand('~/.asdf/shims/python2')
