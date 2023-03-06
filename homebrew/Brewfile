@@ -1,3 +1,4 @@
+tap "dopplerhq/cli"
 tap "github/gh"
 tap "homebrew/bundle"
 tap "homebrew/cask"
@@ -6,6 +7,8 @@ tap "homebrew/cask-versions"
 tap "homebrew/core"
 tap "tj/mmake", "https://github.com/tj/mmake.git"
 tap "universal-ctags/universal-ctags"
+tap "wez/wezterm"
+brew "little-cms2"
 brew "asdf"
 brew "bash"
 brew "bash-completion@2"
@@ -21,17 +24,23 @@ brew "exa"
 brew "fd"
 brew "fzf"
 brew "gh"
+brew "ghostscript"
 brew "git"
 brew "git-delta"
 brew "glances"
+brew "glib"
 brew "glow"
 brew "gnupg"
 brew "gping"
 brew "hadolint"
+brew "helm"
 brew "hyperfine"
+brew "libheif"
 brew "imagemagick"
 brew "jq"
 brew "luacheck"
+brew "kubernetes-cli"
+brew "kubectx"
 brew "macos-trash"
 brew "mas"
 brew "navi"
@@ -49,21 +58,20 @@ brew "stow"
 brew "tldr"
 brew "tmux"
 brew "tree"
-brew "wget"
-brew "wtfutil"
 brew "yamllint"
 brew "yapf"
 brew "zoxide"
+brew "dopplerhq/cli/doppler", link: false
+brew "tj/mmake/mmake"
 brew "universal-ctags/universal-ctags/universal-ctags", args: ["HEAD"]
 cask "docker", args: { appdir: "~/Applications" }
 cask "ngrok"
 cask "postman", args: { appdir: "~/Applications" }
+cask "rectangle", args: { appdir: "~/Applications" }
 cask "wezterm"
 mas "Fantastical", id: 975937182
-mas "ImageOne", id: 1237328432
 mas "Kindle", id: 405399194
-mas "Telegram", id: 747648890
+mas "Numbers", id: 409203825
 mas "TickTick", id: 966085870
 mas "Vimari", id: 1480933944
-mas "WhatsApp", id: 1147396723
 mas "Xcode", id: 497799835
