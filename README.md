@@ -2,22 +2,23 @@
 
 ![](./shellshot.png)
 
-## why are my directories structured the way that they are?
+## tooling (macos)
 
-I'm using [GNU Stow](https://www.gnu.org/software/stow/) to symlink my dotfiles and each directory that you see here mirrors that of my `$HOME` directory -- some application and utility configurations typically go under `$XDG_CONFIG_HOME` (`~/.config`).
-
-## some of my favorite tools and utilities:
-
-- [Alacritty](https://github.com/alacritty/alacritty) : terminal
-- [Neovim](https://github.com/neovim/neovim) : text editor
-- [bat](https://github.com/sharkdp/bat) : cat clone with syntax highlighting and Git integration
+- [asdf](https://direnv.net/) : load/unload environment variables based on $pwd
+- [bat](https://github.com/sharkdp/bat) : cat clone with syntax highlighting and git integration
 - [exa](https://github.com/ogham/exa) : a modern replacement for ls
 - [fd](https://github.com/sharkdp/fd) : simple, fast and user-friendly alternative to find
 - [fzf](https://github.com/junegunn/fzf) : command-line fuzzy finder and file system navigation
+- [github/gh](https://github.com/cli/cli) : github command-line tool
 - [htop](https://github.com/htop-dev/htop) : interactive process viewer
-- [ripgrep](https://github.com/BurntSushi/ripgrep) : command-line search utility (faster than grep and ag)
-- [tmux](https://github.com/tmux/tmux) : terminal multiplexer for project/session management and restore, because re-opening projects is 😭
+- [jq](https://stedolan.github.io/jq/) : lightweight and flexible command-line json processor
+- [neovim](https://github.com/neovim/neovim) : text editor
+- [ripgrep](https://github.com/burntsushi/ripgrep) : command-line search utility (faster than grep and ag)
+- [starship](https://starship.rs) : cross-shell prompt for astronauts
+- [tmux](https://github.com/tmux/tmux) : terminal multiplexer
+- [tree](http://mama.indstate.edu/users/ice/tree) : display directories as trees (with optional color/html output)
 - [zoxide](https://github.com/ajeetdsouza/zoxide) : a faster way to navigate the filesystem
-- [tree](http://mama.indstate.edu/users/ice/tree) : Display directories as trees (with optional color/HTML output)
 
-My other utilities and applications (primarily macOS) can be found in my [Brewfile](./homebrew/Brewfile)
+other utilities and applications can be found in the (./homebrew/Brewfile)
+- installation: `bundle install && brew bundle`
+- help: `brew bundle --help`
