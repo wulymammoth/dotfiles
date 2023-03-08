@@ -1,14 +1,30 @@
-[character]
-success_symbol = "[⚡︎](yellow)"
+format = """
+$directory\
+$git_branch\
+$git_state\
+$git_status\
+$cmd_duration\
+$line_break\
+$python\
+$character"""
 
 [aws]
 symbol = " "
 
 [cmd_duration]
-disabled = true
+format = "[$duration]($style) "
+style = "yellow"
+
+[character]
+success_symbol = "[❯](purple)"
+error_symbol = "[❯](red)"
+vimcmd_symbol = "[❮](green)"
 
 [conda]
 symbol = " "
+
+[directory]
+style = "blue"
 
 [docker_context]
 symbol = " "
@@ -20,7 +36,23 @@ symbol = " "
 symbol = " "
 
 [git_branch]
-symbol = " "
+format = "[]($style) [$branch]($style)"
+style = "bright-black"
+
+[git_status]
+format = "[[(*$conflicted$untracked$modified$staged$renamed$deleted)](red) ($ahead_behind$stashed)]($style)"
+style = "cyan"
+conflicted = "​"
+untracked = "​"
+modified = "​"
+staged = "​"
+renamed = "​"
+deleted = "​"
+stashed = "≡"
+
+[git_state]
+format = '\([$state( $progress_current/$progress_total)]($style)\) '
+style = "bright-black"
 
 [golang]
 symbol = " "
@@ -54,6 +86,10 @@ symbol = " "
 
 [php]
 symbol = " "
+
+[python]
+format = "[$virtualenv]($style) "
+style = "bright-black"
 
 [ruby]
 symbol = " "
