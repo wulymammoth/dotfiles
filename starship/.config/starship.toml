@@ -161,8 +161,7 @@ symbol = " "
 symbol = " "
 
 [python]
-format = "[$virtualenv]($style) "
-style = "bright-black"
+symbol = "🐍 "
 
 [ruby]
 symbol = " "
