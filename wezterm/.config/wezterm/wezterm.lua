@@ -6,7 +6,7 @@ return {
   font = wezterm.font("Hack Nerd Font Mono", {
     weight="DemiBold",
   }),
-  font_size = 14.8,
+  font_size = 14.5,
 
   hide_tab_bar_if_only_one_tab = true,
 
