@@ -4,9 +4,11 @@ return {
   color_scheme = "iceberg-dark",
 
   font = wezterm.font("Hack Nerd Font Mono", {
-    weight="DemiBold",
+    weight="Medium",
   }),
   font_size = 14.75,
+
+  front_end = "WebGpu",
 
   hide_tab_bar_if_only_one_tab = true,
 
