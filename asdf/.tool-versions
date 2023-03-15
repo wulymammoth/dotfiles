@@ -1,5 +1,5 @@
 deno 1.17.2
-elixir 1.11.3-otp-23
+elixir elixir 1.13.4-otp-25 1.11.3-otp-23
 erlang 23.3.4.16
 golang 1.17.7
 nodejs 17.3.0 17.2.0 16.13.1 lts

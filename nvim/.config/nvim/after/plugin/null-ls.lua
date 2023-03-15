@@ -17,6 +17,7 @@ null_ls.setup({
 
     -- elixir
     null_ls.builtins.diagnostics.credo,
+    null_ls.builtins.formatting.mix,
 
     -- lua
     null_ls.builtins.completion.luasnip,
