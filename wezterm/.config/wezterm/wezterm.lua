@@ -6,7 +6,7 @@ return {
   font = wezterm.font("Hack Nerd Font Mono", {
     weight="Medium",
   }),
-  font_size = 14.75,
+  font_size = 14.5,
 
   front_end = "WebGpu",
 
