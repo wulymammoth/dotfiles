@@ -9,7 +9,7 @@ tap "homebrew/core"
 tap "tj/mmake", "https://github.com/tj/mmake.git"
 tap "universal-ctags/universal-ctags"
 tap "wez/wezterm"
-brew "little-cms2"
+brew "unixodbc"
 brew "asdf"
 brew "bash"
 brew "bash-completion@2"
@@ -17,6 +17,7 @@ brew "bat"
 brew "black"
 brew "checkmake"
 brew "direnv"
+brew "docutils"
 brew "dog"
 brew "dotenv-linter"
 brew "dust"
@@ -26,16 +27,12 @@ brew "exa"
 brew "fd"
 brew "fzf"
 brew "gh"
-brew "ghostscript"
 brew "git"
 brew "git-delta"
 brew "gitlint"
 brew "glances"
 brew "glib"
 brew "glow"
-brew "libidn2"
-brew "unbound"
-brew "gnutls"
 brew "gnupg"
 brew "gping"
 brew "hadolint"
@@ -66,23 +63,22 @@ brew "stow"
 brew "tldr"
 brew "tmux"
 brew "tree"
+brew "wget"
 brew "yamllint"
 brew "yapf"
 brew "zoxide"
 brew "dopplerhq/cli/doppler", link: false
 brew "tj/mmake/mmake"
 brew "universal-ctags/universal-ctags/universal-ctags", args: ["HEAD"]
-cask "brave-browser", args: { appdir: "~/Applications" }
-cask "discord", args: { appdir: "~/Applications" }
 cask "docker", args: { appdir: "~/Applications" }
-cask "font-hack-nerd-font"
 cask "ngrok"
 cask "postman", args: { appdir: "~/Applications" }
-cask "rectangle", args: { appdir: "~/Applications" }
 cask "wezterm"
+mas "1Password 7", id: 1333542190
 mas "Fantastical", id: 975937182
 mas "Kindle", id: 405399194
 mas "Numbers", id: 409203825
+mas "Telegram", id: 747648890
 mas "TickTick", id: 966085870
 mas "Vimari", id: 1480933944
 mas "Xcode", id: 497799835
