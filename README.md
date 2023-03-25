@@ -2,7 +2,7 @@
 
 ![](./shellshot.png)
 
-## tooling (macos)
+## tooling (macOS)
 
 - [asdf](https://direnv.net/) : load/unload environment variables based on $pwd
 - [bat](https://github.com/sharkdp/bat) : cat clone with syntax highlighting and git integration
@@ -22,6 +22,6 @@
 - [wezterm](https://wezfurlong.org/wezterm/) : A GPU-accelerated cross-platform terminal emulator and multiplexer written by @wez and implemented in Rust
 - [zoxide](https://github.com/ajeetdsouza/zoxide) : a faster way to navigate the filesystem
 
-other utilities and applications can be found in the (./homebrew/Brewfile)
+other utilities and applications can be found in my [Brewfile](./homebrew/Brewfile)
 - installation: `bundle install && brew bundle`
 - help: `brew bundle --help`
