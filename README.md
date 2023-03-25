@@ -4,7 +4,7 @@
 
 ## tooling (macOS)
 
-- [asdf](https://direnv.net/) : load/unload environment variables based on $pwd
+- [asdf](https://asdf-vm.com/) : Extendable version manager with support for Ruby, Node.js, Erlang & more
 - [bat](https://github.com/sharkdp/bat) : cat clone with syntax highlighting and git integration
 - [direnv](https://direnv.net/) : Load/unload environment variables based on $PWD
 - [exa](https://github.com/ogham/exa) : a modern replacement for ls
