@@ -13,7 +13,7 @@ export HISTTIMEFORMAT='%F '
 
 ## ----- bat (colorizing manual) -----
 
-export BAT_THEME="ansi-dark"
+export BAT_THEME="ansi"
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 ## ----- homebrew -----
