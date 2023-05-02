@@ -30,9 +30,9 @@ null_ls.setup({
     null_ls.builtins.diagnostics.ruff,
 
     null_ls.builtins.formatting.autoflake,
+    null_ls.builtins.formatting.autopep8, -- instead of yapf
     null_ls.builtins.formatting.black,
     null_ls.builtins.formatting.reorder_python_imports,
-    null_ls.builtins.formatting.yapf,  -- instead of autopep8
 
     -- shell
     null_ls.builtins.code_actions.shellcheck,
