@@ -2,6 +2,7 @@ local null_ls = require("null-ls")
 local augroup = vim.api.nvim_create_augroup("LspFormatting", {})
 
 null_ls.setup({
+  -- NOTE: whenever any of these dependencies don't work, ensure that Mason has them installed
   debug = false,
 
   sources = {
