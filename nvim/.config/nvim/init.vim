@@ -80,7 +80,7 @@ call plug#end()
 autocmd FocusGained * :checktime " check if buffers changed outside of vim - required for `set autoread` and `set autoindent`
 autocmd OptionSet guicursor noautocmd set guicursor=
 
-colorscheme nord
+colorscheme iceyberg
 
 " python
 let g:python2_host_prog = expand('~/.asdf/shims/python2')
