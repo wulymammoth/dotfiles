@@ -33,6 +33,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'editorconfig/editorconfig-vim'
   Plug 'folke/which-key.nvim' "pop-up with available key-bindings
   Plug 'ludovicchabant/vim-gutentags' " tag file management in vim
+  Plug 'shaunsingh/nord.nvim'
   Plug 'tpope/vim-obsession' " coupled with tmux-resurrect for saving and restoring vim sessions
 
   " focus
@@ -79,7 +80,7 @@ call plug#end()
 autocmd FocusGained * :checktime " check if buffers changed outside of vim - required for `set autoread` and `set autoindent`
 autocmd OptionSet guicursor noautocmd set guicursor=
 
-colorscheme iceberg
+colorscheme nord
 
 " python
 let g:python2_host_prog = expand('~/.asdf/shims/python2')
