@@ -93,8 +93,8 @@ set background=dark
 set clipboard+=unnamedplus   " To ALWAYS use the clipboard for ALL operations (instead of registers)
 set completeopt=longest,menuone,preview,noselect
 set copyindent
-set cursorcolumn             " Highlight the screen column of the cursor with CursorColumn
-set cursorline               " Highlight cursor position (row/line)
+" set cursorcolumn             " Highlight the screen column of the cursor with CursorColumn
+" set cursorline               " Highlight cursor position (row/line)
 set encoding=utf-8
 set expandtab                " Insert space chars for TAB
 set fileencoding=utf-8
