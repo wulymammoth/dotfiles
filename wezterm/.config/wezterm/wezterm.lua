@@ -3,10 +3,7 @@ local wezterm = require 'wezterm';
 return {
   color_scheme = "iceberg-dark",
 
-  font = wezterm.font("Hack Nerd Font Mono", {
-    weight="Medium",
-  }),
-  font_size = 14.5,
+  font_size = 14,
 
   front_end = "WebGpu",
 
