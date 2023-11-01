@@ -7,7 +7,7 @@
 [branch]
   autosetupmerge = always
   autosetuprebase = always
-  sort = authordate
+  sort = -authordate
 
 [core]
   excludesfile = ~/.gitignore_global
