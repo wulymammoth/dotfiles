@@ -3,7 +3,7 @@ local wezterm = require 'wezterm';
 return {
   color_scheme = "iceberg-dark",
 
-  font_size = 14,
+  font_size = 14.5,
 
   front_end = "WebGpu",
 
