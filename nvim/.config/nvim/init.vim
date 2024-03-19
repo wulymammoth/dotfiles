@@ -53,6 +53,7 @@ call plug#begin('~/.config/nvim/plugged')
   Plug 'williamboman/mason.nvim'
 
   " testing
+  Plug 'nvim-neotest/nvim-nio' " neotest dep
   Plug 'nvim-neotest/neotest' " test runner for nvim
 
   " visual indicators
