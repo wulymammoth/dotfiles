@@ -1,11 +1,14 @@
 return {
   { "EdenEast/nightfox.nvim" },
+  { "catppuccin/nvim" },
+  { "navarasu/onedark.nvim" },
+  { "rebelot/kanagawa.nvim" },
+  { "rose-pine/neovim" },
 
-  -- Configure LazyVim to load gruvbox
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "nightfox",
+      colorscheme = "kanagawa",
     },
   },
 }
