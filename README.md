@@ -7,7 +7,6 @@
 - [asdf](https://asdf-vm.com/) : Extendable version manager with support for Ruby, Node.js, Erlang & more
 - [bat](https://github.com/sharkdp/bat) : cat clone with syntax highlighting and git integration
 - [direnv](https://direnv.net/) : Load/unload environment variables based on $PWD
-- [exa](https://github.com/ogham/exa) : a modern replacement for ls
 - [fd](https://github.com/sharkdp/fd) : simple, fast and user-friendly alternative to find
 - [fzf](https://github.com/junegunn/fzf) : command-line fuzzy finder and file system navigation
 - [github/gh](https://github.com/cli/cli) : github command-line tool
