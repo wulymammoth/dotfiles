@@ -1,6 +1,8 @@
 -- bootstrap lazy.nvim, LazyVim and your plugins
 require("config.lazy")
 
+vim.cmd([[highlight Visual ctermfg=white ctermbg=black guifg=white guibg=black]])
+
 vim.diagnostic.config({
   virtual_text = false, -- Disable inline diagnostics
   signs = true, -- Keep diagnostics in the gutter
