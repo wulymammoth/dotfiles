@@ -11,6 +11,7 @@ vim.diagnostic.config({
 })
 
 vim.o.hlsearch = false -- disable highlight search
+vim.o.wrap = true
 
 vim.opt.hidden = false -- disable 'No Name' buffer
 vim.opt.number = true -- Optionally, also enable absolute line numbers for the current line
