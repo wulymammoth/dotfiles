@@ -41,7 +41,7 @@ function ToggleVirtualText()
   print("virtual_text: " .. (virtual_text_enabled and "enabled" or "disabled"))
 end
 
-vim.api.nvim_set_keymap("n", "<leader>tv", ":lua ToggleVirtualText()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>nv", ":lua ToggleVirtualText()<CR>", { noremap = true, silent = true })
 
 -- inlay hints: type information --
 local inlay_hints_enabled = true
@@ -52,4 +52,4 @@ function ToggleInlayHints()
   print("inlay_hints: " .. (inlay_hints_enabled and "enabled" or "disabled"))
 end
 
-vim.api.nvim_set_keymap("n", "<leader>th", ":lua ToggleInlayHints()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<leader>nh", ":lua ToggleInlayHints()<CR>", { noremap = true, silent = true })
