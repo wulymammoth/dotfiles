@@ -6,6 +6,10 @@ require("lspkind").init({})
 local cmp = require("cmp")
 
 cmp.setup({
+  completion = {
+    keyword_length = 3,
+  },
+
   sources = {
     { name = "buffer" },
     { name = "copilot" },
