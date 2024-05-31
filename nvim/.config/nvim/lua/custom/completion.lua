@@ -6,9 +6,10 @@ require("lspkind").init({})
 local cmp = require("cmp")
 
 cmp.setup({
-  completion = {
-    keyword_length = 3,
-  },
+  -- [UNCOMMENT to only show completion when there are 3+ characters typed]
+  -- completion = {
+  --   keyword_length = 3,
+  -- },
 
   sources = {
     { name = "buffer" },
