@@ -1,5 +1,5 @@
--- vim.opt.completeopt = { "menu", "menuone", "noselect" } -- TJ's config
--- vim.opt.shortmess:append("c") -- TJ's config
+vim.opt.completeopt = { "menu", "menuone", "noselect" } -- TJ's config
+vim.opt.shortmess:append("c") -- TJ's config
 
 require("lspkind").init({})
 
