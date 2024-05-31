@@ -3,13 +3,6 @@ require("config.lazy")
 
 vim.cmd([[highlight Visual ctermfg=white ctermbg=black guifg=white guibg=black]])
 
-vim.diagnostic.config({
-  virtual_text = false, -- Disable inline diagnostics
-  signs = true, -- Keep diagnostics in the gutter
-  underline = true, -- Underline diagnostics in the code (optional)
-  update_in_insert = false, -- Update diagnostics in insert mode (optional)
-})
-
 vim.o.hlsearch = false -- disable highlight search
 vim.o.wrap = true
 

@@ -14,7 +14,8 @@ vim.keymap.set("n", "fg", function()
   require("telescope").extensions.live_grep_args.live_grep_args()
 end, { noremap = true, silent = true })
 
------ file paths -----
+----- FILE PATHS -----
+
 -- copy file name
 vim.api.nvim_set_keymap("n", "<Leader>fn", ':let @*=expand("%") <bar> :echo @*<CR>', { noremap = true, silent = true })
 -- copy file relative path
@@ -26,3 +27,29 @@ vim.api.nvim_set_keymap(
   ':let @*=expand("%:p") <bar> :echo @*<CR>',
   { noremap = true, silent = true }
 )
+
+----- LSP -----
+
+-- virtual text: debug information --
+local virtual_text_enabled = true
+
+function ToggleVirtualText()
+  virtual_text_enabled = not virtual_text_enabled
+  vim.diagnostic.config({
+    virtual_text = virtual_text_enabled,
+  })
+  print("virtual_text: " .. (virtual_text_enabled and "enabled" or "disabled"))
+end
+
+vim.api.nvim_set_keymap("n", "<leader>tv", ":lua ToggleVirtualText()<CR>", { noremap = true, silent = true })
+
+-- inlay hints: type information --
+local inlay_hints_enabled = true
+
+function ToggleInlayHints()
+  inlay_hints_enabled = not inlay_hints_enabled
+  vim.lsp.inlay_hint.enable(inlay_hints_enabled)
+  print("inlay_hints: " .. (inlay_hints_enabled and "enabled" or "disabled"))
+end
+
+vim.api.nvim_set_keymap("n", "<leader>th", ":lua ToggleInlayHints()<CR>", { noremap = true, silent = true })
