@@ -12,7 +12,12 @@ return {
       "hrsh7th/cmp-path",
       "onsails/lspkind.nvim",
       "saadparwaiz1/cmp_luasnip",
-      "zbirenbaum/copilot-cmp",
+      {
+        "zbirenbaum/copilot-cmp",
+        config = function()
+          require("copilot_cmp").setup()
+        end,
+      },
       { "L3MON4D3/LuaSnip", build = "make install_jsregexp" },
     },
 
