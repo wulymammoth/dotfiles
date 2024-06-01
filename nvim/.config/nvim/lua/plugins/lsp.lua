@@ -5,7 +5,7 @@ return {
     opts = {
       diagnostics = {
         underline = false,
-        update_in_insert = true,
+        update_in_insert = false,
         virtual_text = {
           highlight = "Comment",
           prefix = "icons",
