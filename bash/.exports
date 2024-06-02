@@ -26,6 +26,7 @@ BREW_PATHS="${BREW_SBINS}:${BREW_BINS}"
 ## ----- neovim -----
 
 export EDITOR=nvim
+export VIMRUNTIME=$(brew --prefix neovim)/share/nvim/runtime
 
 ## ------ fzf ------
 
