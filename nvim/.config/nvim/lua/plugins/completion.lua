@@ -14,9 +14,10 @@ return {
       "saadparwaiz1/cmp_luasnip",
       {
         "zbirenbaum/copilot-cmp",
-        config = function()
-          require("copilot_cmp").setup()
-        end,
+        opts = {
+          suggestion = { enable = true },
+          panel = { enable = false },
+        },
       },
       { "L3MON4D3/LuaSnip", build = "make install_jsregexp" },
     },
