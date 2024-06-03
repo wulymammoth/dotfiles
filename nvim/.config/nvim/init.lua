@@ -3,6 +3,8 @@ require("config.lazy")
 
 vim.cmd([[highlight Visual ctermfg=white ctermbg=black guifg=white guibg=black]])
 
+vim.g.editorconfig = 1
+
 vim.o.hlsearch = false -- disable highlight search
 vim.o.wrap = true
 
