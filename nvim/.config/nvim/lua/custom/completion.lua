@@ -1,21 +1,15 @@
 vim.opt.completeopt = { "menu", "menuone", "noselect" } -- TJ's config
 vim.opt.shortmess:append("c") -- TJ's config
 
-require("lspkind").init({})
+require("lspkind").init()
 
 local cmp = require("cmp")
 
 cmp.setup({
-  -- [UNCOMMENT to only show completion when there are 3+ characters typed]
-  -- completion = {
-  --   keyword_length = 3,
-  -- },
-
   sources = {
-    { name = "buffer" },
     { name = "copilot" },
+    { name = "luasnip" },
     { name = "nvim_lsp" },
-    { name = "path" },
   },
 
   mapping = {
@@ -68,3 +62,56 @@ vim.keymap.set({ "i", "s" }, "<C-m>", function()
     ls.jump(-1)
   end
 end, { silent = true })
+
+-- rafamadriz/friendly-snippets
+require("luasnip.loaders.from_vscode").lazy_load()
+
+-- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline({ "/", "?" }, {
+  mapping = cmp.mapping.preset.cmdline(),
+
+  sources = {
+    { name = "buffer" },
+  },
+})
+
+-- Use cmdline & path source for ':' (if you enabled `native_menu`, this won't work anymore).
+cmp.setup.cmdline(":", {
+  mapping = cmp.mapping.preset.cmdline(),
+
+  sources = cmp.config.sources({
+    { name = "path" },
+  }, {
+    { name = "cmdline" },
+  }),
+  matching = { disallow_symbol_nonprefix_matching = false },
+})
+
+-- Set up lspconfig.
+local capabilities = require("cmp_nvim_lsp").default_capabilities()
+language_servers = {
+  "dockerls",
+  "elixirls",
+  "eslint",
+  "jsonls",
+  "lua_ls",
+  "marksman",
+  "pyright",
+  "ruff",
+  "ruff_lsp",
+  "rust_analyzer",
+  "solargraph",
+  "tailwindcss",
+  "taplo",
+  "tsserver",
+  "vtsls",
+  "yamlls",
+}
+
+lsp_config = require("lspconfig")
+
+for _, lsp in ipairs(language_servers) do
+  lsp_config[lsp].setup({
+    capabilities = capabilities,
+  })
+end

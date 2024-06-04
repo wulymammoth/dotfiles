@@ -19,7 +19,15 @@ return {
           panel = { enable = false },
         },
       },
-      { "L3MON4D3/LuaSnip", build = "make install_jsregexp" },
+      {
+        "L3MON4D3/LuaSnip",
+
+        build = "make install_jsregexp",
+
+        dependencies = {
+          "rafamadriz/friendly-snippets",
+        },
+      },
     },
 
     config = function()
