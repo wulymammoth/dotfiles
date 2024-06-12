@@ -1,4 +1,5 @@
 nvim/.config/nvim/.netrwhist
+nvim/.config/nvim/lazy-lock.json
 nvim/.config/nvim/plugged/
 tmux/.tmux/plugins/
 tmux/.tmux/resurrect/
