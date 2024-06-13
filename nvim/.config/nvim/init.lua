@@ -6,6 +6,7 @@ vim.cmd([[highlight Visual ctermfg=white ctermbg=black guifg=white guibg=black]]
 vim.g.editorconfig = 1
 
 vim.o.hlsearch = false -- disable highlight search
+vim.o.winbar = "%=%m %f" -- Set the window bar to display relative path
 vim.o.wrap = true
 
 vim.opt.hidden = false -- disable 'No Name' buffer
