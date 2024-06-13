@@ -10,7 +10,7 @@ vim.keymap.set("n", "<Leader>og", function()
   require("telescope.builtin").live_grep({ grep_open_files = true })
 end, { noremap = true, silent = true })
 
-vim.keymap.set("n", "<Leader>/", function()
+vim.keymap.set("n", "<Leader>//", function()
   require("telescope").extensions.live_grep_args.live_grep_args()
 end, { noremap = true, silent = true })
 
