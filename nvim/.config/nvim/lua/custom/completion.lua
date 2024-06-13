@@ -97,14 +97,12 @@ language_servers = {
   "lua_ls",
   "marksman",
   "pyright",
-  "ruff",
   "ruff_lsp",
   "rust_analyzer",
   "solargraph",
   "tailwindcss",
   "taplo",
   "tsserver",
-  "vtsls",
   "yamlls",
 }
 
