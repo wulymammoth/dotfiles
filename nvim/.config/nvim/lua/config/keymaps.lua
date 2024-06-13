@@ -6,11 +6,11 @@
 vim.keymap.del("n", "<S-h>")
 vim.keymap.del("n", "<S-l>")
 
-vim.keymap.set("n", "<leader>og", function()
+vim.keymap.set("n", "<Leader>og", function()
   require("telescope.builtin").live_grep({ grep_open_files = true })
 end, { noremap = true, silent = true })
 
-vim.keymap.set("n", "fg", function()
+vim.keymap.set("n", "<Leader>/", function()
   require("telescope").extensions.live_grep_args.live_grep_args()
 end, { noremap = true, silent = true })
 
@@ -41,7 +41,7 @@ function ToggleVirtualText()
   print("virtual_text: " .. (virtual_text_enabled and "enabled" or "disabled"))
 end
 
-vim.api.nvim_set_keymap("n", "<leader>nv", ":lua ToggleVirtualText()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<Leader>nv", ":lua ToggleVirtualText()<CR>", { noremap = true, silent = true })
 
 -- inlay hints: type information --
 local inlay_hints_enabled = true
@@ -52,4 +52,4 @@ function ToggleInlayHints()
   print("inlay_hints: " .. (inlay_hints_enabled and "enabled" or "disabled"))
 end
 
-vim.api.nvim_set_keymap("n", "<leader>nh", ":lua ToggleInlayHints()<CR>", { noremap = true, silent = true })
+vim.api.nvim_set_keymap("n", "<Leader>nh", ":lua ToggleInlayHints()<CR>", { noremap = true, silent = true })
