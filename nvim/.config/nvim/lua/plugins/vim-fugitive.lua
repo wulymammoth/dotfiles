@@ -1,3 +1,8 @@
 return {
-  "tpope/vim-fugitive",
+  {
+    "tpope/vim-fugitive",
+    dependencies = {
+      "tpope/vim-rhubarb",
+    },
+  },
 }
