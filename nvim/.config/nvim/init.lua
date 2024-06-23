@@ -5,6 +5,9 @@ require("config.lazy")
 vim.cmd([[highlight Visual ctermfg=white ctermbg=black guifg=white guibg=black]])
 
 vim.g.editorconfig = 1 -- enable editorconfig
+vim.g.python3_host_prog = vim.fn.system("which python3"):gsub("\n", "")
+vim.g.loaded_ruby_provider = 1
+vim.g.ruby_host_prog = vim.fn.system("which ruby"):gsub("\n", "")
 
 vim.o.hlsearch = false -- disable highlight search
 vim.o.winbar = "%=%m %f" -- Set the window bar to display relative path
