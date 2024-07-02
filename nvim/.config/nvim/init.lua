@@ -10,6 +10,7 @@ vim.g.loaded_ruby_provider = 1
 vim.g.ruby_host_prog = vim.fn.system("which ruby"):gsub("\n", "")
 
 vim.o.hlsearch = false -- disable highlight search
+vim.o.jumpoptions = "view" -- stop jumping (this is Vim/Neovim default)
 vim.o.winbar = "%=%m %f" -- Set the window bar to display relative path
 vim.o.wrap = true -- enable line wrap
 
