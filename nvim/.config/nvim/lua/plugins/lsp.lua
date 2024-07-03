@@ -23,5 +23,27 @@ return {
         only_current_line = false,
       },
     },
+
+    config = function()
+      local lspconfig = require("lspconfig")
+      local configs = require("lspconfig.configs")
+
+      local home = os.getenv("HOME")
+      if not configs.lexical then
+        configs.lexical = {
+          default_config = {
+            filetypes = { "elixir", "eelixir", "heex" },
+            cmd = { home .. "/.local/share/nvim/mason/packages/lexical/libexec/lexical/bin/start_lexical.sh" },
+            root_dir = function(fname)
+              return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or home
+            end,
+            -- optional settings
+            settings = {},
+          },
+        }
+      end
+
+      lspconfig.lexical.setup({})
+    end,
   },
 }

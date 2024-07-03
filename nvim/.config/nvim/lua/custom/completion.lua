@@ -67,9 +67,9 @@ require("luasnip.loaders.from_vscode").lazy_load()
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 language_servers = {
   "dockerls",
-  "elixirls",
   "eslint",
   "jsonls",
+  "lexical", -- Elixir
   "lua_ls",
   "marksman",
   "pyright",
