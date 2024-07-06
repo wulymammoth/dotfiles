@@ -1,9 +1,6 @@
 -- Options are automatically loaded before lazy.nvim startup
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
-
-vim.cmd([[highlight Visual ctermfg=white ctermbg=black guifg=white guibg=black]]) -- set hightlight color and background
-
 vim.g.editorconfig = 1 -- enable editorconfig
 vim.g.lazyvim_python_lsp = "pyright"
 vim.g.lazyvim_python_ruff = "ruff_lsp"
