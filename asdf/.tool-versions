@@ -2,7 +2,7 @@ deno 1.17.2
 elixir elixir 1.13.4-otp-25 1.11.3-otp-23
 erlang 23.3.4.16
 golang 1.17.7
-nodejs 22.2.0
+nodejs 22.4.0
 purescript 0.14.0
 python 3.11.2
 ruby 3.3.3
