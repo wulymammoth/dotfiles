@@ -2,10 +2,8 @@ tap "dopplerhq/cli"
 tap "github/gh"
 tap "golangci/tap"
 tap "homebrew/bundle"
-tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "homebrew/cask-versions"
-tap "homebrew/core"
 tap "tj/mmake", "https://github.com/tj/mmake.git"
 tap "universal-ctags/universal-ctags"
 tap "wez/wezterm"
@@ -23,6 +21,7 @@ brew "dotenv-linter"
 brew "dust"
 brew "editorconfig-checker"
 brew "entr"
+brew "eza"
 brew "fd"
 brew "fzf"
 brew "gh"
@@ -36,22 +35,24 @@ brew "gnupg"
 brew "gping"
 brew "hadolint"
 brew "helm"
+brew "htop"
 brew "hyperfine"
 brew "libheif"
 brew "imagemagick"
 brew "jq"
-brew "kubernetes-cli"
-brew "kubectx"
-brew "luacheck", link: false
+brew "lazygit"
+brew "luacheck"
+brew "luarocks"
 brew "macos-trash"
 brew "mas"
 brew "navi"
 brew "neofetch"
 brew "neovim", args: ["HEAD"]
 brew "ngrep"
+brew "node"
 brew "pastel"
 brew "pre-commit"
-brew "reorder-python-imports"
+brew "prettierd"
 brew "ripgrep"
 brew "ruff"
 brew "shellcheck"
@@ -62,22 +63,37 @@ brew "stow"
 brew "tldr"
 brew "tmux"
 brew "tree"
-brew "wget"
+brew "universal-ctags"
 brew "yamllint"
-brew "yapf"
 brew "zoxide"
-brew "dopplerhq/cli/doppler", link: false
 brew "tj/mmake/mmake"
-brew "universal-ctags/universal-ctags/universal-ctags", args: ["HEAD"]
 cask "docker", args: { appdir: "~/Applications" }
+cask "font-fira-mono-for-powerline"
 cask "ngrok"
 cask "postman", args: { appdir: "~/Applications" }
 cask "wezterm"
 mas "1Password 7", id: 1333542190
 mas "Fantastical", id: 975937182
-mas "Kindle", id: 405399194
+mas "ImageOne", id: 1237328432
+mas "Kindle Classic", id: 405399194
+mas "Messenger", id: 1480068668
 mas "Numbers", id: 409203825
+mas "Okta Verify", id: 490179405
 mas "Telegram", id: 747648890
 mas "TickTick", id: 966085870
 mas "Vimari", id: 1480933944
+mas "WeChat", id: 836500024
+mas "WhatsApp", id: 1147396723
 mas "Xcode", id: 497799835
+vscode "atomiks.moonlight"
+vscode "dbaeumer.vscode-eslint"
+vscode "esbenp.prettier-vscode"
+vscode "github.copilot"
+vscode "github.copilot-chat"
+vscode "github.github-vscode-theme"
+vscode "gmsgarcia.min-darker-theme"
+vscode "miguelsolorio.min-theme"
+vscode "ms-azuretools.vscode-docker"
+vscode "ms-vscode-remote.remote-containers"
+vscode "rvest.vs-code-prettier-eslint"
+vscode "vscodevim.vim"

@@ -22,6 +22,7 @@ BREW_PREFIX='/opt/homebrew'
 BREW_BINS='/opt/homebrew/bin:/usr/local/bin'
 BREW_SBINS='/opt/homebrew/sbin:/usr/local/sbin'
 BREW_PATHS="${BREW_SBINS}:${BREW_BINS}"
+HOMEBREW_BUNDLE_FILE=$HOME/dotfiles/homebrew/Brewfile
 
 ## ----- neovim -----
 
