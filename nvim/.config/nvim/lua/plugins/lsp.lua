@@ -28,6 +28,7 @@ return {
       local lspconfig = require("lspconfig")
       local configs = require("lspconfig.configs")
 
+      -- [Elixir]
       local home = os.getenv("HOME")
       if not configs.lexical then
         configs.lexical = {
@@ -44,6 +45,23 @@ return {
       end
 
       lspconfig.lexical.setup({})
+
+      -- [Python]
+      -- Get the Poetry virtual environment path
+      local poetry_handle = io.popen("poetry env info --path")
+      local poetry_venv = poetry_handle:read("*a"):gsub("\n", "")
+      poetry_handle:close()
+
+      -- Get the Python version
+      local python_handle = io.popen("python --version")
+      local python_version = python_handle:read("*a"):gsub("Python ", ""):gsub("\n", "")
+      python_handle:close()
+
+      -- Extract the major and minor version
+      local python_major_minor = python_version:match("^(%d+%.%d+)")
+
+      -- Set the PYTHONPATH environment variable dynamically
+      vim.env.PYTHONPATH = poetry_venv .. "/lib/python" .. python_major_minor .. "/site-packages"
     end,
   },
 }
