@@ -47,6 +47,14 @@ return {
       lspconfig.lexical.setup({})
 
       -- [Python]
+
+      -- HACK to fix hover (in Python)
+      vim.api.nvim_create_autocmd("LspAttach", {
+        callback = function(args)
+          vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = args.buf })
+        end,
+      })
+
       -- Get the Poetry virtual environment path
       local poetry_handle = io.popen("poetry env info --path")
       local poetry_venv = poetry_handle:read("*a"):gsub("\n", "")

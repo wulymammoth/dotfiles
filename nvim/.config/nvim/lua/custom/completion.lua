@@ -73,7 +73,7 @@ language_servers = {
   "lua_ls",
   "marksman",
   "pyright",
-  "ruff_lsp",
+  "ruff",
   "rust_analyzer",
   "solargraph",
   "tailwindcss",

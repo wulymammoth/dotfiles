@@ -3,8 +3,8 @@
 -- Add any additional options here
 vim.g.editorconfig = 1 -- enable editorconfig
 vim.g.loaded_ruby_provider = 1
-vim.g.python_host_prog = vim.fn.system("which python"):gsub("\n", "")
 vim.g.python3_host_prog = vim.fn.system("which python3"):gsub("\n", "")
+vim.g.python_host_prog = vim.fn.system("which python"):gsub("\n", "")
 vim.g.ruby_host_prog = vim.fn.system("which ruby"):gsub("\n", "")
 
 vim.o.hlsearch = false -- disable highlight search
