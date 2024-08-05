@@ -7,14 +7,11 @@ return {
       eelixir = { "mix" },
       elixir = { "mix" },
       heex = { "mix" },
-      -- NOTE: (BUG) python (ruff) manually configured 7/22/24 (for formatting to work)
-      python = function(bufnr)
-        if require("conform").get_formatter_info("ruff_format", bufnr).available then
-          return { "ruff_format" }
-        else
-          return { "isort", "black" }
-        end
-      end,
+      python = {
+        "ruff_fix",
+        "ruff_format",
+        "ruff_organize_imports",
+      },
       surface = { "mix" },
     },
 
