@@ -8,7 +8,7 @@ return {
       elixir = { "mix" },
       heex = { "mix" },
       python = {
-        "ruff_fix",
+        -- "ruff_fix",
         "ruff_format",
         "ruff_organize_imports",
       },
