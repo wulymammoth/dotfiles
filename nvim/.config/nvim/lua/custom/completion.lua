@@ -1,6 +1,7 @@
 require("lspkind").init()
 
 local cmp = require("cmp")
+local lsp_config = require("lspconfig")
 
 cmp.setup({
   sources = {
@@ -66,13 +67,13 @@ require("luasnip.loaders.from_vscode").lazy_load()
 -- Set up lspconfig.
 local capabilities = require("cmp_nvim_lsp").default_capabilities()
 language_servers = {
+  "basedpyright",
   "dockerls",
   "eslint",
   "jsonls",
   "lexical", -- Elixir
   "lua_ls",
   "marksman",
-  "pyright",
   "ruff",
   "rust_analyzer",
   "solargraph",
@@ -81,8 +82,6 @@ language_servers = {
   "tsserver",
   "yamlls",
 }
-
-lsp_config = require("lspconfig")
 
 for _, lsp in ipairs(language_servers) do
   lsp_config[lsp].setup({

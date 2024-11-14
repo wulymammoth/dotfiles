@@ -2,6 +2,7 @@
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
 vim.g.editorconfig = 1 -- enable editorconfig
+vim.g.lazyvim_python_lsp = "basedpyright"
 vim.g.loaded_ruby_provider = 1
 vim.g.python3_host_prog = vim.fn.system("which python3"):gsub("\n", "")
 vim.g.python_host_prog = vim.fn.system("which python"):gsub("\n", "")

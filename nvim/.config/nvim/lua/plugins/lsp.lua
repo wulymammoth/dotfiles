@@ -1,3 +1,15 @@
+local function get_python_path()
+  local venv_path = os.getenv("VIRTUAL_ENV")
+
+  if venv_path then
+    -- If a virtual environment is activated, return the path to the Python executable
+    return venv_path .. "/bin/python"
+  else
+    -- Otherwise, fallback to system Python or another preferred interpreter
+    return "/usr/bin/python"
+  end
+end
+
 return {
   {
     "neovim/nvim-lspconfig",
@@ -57,19 +69,34 @@ return {
 
       -- Get the Poetry virtual environment path
       local poetry_handle = io.popen("poetry env info --path")
-      local poetry_venv = poetry_handle:read("*a"):gsub("\n", "")
-      poetry_handle:close()
+      if poetry_handle then
+        local poetry_venv = poetry_handle:read("*a"):gsub("\n", "")
+        poetry_handle:close()
 
-      -- Get the Python version
-      local python_handle = io.popen("python --version")
-      local python_version = python_handle:read("*a"):gsub("Python ", ""):gsub("\n", "")
-      python_handle:close()
+        -- Get the Python version
+        local python_handle = io.popen("python --version")
+        local python_version = python_handle:read("*a"):gsub("Python ", ""):gsub("\n", "")
+        python_handle:close()
 
-      -- Extract the major and minor version
-      local python_major_minor = python_version:match("^(%d+%.%d+)")
+        -- Extract the major and minor version
+        local python_major_minor = python_version:match("^(%d+%.%d+)")
 
-      -- Set the PYTHONPATH environment variable dynamically
-      vim.env.PYTHONPATH = poetry_venv .. "/lib/python" .. python_major_minor .. "/site-packages"
+        -- Set the PYTHONPATH environment variable dynamically
+        vim.env.PYTHONPATH = poetry_venv .. "/lib/python" .. python_major_minor .. "/site-packages"
+      end
+
+      lspconfig.basedpyright.setup({
+        settings = {
+          python = {
+            analysis = {
+              autoSearchPaths = true,
+              useLibraryCodeForTypes = true,
+              diagnosticMode = "workspace",
+              pythonPath = get_python_path(), -- Dynamically resolved Python path
+            },
+          },
+        },
+      })
     end,
   },
 }
