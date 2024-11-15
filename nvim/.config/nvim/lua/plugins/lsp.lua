@@ -1,11 +1,23 @@
-local function get_python_path()
-  local venv_path = os.getenv("VIRTUAL_ENV")
+-- local function get_python_path()
+--   local venv_path = os.getenv("VIRTUAL_ENV")
+--
+--   if venv_path then
+--     -- If a virtual environment is activated, return the path to the Python executable
+--     return venv_path .. "/bin/python"
+--   else
+--     -- Otherwise, fallback to system Python or another preferred interpreter
+--     return "/usr/bin/python"
+--   end
+-- end
 
-  if venv_path then
-    -- If a virtual environment is activated, return the path to the Python executable
-    return venv_path .. "/bin/python"
+local function get_python_path()
+  local venv_path = ".venv/bin/python" -- Path within nix-shell
+
+  if vim.fn.filereadable(venv_path) == 1 then
+    -- If the .venv exists and is accessible, return the path to the Python executable
+    return venv_path
   else
-    -- Otherwise, fallback to system Python or another preferred interpreter
+    -- Fallback to system Python or another interpreter
     return "/usr/bin/python"
   end
 end
@@ -92,10 +104,28 @@ return {
               autoSearchPaths = true,
               useLibraryCodeForTypes = true,
               diagnosticMode = "workspace",
+              typeCheckingMode = "strict", -- Enable strict type-checking similar to MyPy's settings
               pythonPath = get_python_path(), -- Dynamically resolved Python path
             },
           },
         },
+      })
+    end,
+  },
+
+  -- nvim-lint setup for MyPy
+  {
+    "mfussenegger/nvim-lint",
+    config = function()
+      require("lint").linters_by_ft = {
+        python = { "mypy" },
+      }
+
+      -- Auto-run linting on save
+      vim.api.nvim_create_autocmd({ "BufWritePost" }, {
+        callback = function()
+          require("lint").try_lint()
+        end,
       })
     end,
   },
