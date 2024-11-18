@@ -6,10 +6,12 @@ export CLICOLOR=1
 # erasedups all previous  lines  matching  the  current remove before save
 # do not record commands that begin with pressing up/down or space
 export HISTCONTROL=ignoreboth:erasedups
+export HISTFILESIZE=20000         # Number of commands to save in the history file
 export HISTFILESIZE=9999
 export HISTIGNORE='&:ls:[bf]g:exit:pwd:clear:mount:umount' # :[ \t]* # space prefix ignores comment
 export HISTSIZE= # unlimited
 export HISTTIMEFORMAT='%F '
+export PROMPT_COMMAND='history -a' # Append history after each command
 
 ## ----- bat (colorizing manual) -----
 
