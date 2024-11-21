@@ -3,6 +3,8 @@
   diffw = diff --color-words=. # color words
   dmb = !sh -c 'git branch --merged | rg -v main | rg -v master | xargs git branch -d' - # delete merged branches
   rpo = remote prune origin # clean deleted branches on remote
+  wip = "!git add -A; git rm $(git ls-files --deleted) 2> /dev/null; git commit --no-verify --no-gpg-sign -m '--wip-- [skip ci]'"
+  uwip = "!git reset HEAD~1 --soft; git restore --staged ."
 
 [branch]
   autosetupmerge = always
