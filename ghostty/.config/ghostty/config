@@ -1,0 +1,11 @@
+clipboard-read = allow
+clipboard-trim-trailing-spaces = true
+clipboard-write = allow
+copy-on-select = true
+font-family-bold = Hack Bold Nerd Font Complete Mono
+font-size = 14
+font-thicken = true
+macos-option-as-alt = true
+window-decoration = false
+window-theme = ghostty
+title = ""
