@@ -6,6 +6,7 @@
 vim.keymap.del("n", "<S-h>")
 vim.keymap.del("n", "<S-l>")
 
+--- SEARCH ---
 vim.keymap.set("n", "<Leader>og", function()
   require("telescope.builtin").live_grep({ grep_open_files = true })
 end, { noremap = true, silent = true })
@@ -14,42 +15,45 @@ vim.keymap.set("n", "<Leader>//", function()
   require("telescope").extensions.live_grep_args.live_grep_args()
 end, { noremap = true, silent = true })
 
------ FILE PATHS -----
+-- search resume
+vim.keymap.set("n", "<Leader>rs", function()
+  require("telescope.builtin").resume()
+end, { noremap = true, silent = true })
 
--- copy file name
-vim.api.nvim_set_keymap("n", "<Leader>fn", ':let @*=expand("%") <bar> :echo @*<CR>', { noremap = true, silent = true })
--- copy file relative path
-vim.api.nvim_set_keymap("n", "<Leader>fy", ':let @*=expand("%p") <bar> :echo @*<CR>', { noremap = true, silent = true })
--- copy file full path
-vim.api.nvim_set_keymap(
-  "n",
-  "<Leader>ffy",
-  ':let @*=expand("%:p") <bar> :echo @*<CR>',
-  { noremap = true, silent = true }
-)
+--- FILE PATHS ---
 
------ LSP -----
+-- Copy file name
+vim.keymap.set("n", "<Leader>fn", function()
+  vim.fn.setreg("*", vim.fn.expand("%"))
+  print(vim.fn.getreg("*"))
+end, { noremap = true, silent = true })
 
--- virtual text: debug information --
+-- Copy file relative path
+vim.keymap.set("n", "<Leader>fy", function()
+  vim.fn.setreg("*", vim.fn.expand("%p"))
+  print(vim.fn.getreg("*"))
+end, { noremap = true, silent = true })
+
+-- Copy file full path
+vim.keymap.set("n", "<Leader>ffy", function()
+  vim.fn.setreg("*", vim.fn.expand("%:p"))
+  print(vim.fn.getreg("*"))
+end, { noremap = true, silent = true })
+
+--- LSP ---
+
+-- Virtual text: debug information
 local virtual_text_enabled = true
-
-function ToggleVirtualText()
+vim.keymap.set("n", "<Leader>vt", function()
   virtual_text_enabled = not virtual_text_enabled
-  vim.diagnostic.config({
-    virtual_text = virtual_text_enabled,
-  })
+  vim.diagnostic.config({ virtual_text = virtual_text_enabled })
   print("virtual_text: " .. (virtual_text_enabled and "enabled" or "disabled"))
-end
+end, { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap("n", "<Leader>vt", ":lua ToggleVirtualText()<CR>", { noremap = true, silent = true })
-
--- inlay hints: type information --
+-- Inlay hints: type information
 local inlay_hints_enabled = true
-
-function ToggleInlayHints()
+vim.keymap.set("n", "<Leader>ih", function()
   inlay_hints_enabled = not inlay_hints_enabled
   vim.lsp.inlay_hint.enable(inlay_hints_enabled)
   print("inlay_hints: " .. (inlay_hints_enabled and "enabled" or "disabled"))
-end
-
-vim.api.nvim_set_keymap("n", "<Leader>ih", ":lua ToggleInlayHints()<CR>", { noremap = true, silent = true })
+end, { noremap = true, silent = true })
