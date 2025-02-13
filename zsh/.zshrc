@@ -1,19 +1,34 @@
-bindkey -e # use emacs keybinds 
+# Use Emacs keybindings
+bindkey -e
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# Homebrew
+HOMEBREW_PREFIX="/opt/homebrew"
+eval "$(${HOMEBREW_PREFIX}/bin/brew shellenv)"
+
+# Starship prompt
 eval "$(starship init zsh)"
 
+# Editor
 export EDITOR="nvim"
-export PATH="${ASDF_DATA_DIR:-$HOME/.asdf}/shims:$PATH"
+
+# Define PATH segments
+ASDF_SHIMS="${ASDF_DATA_DIR:-$HOME/.asdf}/shims"
+FZF_SHELL_COMPLETIONS="$(brew --prefix)/opt/fzf/shell/completion.zsh"
+FZF_SHELL_KEY_BINDINGS="$(brew --prefix)/opt/fzf/shell/key-bindings.zsh"
+
+# Set PATH in an ordered way
+export PATH="$ASDF_SHIMS:$PATH"
+
+# Word characters
 export WORDCHARS='*?_[]~=&;!#$%^(){}<>'
 
+# fzf
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-[ -f $(brew --prefix)/opt/fzf/shell/completion.zsh ] && source $(brew --prefix)/opt/fzf/shell/completion.zsh # Apple Silicon
-[ -f $(brew --prefix)/opt/fzf/shell/key-bindings.zsh ] && source $(brew --prefix)/opt/fzf/shell/key-bindings.zsh # Apple Silicon
+[ -f "$FZF_SHELL_COMPLETIONS" ] && source "$FZF_SHELL_COMPLETIONS"
+[ -f "$FZF_SHELL_KEY_BINDINGS" ] && source "$FZF_SHELL_KEY_BINDINGS"
 
-# append completions to fpath
-fpath=(${ASDF_DATA_DIR:-$HOME/.asdf}/completions $fpath)
-# initialise completions with ZSH's compinit
+# Append ASDF completions to fpath
+fpath=("${ASDF_DATA_DIR:-$HOME/.asdf}/completions" $fpath)
+
+# Initialize ZSH completions
 autoload -Uz compinit && compinit
-
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
