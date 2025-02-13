@@ -1,4 +1,5 @@
 local function get_python_path()
+  local home = os.getenv("HOME")
   local venv_path = os.getenv("VIRTUAL_ENV")
 
   if venv_path then
@@ -6,7 +7,7 @@ local function get_python_path()
     return venv_path .. "/bin/python"
   else
     -- Otherwise, fallback to system Python or another preferred interpreter
-    return "/usr/bin/python"
+    return home .. "/.asdf/shims/python"
   end
 end
 
@@ -50,7 +51,6 @@ return {
             root_dir = function(fname)
               return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or home
             end,
-            -- optional settings
             settings = {},
           },
         }
@@ -60,7 +60,7 @@ return {
 
       -- [Python]
 
-      -- HACK to fix hover (in Python)
+      -- Fix hover in Python
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(args)
           vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = args.buf })
@@ -68,21 +68,27 @@ return {
       })
 
       -- Get the Poetry virtual environment path
-      local poetry_handle = io.popen("poetry env info --path")
+      local poetry_venv = nil
+      local poetry_handle = io.popen("poetry env info --path 2>/dev/null") -- Ignore errors
       if poetry_handle then
-        local poetry_venv = poetry_handle:read("*a"):gsub("\n", "")
+        poetry_venv = poetry_handle:read("*a"):gsub("\n", "")
         poetry_handle:close()
+      end
 
-        -- Get the Python version
-        local python_handle = io.popen("python --version")
-        local python_version = python_handle:read("*a"):gsub("Python ", ""):gsub("\n", "")
+      -- Get the Python version
+      local python_version = nil
+      local python_handle = io.popen("python --version 2>&1 || python3 --version 2>&1") -- Try both python and python3
+      if python_handle then
+        python_version = python_handle:read("*a"):gsub("Python ", ""):gsub("\n", "")
         python_handle:close()
+      end
 
-        -- Extract the major and minor version
-        local python_major_minor = python_version:match("^(%d+%.%d+)")
+      -- Extract the major and minor version
+      local python_major_minor = python_version and python_version:match("^(%d+%.%d+)") or nil
 
-        -- Set the PYTHONPATH environment variable dynamically
-        vim.env.PYTHONPATH = poetry_venv .. "/lib/python" .. python_major_minor .. "/site-packages"
+      -- Set the PYTHONPATH environment variable dynamically if both values exist
+      if poetry_venv and poetry_venv ~= "" and python_major_minor then
+        vim.env.PYTHONPATH = string.format("%s/lib/python%s/site-packages", poetry_venv, python_major_minor)
       end
 
       lspconfig.basedpyright.setup({
