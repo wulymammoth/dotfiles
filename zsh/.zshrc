@@ -13,11 +13,12 @@ export EDITOR="nvim"
 
 # Define PATH segments
 ASDF_SHIMS="${ASDF_DATA_DIR:-$HOME/.asdf}/shims"
+LOCAL_BIN="$HOME/.local/bin"
 FZF_SHELL_COMPLETIONS="$(brew --prefix)/opt/fzf/shell/completion.zsh"
 FZF_SHELL_KEY_BINDINGS="$(brew --prefix)/opt/fzf/shell/key-bindings.zsh"
 
 # Set PATH in an ordered way
-export PATH="$ASDF_SHIMS:$PATH"
+export PATH="$LOCAL_BIN:$ASDF_SHIMS:$PATH"
 
 # Word characters
 export WORDCHARS='*?_[]~=&;!#$%^(){}<>'
