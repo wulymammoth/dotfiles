@@ -3,6 +3,7 @@ bindkey -e
 
 # Homebrew
 HOMEBREW_PREFIX="/opt/homebrew"
+HOMEBREW_SITE_FUNCTIONS="$HOMEBREW_PREFIX/share/zsh/site-functions"
 eval "$(${HOMEBREW_PREFIX}/bin/brew shellenv)"
 
 # Starship prompt
@@ -28,8 +29,15 @@ export WORDCHARS='*?_[]~=&;!#$%^(){}<>'
 [ -f "$FZF_SHELL_COMPLETIONS" ] && source "$FZF_SHELL_COMPLETIONS"
 [ -f "$FZF_SHELL_KEY_BINDINGS" ] && source "$FZF_SHELL_KEY_BINDINGS"
 
-# Append ASDF completions to fpath
-fpath=("${ASDF_DATA_DIR:-$HOME/.asdf}/completions" $fpath)
+# Define fpath segments
+ASDF_COMPLETIONS="${ASDF_DATA_DIR:-$HOME/.asdf}/completions"
+
+# Append custom completion paths to fpath
+fpath=(
+  "$ASDF_COMPLETIONS"
+  "$HOMEBREW_SITE_FUNCTIONS"
+  $fpath
+)
 
 # Initialize ZSH completions
 autoload -Uz compinit && compinit
