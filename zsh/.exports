@@ -1,0 +1,52 @@
+# History settings
+export HISTFILE="$HOME/.zsh_history"
+export HISTSIZE=20000
+export SAVEHIST=20000
+
+# Editor
+export EDITOR="nvim"
+export VIMRUNTIME=$(brew --prefix neovim)/share/nvim/runtime
+
+# Word characters
+export WORDCHARS='*?_[]~=&;!#$%^(){}<>'
+
+# Locale
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+# bat configuration
+export BAT_THEME="ansi"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+# fzf configuration
+export FZF_DEFAULT_COMMAND='fd --type f'
+export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+  --border
+  --color fg:#D8DEE9,hl:#89b8c2,fg+:#D8DEE9,hl+:#e27878
+  --color pointer:#BF616A,info:#4C566A,spinner:#4C566A,header:#4C566A,prompt:#81A1C1,marker:#EBCB8B'
+
+# ripgrep
+export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
+
+# Homebrew
+export HOMEBREW_BUNDLE_FILE=$HOME/dotfiles/homebrew/Brewfile
+
+# Path segments
+path=(
+    "$HOME/.asdf/shims"
+    "$HOME/.cargo/bin"
+    "$HOME/.local/bin"
+    "/usr/local/opt/llvm/bin"
+    "/usr/local/opt/openssl@3/bin"
+    "/opt/homebrew/bin"
+    "/opt/homebrew/sbin"
+    "/usr/local/bin"
+    "/usr/local/sbin"
+    $path
+)
+typeset -U path  # Ensures unique entries in PATH
+
+# New options
+setopt AUTO_PUSHD           # Push directories automatically
+setopt PUSHD_IGNORE_DUPS    # Don't push duplicates
+setopt PUSHD_SILENT         # Don't print directory stack 

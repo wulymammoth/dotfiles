@@ -1,0 +1,15 @@
+# History options
+setopt EXTENDED_HISTORY      # Write format
+setopt INC_APPEND_HISTORY    # Write after each command
+setopt HIST_IGNORE_DUPS      # Ignore duplicates
+setopt HIST_IGNORE_SPACE     # Ignore commands starting with space
+setopt HIST_REDUCE_BLANKS    # Remove superfluous blanks
+setopt HIST_VERIFY           # Show before executing history commands
+setopt SHARE_HISTORY         # Share history between sessions
+setopt HIST_SAVE_NO_DUPS     # Don't save duplicates
+setopt HIST_FIND_NO_DUPS     # Don't display duplicates in search
+
+# Directory options
+setopt AUTO_PUSHD            # Push directories automatically
+setopt PUSHD_IGNORE_DUPS     # Don't push duplicates
+setopt PUSHD_SILENT          # Don't print directory stack 

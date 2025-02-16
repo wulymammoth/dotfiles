@@ -1,0 +1,34 @@
+# Homebrew setup
+if [[ -f "/opt/homebrew/bin/brew" ]]; then
+    HOMEBREW_PREFIX="/opt/homebrew"
+elif [[ -f "/usr/local/bin/brew" ]]; then
+    HOMEBREW_PREFIX="/usr/local"
+else
+    echo "Homebrew not found"
+fi
+
+[[ -n "$HOMEBREW_PREFIX" ]] && eval "$(${HOMEBREW_PREFIX}/bin/brew shellenv)"
+
+# asdf
+if (( $+commands[asdf] )); then
+    if [[ -f "$(brew --prefix asdf)/libexec/asdf.sh" ]]; then
+        . "$(brew --prefix asdf)/libexec/asdf.sh"
+    else
+        echo "Warning: asdf.sh not found at $(brew --prefix asdf)/libexec/asdf.sh"
+    fi
+fi
+
+# Tool initialization
+if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init zsh)"
+fi
+
+if command -v direnv >/dev/null 2>&1; then
+    eval "$(direnv hook zsh)"
+fi
+
+if command -v zoxide >/dev/null 2>&1; then
+    eval "$(zoxide init zsh)"
+fi
+
+# Rest of your utilities file... 

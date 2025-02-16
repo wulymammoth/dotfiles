@@ -1,0 +1,42 @@
+# Load completion system
+autoload -Uz compinit
+
+# Setup cache
+zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/.zcompcache"
+zstyle ':completion:*' use-cache on
+
+# Initialize completion
+compinit -u -d "$XDG_CACHE_HOME/zsh/.zcompdump"
+
+# Completion options
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
+# Docker completions
+if (( $+commands[docker] )); then
+    # Create site-functions directory if it doesn't exist
+    if [[ ! -d "$HOMEBREW_PREFIX/share/zsh/site-functions" ]]; then
+        mkdir -p "$HOMEBREW_PREFIX/share/zsh/site-functions"
+    fi
+    
+    # Install Docker completion if missing
+    if [[ ! -f "$HOMEBREW_PREFIX/share/zsh/site-functions/_docker" ]]; then
+        debug "Installing Docker completion..."
+        curl -L https://raw.githubusercontent.com/docker/cli/master/contrib/completion/zsh/_docker \
+            -o "$HOMEBREW_PREFIX/share/zsh/site-functions/_docker"
+    fi
+    
+    # Install Docker Compose v2 completion if missing
+    if [[ ! -f "$HOMEBREW_PREFIX/share/zsh/site-functions/_docker-compose" ]]; then
+        debug "Installing Docker Compose completion..."
+        curl -L https://raw.githubusercontent.com/docker/compose/v2/contrib/completion/zsh/_docker-compose \
+            -o "$HOMEBREW_PREFIX/share/zsh/site-functions/_docker-compose"
+    fi
+fi
+
+# fpath setup for completions
+fpath=(
+    "${ASDF_DATA_DIR:-$HOME/.asdf}/completions"
+    "$HOMEBREW_PREFIX/share/zsh/site-functions"
+    $fpath
+) 

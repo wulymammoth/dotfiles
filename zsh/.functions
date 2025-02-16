@@ -1,0 +1,16 @@
+# Set window title
+function set_win_title() {
+    emulate -L zsh
+    print -Pn "\e]0;${PWD:t}\a"
+}
+precmd_functions+=(set_win_title)
+
+# Make directory and change into it
+function mkd() {
+  mkdir -p "$@" && cd "$@"
+}
+
+# gitignore.io
+function gi() {
+  curl -sL "https://www.toptal.com/developers/gitignore/api/$@"
+} 
