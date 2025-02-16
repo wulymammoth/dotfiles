@@ -1,0 +1,13 @@
+# Existing completion setup...
+
+# asdf completions
+fpath=(
+    "${ASDF_DATA_DIR:-$HOME/.asdf}/completions"
+    "$HOMEBREW_PREFIX/share/zsh/site-functions"
+    $fpath
+)
+
+# Initialize completion
+compinit -u -d "$XDG_CACHE_HOME/zsh/.zcompdump"
+
+# Rest of the file... 

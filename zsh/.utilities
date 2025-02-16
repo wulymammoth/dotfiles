@@ -9,11 +9,6 @@ fi
 
 [[ -n "$HOMEBREW_PREFIX" ]] && eval "$(${HOMEBREW_PREFIX}/bin/brew shellenv)"
 
-# asdf
-if (( $+commands[asdf] )); then
-    . "$(brew --prefix asdf)/libexec/asdf.sh"
-fi
-
 # cargo
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 

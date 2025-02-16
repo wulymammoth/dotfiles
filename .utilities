@@ -11,10 +11,13 @@ fi
 
 # asdf
 if (( $+commands[asdf] )); then
-    if [[ -f "$(brew --prefix asdf)/libexec/asdf.sh" ]]; then
-        . "$(brew --prefix asdf)/libexec/asdf.sh"
-    else
-        echo "Warning: asdf.sh not found at $(brew --prefix asdf)/libexec/asdf.sh"
+    # Source asdf
+    . "${ASDF_DATA_DIR:-$HOME/.asdf}/asdf.sh"
+    
+    # Create completions directory if it doesn't exist
+    if [[ ! -d "${ASDF_DATA_DIR:-$HOME/.asdf}/completions" ]]; then
+        mkdir -p "${ASDF_DATA_DIR:-$HOME/.asdf}/completions"
+        asdf completion zsh > "${ASDF_DATA_DIR:-$HOME/.asdf}/completions/_asdf"
     fi
 fi
 

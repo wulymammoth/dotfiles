@@ -12,14 +12,11 @@ bindkey -e
 for config in {exports,options,completions,utilities,aliases,functions}; do
     config_path="$HOME/.${config}"
     if [[ -r "$config_path" ]]; then
-        echo "Sourcing $config_path"
         source "$config_path"
     else
         echo "Could not read $config_path"
     fi
 done
-
-echo "ZSH configuration loaded"
 
 # After the source loop
 if ! (( $+commands[starship] )); then
