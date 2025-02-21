@@ -1,6 +1,0 @@
-# Existing path setup...
-path=(
-    "$HOME/.asdf/shims"  # This line already exists and is correct
-    # rest of your path entries...
-)
-typeset -U path 

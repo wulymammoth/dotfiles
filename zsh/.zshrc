@@ -19,12 +19,14 @@ for config in {exports,options,completions,utilities,aliases,functions}; do
 done
 
 # Load zsh-autosuggestions
-if [[ -f /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
-    source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-fi
+local autosuggestions_paths=(
+    "/usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    "/opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+)
 
-# After the source loop
-if ! (( $+commands[starship] )); then
-    echo "starship not found in PATH"
-    echo "PATH: $PATH"
-fi
+# for path in $autosuggestions_paths; do
+#     if [[ -f "$path" ]]; then
+#         source "$path"
+#         break  
+#     fi
+# done

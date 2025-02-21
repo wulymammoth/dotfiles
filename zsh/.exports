@@ -1,3 +1,5 @@
+#!/usr/bin/env zsh
+
 # History settings
 export HISTFILE="$HOME/.zsh_history"
 export HISTSIZE=20000
@@ -5,7 +7,9 @@ export SAVEHIST=20000
 
 # Editor
 export EDITOR="nvim"
-export VIMRUNTIME=$(brew --prefix neovim)/share/nvim/runtime
+local brew_prefix
+brew_prefix=$(/opt/homebrew/bin/brew --prefix neovim)
+export VIMRUNTIME="$brew_prefix/share/nvim/runtime"
 
 # Word characters
 export WORDCHARS='*?_[]~=&;!#$%^(){}<>'
