@@ -8,7 +8,13 @@ export SAVEHIST=20000
 # Editor
 export EDITOR="nvim"
 local brew_prefix
-brew_prefix=$(/opt/homebrew/bin/brew --prefix neovim)
+if [[ -f "/opt/homebrew/bin/brew" ]]; then
+    brew_prefix=$(/opt/homebrew/bin/brew --prefix)
+elif [[ -f "/usr/local/bin/brew" ]]; then
+    brew_prefix=$(/usr/local/bin/brew --prefix)
+else
+    echo "Homebrew not found"
+fi
 export VIMRUNTIME="$brew_prefix/share/nvim/runtime"
 
 # Word characters
