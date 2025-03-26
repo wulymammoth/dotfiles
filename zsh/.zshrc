@@ -9,12 +9,17 @@ mkdir -p "$XDG_CACHE_HOME/zsh"
 bindkey -e
 
 # Source core configurations in specific order
-for config in {exports,options,completions,utilities,aliases,functions}; do
+for config in {exports,exports_local,options,completions,utilities,aliases,functions}; do
+    # Load base config if it exists
     config_path="$HOME/.${config}"
     if [[ -r "$config_path" ]]; then
         source "$config_path"
-    else
-        echo "Could not read $config_path"
+    fi
+
+    # Load work-specific config if it exists
+    work_config_path="$HOME/.${config}_work"
+    if [[ -r "$work_config_path" ]]; then
+        source "$work_config_path"
     fi
 done
 
