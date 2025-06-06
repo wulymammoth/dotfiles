@@ -1,11 +1,11 @@
 return {
-  -- { "AlexvZyl/nordic.nvim" },
-  { "fcancelinha/nordern.nvim" },
+  { "AlexvZyl/nordic.nvim" },
+  -- { "fcancelinha/nordern.nvim" },
 
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "nordern",
+      colorscheme = "nordic",
     },
   },
 }
