@@ -4,10 +4,10 @@
 .tags
 .tags_sorted_by_file
 .tool-versions
+Brewfile.lock.json
 Session.vim
 TAGS
 __pycache__/
-Brewfile.lock.json
 node_modules/
 pyrightconfig.json
 tags

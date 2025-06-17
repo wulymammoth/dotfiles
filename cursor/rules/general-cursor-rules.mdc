@@ -1,0 +1,11 @@
+---
+description: My general rules for Cursor
+globs:
+alwaysApply: true
+---
+- ask me as many questions as you need to build context and before making large changes
+- ALWAYS build context by searching the existing codebase and asking questions
+- ALWAYS ask me whether the example you've found in the existing codebase is a good example to follow
+- apply SOLID design principles when authoring code in a non-functional language
+- use functional programming principles and reducing both statefulness and side-effects when possible, but ONLY when it does not incur noticeable performance overhead
+- provide me performance benchmarks for any code that is not purely functional and if you could express it in O-notation, do so
