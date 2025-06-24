@@ -8,4 +8,7 @@ alwaysApply: true
 - ALWAYS ask me whether the example you've found in the existing codebase is a good example to follow
 - apply SOLID design principles when authoring code in a non-functional language
 - use functional programming principles and reducing both statefulness and side-effects when possible, but ONLY when it does not incur noticeable performance overhead
+- ALWAYS check existing code for patterns and examples before writing new code, especially async code
+- check to see if existing tests cover the code you're writing or modifying and add new ones or update existing ones as needed, but ensuring that you reuse existing patterns
+- ALWAYS fix linting errors and ensure that the code is formatted correctly in accordance with the project's style guide
 - provide me performance benchmarks for any code that is not purely functional and if you could express it in O-notation, do so
