@@ -1,5 +1,6 @@
 # Same aliases work in zsh
 alias cat='bat'
+alias claude="/Users/wulymammoth/.claude/local/claude"
 alias desk='cd ~/Desktop'
 alias dig='dog'
 alias dotfiles='cd ~/dotfiles'
