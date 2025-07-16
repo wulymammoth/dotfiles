@@ -1,3 +1,6 @@
+# Disable extended history to not screw up my command history
+unsetopt EXTENDED_HISTORY
+
 # Simplified XDG setup - only what's needed for zsh
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
