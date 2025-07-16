@@ -1,5 +1,7 @@
 .DS_Store
 .claude-context.md
+.claude/
+CLAUDE.local.md
 .envrc
 .null-ls*
 .tags
