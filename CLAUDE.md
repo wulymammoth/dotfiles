@@ -105,15 +105,15 @@ Audit and modernization of Neovim configuration based on 2024-2025 community tre
    - Updated Claude settings to disable co-authored lines
    - Committed: `0ccb36c`
 
-### ✅ Phase 2: Performance Optimizations - MOSTLY COMPLETED
-3. **LSP Migration (Mason removal)** - ✅ MOSTLY DONE
+### ✅ Phase 2: Performance Optimizations - COMPLETED  
+3. **LSP Migration (Mason removal)** - ✅ FULLY COMPLETED
    - ✅ Installed system LSPs via Homebrew/npm:
      - `basedpyright` (Python) - Homebrew
      - `typescript-language-server` - Homebrew  
      - `vscode-eslint-language-server` - npm
    - ✅ Disabled Mason plugins in `disabled.lua`
    - ✅ Updated LSP configs to use system binaries
-   - 🔄 **PENDING**: Lexical (Elixir LSP) - needs proper dotfiles integration
+   - ✅ **COMPLETED**: ElixirLS (Elixir LSP) - installed via Homebrew
 
 4. **Consider fzf-lua Migration** - 🔄 NOT STARTED
    - Evaluate performance gains vs Telescope familiarity
@@ -140,11 +140,11 @@ Audit and modernization of Neovim configuration based on 2024-2025 community tre
 - **Removed Mason dependency** for language servers  
 - **System installations completed**:
   ```bash
-  brew install basedpyright typescript-language-server
+  brew install basedpyright typescript-language-server elixir-ls
   npm install -g vscode-langservers-extracted
   ```
 - **Configuration updated** to use system binaries
-- **Lexical temporarily disabled** - needs proper installation within dotfiles workflow
+- **ElixirLS integrated** - using stable, system-managed installation via Homebrew
 - **Benefits**: Simplified dependency management, no version conflicts, faster startup
 
 ## Recent Changes

@@ -40,25 +40,11 @@ return {
     config = function()
       local lspconfig = require("lspconfig")
 
-      -- [Elixir] - TODO: Set up Lexical properly within dotfiles structure
-      -- Temporarily commented out until we can install Lexical properly
-      -- local configs = require("lspconfig.configs")
-      -- local home = os.getenv("HOME")
-      -- if not configs.lexical then
-      --   configs.lexical = {
-      --     default_config = {
-      --       filetypes = { "elixir", "eelixir", "heex" },
-      --       cmd = { home .. "/tools/lexical/bin/start_lexical.sh" },
-      --       root_dir = function(fname)
-      --         return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or home
-      --       end,
-      --       settings = {},
-      --     },
-      --   }
-      -- end
-      -- lspconfig.lexical.setup({
-      --   capabilities = require("blink.cmp").get_lsp_capabilities(),
-      -- })
+      -- [Elixir] - Using system-installed ElixirLS via Homebrew
+      lspconfig.elixirls.setup({
+        capabilities = require("blink.cmp").get_lsp_capabilities(),
+        cmd = { "elixir-ls" },
+      })
 
       -- System-managed LSPs (no longer using Mason)
       
