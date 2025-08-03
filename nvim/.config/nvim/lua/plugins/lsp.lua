@@ -56,7 +56,9 @@ return {
         }
       end
 
-      lspconfig.lexical.setup({})
+      lspconfig.lexical.setup({
+        capabilities = require("blink.cmp").get_lsp_capabilities(),
+      })
 
       -- [Python]
 
@@ -92,6 +94,7 @@ return {
       end
 
       lspconfig.basedpyright.setup({
+        capabilities = require("blink.cmp").get_lsp_capabilities(),
         settings = {
           python = {
             analysis = {
