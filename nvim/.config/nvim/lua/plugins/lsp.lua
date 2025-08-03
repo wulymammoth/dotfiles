@@ -39,29 +39,40 @@ return {
 
     config = function()
       local lspconfig = require("lspconfig")
-      local configs = require("lspconfig.configs")
 
-      -- [Elixir]
-      local home = os.getenv("HOME")
-      if not configs.lexical then
-        configs.lexical = {
-          default_config = {
-            filetypes = { "elixir", "eelixir", "heex" },
-            cmd = { home .. "/.local/share/nvim/mason/packages/lexical/libexec/lexical/bin/start_lexical.sh" },
-            root_dir = function(fname)
-              return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or home
-            end,
-            settings = {},
-          },
-        }
-      end
+      -- [Elixir] - TODO: Set up Lexical properly within dotfiles structure
+      -- Temporarily commented out until we can install Lexical properly
+      -- local configs = require("lspconfig.configs")
+      -- local home = os.getenv("HOME")
+      -- if not configs.lexical then
+      --   configs.lexical = {
+      --     default_config = {
+      --       filetypes = { "elixir", "eelixir", "heex" },
+      --       cmd = { home .. "/tools/lexical/bin/start_lexical.sh" },
+      --       root_dir = function(fname)
+      --         return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or home
+      --       end,
+      --       settings = {},
+      --     },
+      --   }
+      -- end
+      -- lspconfig.lexical.setup({
+      --   capabilities = require("blink.cmp").get_lsp_capabilities(),
+      -- })
 
-      lspconfig.lexical.setup({
+      -- System-managed LSPs (no longer using Mason)
+      
+      -- [TypeScript/JavaScript]
+      lspconfig.ts_ls.setup({
+        capabilities = require("blink.cmp").get_lsp_capabilities(),
+      })
+
+      -- [ESLint]
+      lspconfig.eslint.setup({
         capabilities = require("blink.cmp").get_lsp_capabilities(),
       })
 
       -- [Python]
-
       -- Fix hover in Python
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(args)

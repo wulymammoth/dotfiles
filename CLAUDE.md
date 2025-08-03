@@ -105,11 +105,15 @@ Audit and modernization of Neovim configuration based on 2024-2025 community tre
    - Updated Claude settings to disable co-authored lines
    - Committed: `0ccb36c`
 
-### ⏳ Phase 2: Performance Optimizations - PENDING
-3. **LSP Migration (Mason removal)** - 🔄 NOT STARTED
-   - Remove Mason for language servers
-   - Use direct system package manager installation
-   - Streamline `lua/plugins/lsp.lua`
+### ✅ Phase 2: Performance Optimizations - MOSTLY COMPLETED
+3. **LSP Migration (Mason removal)** - ✅ MOSTLY DONE
+   - ✅ Installed system LSPs via Homebrew/npm:
+     - `basedpyright` (Python) - Homebrew
+     - `typescript-language-server` - Homebrew  
+     - `vscode-eslint-language-server` - npm
+   - ✅ Disabled Mason plugins in `disabled.lua`
+   - ✅ Updated LSP configs to use system binaries
+   - 🔄 **PENDING**: Lexical (Elixir LSP) - needs proper dotfiles integration
 
 4. **Consider fzf-lua Migration** - 🔄 NOT STARTED
    - Evaluate performance gains vs Telescope familiarity
@@ -128,9 +132,20 @@ Audit and modernization of Neovim configuration based on 2024-2025 community tre
 - [ ] DAP debugging functionality
 
 ## Next Immediate Actions
-1. **🚨 PRIORITY**: Test the new blink.cmp setup in actual development
-2. **IF TESTS PASS**: Proceed with Phase 2 (LSP Migration)
-3. **IF TESTS FAIL**: Debug and fix issues before continuing
+1. **🚨 PRIORITY**: Test the migrated LSP setup (TypeScript, Python, ESLint)
+2. **AFTER LSP TESTING**: Set up Lexical (Elixir LSP) within dotfiles structure
+3. **OPTIONAL**: Consider Phase 3 (fzf-lua migration)
+
+## Recent LSP Migration Summary
+- **Removed Mason dependency** for language servers  
+- **System installations completed**:
+  ```bash
+  brew install basedpyright typescript-language-server
+  npm install -g vscode-langservers-extracted
+  ```
+- **Configuration updated** to use system binaries
+- **Lexical temporarily disabled** - needs proper installation within dotfiles workflow
+- **Benefits**: Simplified dependency management, no version conflicts, faster startup
 
 ## Recent Changes
 - **Completed blink.cmp Migration**: Full replacement of nvim-cmp with modern completion engine
