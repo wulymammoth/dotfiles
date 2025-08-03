@@ -3,3 +3,6 @@ nvim/.config/nvim/lazy-lock.json
 nvim/.config/nvim/plugged/
 tmux/.tmux/plugins/
 tmux/.tmux/resurrect/
+
+# Claude local settings (environment-specific, should not be committed)
+.claude/settings.local.json
