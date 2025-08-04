@@ -10,7 +10,8 @@ vim.g.ruby_host_prog = vim.fn.system("which ruby"):gsub("\n", "")
 
 vim.o.hlsearch = false -- disable highlight search
 vim.o.jumpoptions = "view" -- stop jumping (this is Vim/Neovim default)
-vim.o.winbar = "%=%m %f" -- set the window bar to display relative path
+-- Set winbar to show relative path from current working directory
+vim.o.winbar = "%=%m %{expand('%:.')}"
 vim.o.wrap = true -- enable line wrap
 
 vim.opt.hidden = false -- disable 'No Name' buffer
