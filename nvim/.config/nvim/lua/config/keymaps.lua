@@ -8,16 +8,16 @@ vim.keymap.del("n", "<S-l>")
 
 --- SEARCH ---
 vim.keymap.set("n", "<Leader>og", function()
-  require("telescope.builtin").live_grep({ grep_open_files = true })
+  require("fzf-lua").grep({ grep_open_files = true })
 end, { noremap = true, silent = true })
 
 vim.keymap.set("n", "<Leader>//", function()
-  require("telescope").extensions.live_grep_args.live_grep_args()
+  require("fzf-lua").live_grep()
 end, { noremap = true, silent = true })
 
 -- search resume
 vim.keymap.set("n", "<Leader>rs", function()
-  require("telescope.builtin").resume()
+  require("fzf-lua").resume()
 end, { noremap = true, silent = true })
 
 --- FILE PATHS ---

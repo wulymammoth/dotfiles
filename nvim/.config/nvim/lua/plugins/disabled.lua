@@ -11,4 +11,7 @@ return {
   { "williamboman/mason.nvim", enabled = false },
   { "williamboman/mason-lspconfig.nvim", enabled = false },
   { "jay-babu/mason-nvim-dap.nvim", enabled = false },
+  -- Disable Telescope plugins - using fzf-lua instead
+  { "nvim-telescope/telescope.nvim", enabled = false },
+  { "nvim-telescope/telescope-live-grep-args.nvim", enabled = false },
 }
