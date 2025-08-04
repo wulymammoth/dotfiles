@@ -30,7 +30,7 @@ end, { noremap = true, silent = true })
 
 -- Copy file relative path
 vim.keymap.set("n", "<Leader>fy", function()
-  vim.fn.setreg("*", vim.fn.expand("%p"))
+  vim.fn.setreg("*", vim.fn.expand("%:."))
   print(vim.fn.getreg("*"))
 end, { noremap = true, silent = true })
 
