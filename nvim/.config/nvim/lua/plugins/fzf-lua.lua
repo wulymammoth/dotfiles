@@ -76,7 +76,7 @@ return {
       actions = {
         files = {
           ["default"] = require("fzf-lua.actions").file_edit_or_qf,
-          ["ctrl-s"] = require("fzf-lua.actions").file_split,
+          ["ctrl-x"] = require("fzf-lua.actions").file_split,
           ["ctrl-v"] = require("fzf-lua.actions").file_vsplit,
           ["ctrl-t"] = require("fzf-lua.actions").file_tabedit,
           ["alt-q"] = require("fzf-lua.actions").file_sel_to_qf,
@@ -84,7 +84,7 @@ return {
         },
         buffers = {
           ["default"] = require("fzf-lua.actions").buf_edit,
-          ["ctrl-s"] = require("fzf-lua.actions").buf_split,
+          ["ctrl-x"] = require("fzf-lua.actions").buf_split,
           ["ctrl-v"] = require("fzf-lua.actions").buf_vsplit,
           ["ctrl-t"] = require("fzf-lua.actions").buf_tabedit,
         }
