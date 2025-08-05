@@ -12,7 +12,8 @@ vim.keymap.set("n", "<Leader>og", function()
 end, { noremap = true, silent = true })
 
 vim.keymap.set("n", "<Leader>//", function()
-  require("fzf-lua").live_grep()
+  local dir = vim.fn.input("Search in dir: ", "./", "dir")
+  require("fzf-lua").live_grep({ cwd = dir })
 end, { noremap = true, silent = true })
 
 -- search resume
