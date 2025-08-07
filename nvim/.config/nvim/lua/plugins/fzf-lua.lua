@@ -87,6 +87,7 @@ return {
           ["ctrl-x"] = require("fzf-lua.actions").buf_split,
           ["ctrl-v"] = require("fzf-lua.actions").buf_vsplit,
           ["ctrl-t"] = require("fzf-lua.actions").buf_tabedit,
+          ["ctrl-d"] = require("fzf-lua.actions").buf_del,
         }
       },
       grep = {
@@ -116,9 +117,6 @@ return {
         sort_lastused = true,
         show_unloaded = true,
         cwd_only = false,
-        actions = {
-          ["ctrl-d"] = { fn = require("fzf-lua.actions").buf_del, reload = true },
-        }
       },
       oldfiles = {
         prompt = 'History❯ ',
