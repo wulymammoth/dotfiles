@@ -39,6 +39,19 @@ return {
 
     config = function()
       local lspconfig = require("lspconfig")
+      
+      -- Global LSP error handling to prevent sync errors
+      vim.lsp.set_log_level("error")
+      
+      -- Add error handler for LSP sync issues
+      local original_handler = vim.lsp.handlers["textDocument/didChange"]
+      vim.lsp.handlers["textDocument/didChange"] = function(...)
+        local ok, result = pcall(original_handler, ...)
+        if not ok then
+          vim.notify("LSP sync error ignored: " .. tostring(result), vim.log.levels.DEBUG)
+        end
+        return result
+      end
 
       -- [Elixir] - Using system-installed ElixirLS via Homebrew
       lspconfig.elixirls.setup({
@@ -46,17 +59,21 @@ return {
         cmd = { "elixir-ls" },
       })
 
+      -- Common LSP setup options to prevent sync issues
+      local default_setup = {
+        capabilities = require("blink.cmp").get_lsp_capabilities(),
+        flags = {
+          debounce_text_changes = 150, -- Reduce sync frequency
+        },
+      }
+
       -- System-managed LSPs (no longer using Mason)
       
       -- [TypeScript/JavaScript]
-      lspconfig.ts_ls.setup({
-        capabilities = require("blink.cmp").get_lsp_capabilities(),
-      })
+      lspconfig.ts_ls.setup(default_setup)
 
       -- [ESLint]
-      lspconfig.eslint.setup({
-        capabilities = require("blink.cmp").get_lsp_capabilities(),
-      })
+      lspconfig.eslint.setup(default_setup)
 
       -- [Python]
       -- Fix hover in Python
@@ -90,8 +107,7 @@ return {
         vim.env.PYTHONPATH = string.format("%s/lib/python%s/site-packages", poetry_venv, python_major_minor)
       end
 
-      lspconfig.basedpyright.setup({
-        capabilities = require("blink.cmp").get_lsp_capabilities(),
+      lspconfig.basedpyright.setup(vim.tbl_deep_extend("force", default_setup, {
         settings = {
           python = {
             analysis = {
@@ -102,7 +118,7 @@ return {
             },
           },
         },
-      })
+      }))
     end,
   },
 }
