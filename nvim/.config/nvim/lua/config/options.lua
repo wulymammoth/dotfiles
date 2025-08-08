@@ -8,6 +8,9 @@ vim.g.python3_host_prog = vim.fn.system("which python3"):gsub("\n", "")
 vim.g.python_host_prog = vim.fn.system("which python"):gsub("\n", "")
 vim.g.ruby_host_prog = vim.fn.system("which ruby"):gsub("\n", "")
 
+-- Set clipboard to use system clipboard (macOS)
+vim.opt.clipboard = "unnamedplus"
+
 vim.o.hlsearch = false -- disable highlight search
 vim.o.jumpoptions = "view" -- stop jumping (this is Vim/Neovim default)
 -- Set winbar to show relative path from current working directory
