@@ -10,6 +10,7 @@ LOCAL_BIN="$HOME/.local/bin"
 CARGO_BINS=$HOME/.cargo/bin
 LLVM_PATH=/usr/local/opt/llvm/bin
 OPENSSL_PATH=/usr/local/opt/openssl@3/bin
+TREE_SITTER_PATH=/usr/local/opt/tree-sitter/bin
 PYTHON_BINS=$HOME/.local/bin
 
 # Set PATH
@@ -18,6 +19,7 @@ path=(
   $CARGO_BINS
   $GOPATH/bin
   $LLVM_PATH
+  $TREE_SITTER_PATH
   $PYTHON_BINS
   $BREW_PATHS
   $OPENSSL_PATH
