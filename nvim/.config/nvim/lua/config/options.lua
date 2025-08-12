@@ -3,10 +3,9 @@
 -- Add any additional options here
 vim.g.editorconfig = 1 -- enable editorconfig
 vim.g.lazyvim_python_lsp = "basedpyright"
-vim.g.loaded_ruby_provider = 1
+vim.g.loaded_ruby_provider = 0  -- disable Ruby provider for cross-machine compatibility
 vim.g.python3_host_prog = vim.fn.system("which python3"):gsub("\n", "")
 vim.g.python_host_prog = vim.fn.system("which python"):gsub("\n", "")
-vim.g.ruby_host_prog = vim.fn.system("which ruby"):gsub("\n", "")
 
 -- Set clipboard to use system clipboard (macOS)
 vim.opt.clipboard = "unnamedplus"
