@@ -66,6 +66,13 @@ return {
         vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
       end
 
+      -- [Elixir] - Using system-installed ElixirLS via Homebrew
+      lspconfig.elixirls.setup({
+        capabilities = require("blink.cmp").get_lsp_capabilities(),
+        cmd = { "elixir-ls" },
+        on_attach = on_attach,
+      })
+
       -- Common LSP setup options to prevent sync issues
       local default_setup = {
         capabilities = require("blink.cmp").get_lsp_capabilities(),
@@ -76,10 +83,7 @@ return {
       }
 
       -- System-managed LSPs (no longer using Mason)
-
-      -- [Elixir] - Using LazyVim's Elixir extra configuration
-      -- Note: ElixirLS setup is handled by lazyvim.plugins.extras.lang.elixir
-
+      
       -- [TypeScript/JavaScript]
       lspconfig.ts_ls.setup(default_setup)
 
