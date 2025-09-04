@@ -39,6 +39,7 @@ return {
 
     config = function()
       local lspconfig = require("lspconfig")
+      local mason_lspconfig = require("mason-lspconfig")
       
       -- Global LSP error handling to prevent sync errors
       vim.lsp.set_log_level("error")
@@ -66,13 +67,6 @@ return {
         vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
       end
 
-      -- [Elixir] - Using system-installed ElixirLS via Homebrew
-      lspconfig.elixirls.setup({
-        capabilities = require("blink.cmp").get_lsp_capabilities(),
-        cmd = { "elixir-ls" },
-        on_attach = on_attach,
-      })
-
       -- Common LSP setup options to prevent sync issues
       local default_setup = {
         capabilities = require("blink.cmp").get_lsp_capabilities(),
@@ -82,20 +76,23 @@ return {
         },
       }
 
-      -- System-managed LSPs (no longer using Mason)
-      
-      -- [TypeScript/JavaScript]
-      lspconfig.ts_ls.setup(default_setup)
-
-      -- [ESLint]
-      lspconfig.eslint.setup(default_setup)
-
-      -- [Python]
-      -- Fix hover in Python
-      vim.api.nvim_create_autocmd("LspAttach", {
-        callback = function(args)
-          vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = args.buf })
+      -- Python-specific setup with Poetry/virtual environment detection
+      local python_setup = vim.tbl_deep_extend("force", default_setup, {
+        -- Fix hover in Python
+        on_attach = function(client, bufnr)
+          on_attach(client, bufnr)
+          vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = bufnr })
         end,
+        settings = {
+          python = {
+            analysis = {
+              autoSearchPaths = true,
+              useLibraryCodeForTypes = true,
+              diagnosticMode = "workspace",
+              pythonPath = get_python_path(), -- Dynamically resolved Python path
+            },
+          },
+        },
       })
 
       -- Get the Poetry virtual environment path
@@ -122,18 +119,78 @@ return {
         vim.env.PYTHONPATH = string.format("%s/lib/python%s/site-packages", poetry_venv, python_major_minor)
       end
 
-      lspconfig.basedpyright.setup(vim.tbl_deep_extend("force", default_setup, {
-        settings = {
-          python = {
-            analysis = {
-              autoSearchPaths = true,
-              useLibraryCodeForTypes = true,
-              diagnosticMode = "workspace",
-              pythonPath = get_python_path(), -- Dynamically resolved Python path
+      -- Expert LSP (Elixir) - manually installed, not managed by Mason
+      lspconfig.lexical.setup({
+        capabilities = require("blink.cmp").get_lsp_capabilities(),
+        cmd = { vim.fn.expand("~/.local/bin/expert") },
+        root_dir = function(fname)
+          return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or vim.loop.cwd()
+        end,
+        filetypes = { "elixir", "eelixir", "heex" },
+        on_attach = on_attach,
+        settings = {}
+      })
+
+      -- Mason-managed LSP server configurations
+      local server_configs = {
+        basedpyright = python_setup,
+        ts_ls = default_setup,
+        eslint = default_setup,
+        lua_ls = vim.tbl_deep_extend("force", default_setup, {
+          settings = {
+            Lua = {
+              runtime = {
+                version = "LuaJIT",
+              },
+              diagnostics = {
+                globals = { "vim" },
+              },
+              workspace = {
+                library = vim.api.nvim_get_runtime_file("", true),
+                checkThirdParty = false,
+              },
+              telemetry = {
+                enable = false,
+              },
             },
           },
-        },
-      }))
+        }),
+        jsonls = default_setup,
+        yamlls = default_setup,
+      }
+
+      -- Setup LSP servers through mason-lspconfig
+      mason_lspconfig.setup_handlers({
+        -- Default handler for servers without custom configuration
+        function(server_name)
+          lspconfig[server_name].setup(default_setup)
+        end,
+        
+        -- Custom configurations for specific servers
+        ["basedpyright"] = function()
+          lspconfig.basedpyright.setup(server_configs.basedpyright)
+        end,
+        
+        ["ts_ls"] = function()
+          lspconfig.ts_ls.setup(server_configs.ts_ls)
+        end,
+        
+        ["eslint"] = function()
+          lspconfig.eslint.setup(server_configs.eslint)
+        end,
+        
+        ["lua_ls"] = function()
+          lspconfig.lua_ls.setup(server_configs.lua_ls)
+        end,
+        
+        ["jsonls"] = function()
+          lspconfig.jsonls.setup(server_configs.jsonls)
+        end,
+        
+        ["yamlls"] = function()
+          lspconfig.yamlls.setup(server_configs.yamlls)
+        end,
+      })
     end,
   },
 }
