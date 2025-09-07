@@ -53,6 +53,17 @@
 9. After writing code or implementing something, prompt me with a commit message that describes the changes made, and ask for confirmation before committing.
 10. **ALWAYS** update context files before committing completed work and moving on to the next task.
 
+## Language-Specific Guidelines
+
+### Elixir/Phoenix
+- Follow modern Elixir patterns: `with/else`, explicit data contracts, composable functions
+- Use static analysis (`@spec` + Dialyzer) + runtime guards for layered correctness
+- Property-based testing for complex data, example-based for specific scenarios
+- Database orchestration via `Ecto.Multi` for transactional workflows
+
+### Future Languages
+- [Add guidelines as needed for other languages you work with]
+
 ## Commit Standards
 
 - **MANDATORY**: Commit all completed work before proceeding to new tasks
