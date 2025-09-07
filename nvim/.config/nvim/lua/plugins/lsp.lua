@@ -131,16 +131,14 @@ return {
       end
 
       -- Setup individual LSP servers
-      -- Expert LSP (Elixir) - manually installed
-      lspconfig.lexical.setup({
+      -- Expert LSP (Elixir) - Mason installed using new Neovim 0.11+ native API
+      vim.lsp.config('expert', {
+        cmd = { vim.fn.expand("~/.local/share/nvim/mason/bin/expert") },
+        filetypes = { 'elixir', 'eelixir', 'heex' },
+        root_markers = { 'mix.exs', '.git' },
         capabilities = require("blink.cmp").get_lsp_capabilities(),
-        cmd = { vim.fn.expand("~/.local/bin/expert") },
-        root_dir = function(fname)
-          return lspconfig.util.root_pattern("mix.exs", ".git")(fname) or vim.loop.cwd()
-        end,
-        filetypes = { "elixir", "eelixir", "heex" },
         on_attach = on_attach,
-        settings = {}
+        settings = {},
       })
 
       -- Setup basedpyright
