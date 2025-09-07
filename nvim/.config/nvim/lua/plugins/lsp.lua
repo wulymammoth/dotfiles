@@ -14,6 +14,10 @@ end
 return {
   {
     "neovim/nvim-lspconfig",
+    dependencies = {
+      "williamboman/mason.nvim",
+      "williamboman/mason-lspconfig.nvim",
+    },
 
     opts = {
       diagnostics = {
@@ -37,21 +41,28 @@ return {
       },
     },
 
-    config = function()
+    config = function(_, opts)
       local lspconfig = require("lspconfig")
-      local mason_lspconfig = require("mason-lspconfig")
+      
+      -- Apply diagnostic and inlay hints settings
+      vim.diagnostic.config(opts.diagnostics or {})
+      if opts.inlay_hints then
+        vim.lsp.inlay_hint.enable(opts.inlay_hints.enabled)
+      end
       
       -- Global LSP error handling to prevent sync errors
       vim.lsp.set_log_level("error")
       
       -- Add error handler for LSP sync issues
       local original_handler = vim.lsp.handlers["textDocument/didChange"]
-      vim.lsp.handlers["textDocument/didChange"] = function(...)
-        local ok, result = pcall(original_handler, ...)
-        if not ok then
-          vim.notify("LSP sync error ignored: " .. tostring(result), vim.log.levels.DEBUG)
+      if original_handler then
+        vim.lsp.handlers["textDocument/didChange"] = function(...)
+          local ok, result = pcall(original_handler, ...)
+          if not ok then
+            vim.notify("LSP sync error ignored: " .. tostring(result), vim.log.levels.DEBUG)
+          end
+          return result
         end
-        return result
       end
 
       -- LSP keymaps setup
@@ -119,7 +130,8 @@ return {
         vim.env.PYTHONPATH = string.format("%s/lib/python%s/site-packages", poetry_venv, python_major_minor)
       end
 
-      -- Expert LSP (Elixir) - manually installed, not managed by Mason
+      -- Setup individual LSP servers
+      -- Expert LSP (Elixir) - manually installed
       lspconfig.lexical.setup({
         capabilities = require("blink.cmp").get_lsp_capabilities(),
         cmd = { vim.fn.expand("~/.local/bin/expert") },
@@ -131,65 +143,58 @@ return {
         settings = {}
       })
 
-      -- Mason-managed LSP server configurations
-      local server_configs = {
-        basedpyright = python_setup,
-        ts_ls = default_setup,
-        eslint = default_setup,
-        lua_ls = vim.tbl_deep_extend("force", default_setup, {
-          settings = {
-            Lua = {
-              runtime = {
-                version = "LuaJIT",
-              },
-              diagnostics = {
-                globals = { "vim" },
-              },
-              workspace = {
-                library = vim.api.nvim_get_runtime_file("", true),
-                checkThirdParty = false,
-              },
-              telemetry = {
-                enable = false,
-              },
+      -- Setup basedpyright
+      lspconfig.basedpyright.setup(python_setup)
+      
+      -- Setup TypeScript/JavaScript
+      lspconfig.ts_ls.setup(default_setup)
+      
+      -- Setup ESLint
+      lspconfig.eslint.setup(default_setup)
+      
+      -- Setup Lua LS
+      lspconfig.lua_ls.setup(vim.tbl_deep_extend("force", default_setup, {
+        settings = {
+          Lua = {
+            runtime = {
+              version = "LuaJIT",
+            },
+            diagnostics = {
+              globals = { "vim" },
+            },
+            workspace = {
+              library = vim.api.nvim_get_runtime_file("", true),
+              checkThirdParty = false,
+            },
+            telemetry = {
+              enable = false,
             },
           },
-        }),
-        jsonls = default_setup,
-        yamlls = default_setup,
-      }
-
-      -- Setup LSP servers through mason-lspconfig
-      mason_lspconfig.setup_handlers({
-        -- Default handler for servers without custom configuration
-        function(server_name)
-          lspconfig[server_name].setup(default_setup)
-        end,
-        
-        -- Custom configurations for specific servers
-        ["basedpyright"] = function()
-          lspconfig.basedpyright.setup(server_configs.basedpyright)
-        end,
-        
-        ["ts_ls"] = function()
-          lspconfig.ts_ls.setup(server_configs.ts_ls)
-        end,
-        
-        ["eslint"] = function()
-          lspconfig.eslint.setup(server_configs.eslint)
-        end,
-        
-        ["lua_ls"] = function()
-          lspconfig.lua_ls.setup(server_configs.lua_ls)
-        end,
-        
-        ["jsonls"] = function()
-          lspconfig.jsonls.setup(server_configs.jsonls)
-        end,
-        
-        ["yamlls"] = function()
-          lspconfig.yamlls.setup(server_configs.yamlls)
-        end,
+        },
+      }))
+      
+      -- Setup JSON LS
+      lspconfig.jsonls.setup(default_setup)
+      
+      -- Setup YAML LS
+      lspconfig.yamlls.setup(default_setup)
+      
+      -- Register copilot config to suppress warning
+      -- Copilot is handled via copilot.lua, not as an LSP server
+      vim.lsp.config("copilot", {})
+      
+      -- Setup Mason and mason-lspconfig
+      require("mason").setup()
+      require("mason-lspconfig").setup({
+        ensure_installed = {
+          "basedpyright",
+          "ts_ls",
+          "eslint",
+          "lua_ls",
+          "jsonls",
+          "yamlls",
+        },
+        automatic_installation = true,
       })
     end,
   },
