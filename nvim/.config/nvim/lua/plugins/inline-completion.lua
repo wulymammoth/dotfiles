@@ -1,15 +1,16 @@
--- Inline completion configuration for Neovim 0.11.0+
+-- Inline completion configuration for Neovim 0.12.0+
 -- Based on https://github.com/neovim/neovim/pull/33972
+-- Available API: enable, get, is_enabled, select
 return {
   {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
-      -- Enable inline completion globally
+      -- Enable inline completion globally when LSP supports it
       vim.api.nvim_create_autocmd("LspAttach", {
         callback = function(args)
           local client = vim.lsp.get_client_by_id(args.data.client_id)
           if client and client.supports_method("textDocument/inlineCompletion") then
-            vim.lsp.inline_completion.enable(true, { bufnr = args.buf })
+            vim.lsp.inline_completion.enable()
           end
         end,
       })
@@ -17,11 +18,13 @@ return {
       return opts
     end,
     keys = {
-      -- Accept inline completion
+      -- Accept/select inline completion
       {
         "<C-y>",
         function()
-          if vim.lsp.inline_completion.accept() then
+          local completion = vim.lsp.inline_completion.get()
+          if completion then
+            vim.lsp.inline_completion.select()
             return
           end
           return "<C-y>"
@@ -30,44 +33,19 @@ return {
         mode = "i",
         desc = "Accept inline completion",
       },
-      -- Trigger inline completion manually
+      -- Get current inline completion (for debugging)
       {
         "<C-x><C-i>",
         function()
-          vim.lsp.inline_completion.trigger()
-        end,
-        mode = "i",
-        desc = "Trigger inline completion",
-      },
-      -- Navigate through inline completion suggestions
-      {
-        "<M-]>",
-        function()
-          vim.lsp.inline_completion.next()
-        end,
-        mode = "i",
-        desc = "Next inline completion",
-      },
-      {
-        "<M-[>",
-        function()
-          vim.lsp.inline_completion.prev()
-        end,
-        mode = "i",
-        desc = "Previous inline completion",
-      },
-      -- Clear inline completion
-      {
-        "<C-e>",
-        function()
-          if vim.lsp.inline_completion.clear() then
-            return
+          local completion = vim.lsp.inline_completion.get()
+          if completion then
+            print("Inline completion available:", vim.inspect(completion))
+          else
+            print("No inline completion available")
           end
-          return "<C-e>"
         end,
-        expr = true,
         mode = "i",
-        desc = "Clear inline completion",
+        desc = "Show inline completion info",
       },
     },
   },
