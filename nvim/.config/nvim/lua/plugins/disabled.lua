@@ -14,4 +14,6 @@ return {
   -- Disable Telescope plugins - using fzf-lua instead
   { "nvim-telescope/telescope.nvim", enabled = false },
   { "nvim-telescope/telescope-live-grep-args.nvim", enabled = false },
+  -- Disable treesitter-refactor - incompatible with current setup
+  { "nvim-treesitter/nvim-treesitter-refactor", enabled = false },
 }
