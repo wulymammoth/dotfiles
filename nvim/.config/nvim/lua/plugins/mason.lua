@@ -1,7 +1,7 @@
 return {
   -- Mason for managing LSP servers, formatters, and linters
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
     cmd = "Mason",
     build = ":MasonUpdate",
     opts = {
@@ -19,10 +19,10 @@ return {
 
   -- Mason integration with nvim-lspconfig
   {
-    "williamboman/mason-lspconfig.nvim",
+    "mason-org/mason-lspconfig.nvim",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = {
-      "williamboman/mason.nvim",
+      "mason-org/mason.nvim",
       "neovim/nvim-lspconfig",
     },
     opts = {
@@ -43,7 +43,7 @@ return {
   {
     "jay-babu/mason-nvim-dap.nvim",
     dependencies = {
-      "williamboman/mason.nvim",
+      "mason-org/mason.nvim",
       "mfussenegger/nvim-dap",
     },
     opts = {
