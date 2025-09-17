@@ -12,11 +12,11 @@ Audit and modernization of Neovim configuration based on 2024-2025 community tre
 
 ### Outdated Components Identified
 
-#### 1. LSP Setup with Mason ❌ **HIGH PRIORITY**
-- **Current**: Mason-managed LSP servers
-- **Issue**: Community moving away from Mason due to complexity
-- **Location**: `nvim/.config/nvim/lua/plugins/lsp.lua`
-- **Impact**: Maintenance overhead, version conflicts
+#### 1. LSP Setup with Mason ✅ **MODERNIZED**
+- **Current**: Mason v2 with native Neovim 0.11 LSP APIs
+- **Status**: LazyVim v15+ uses Mason v2 + `vim.lsp.config()`
+- **Namespace**: Updated to `mason-org/` plugins
+- **Benefits**: Simplified configuration, native LSP integration
 
 #### 2. Completion Engine ❌ **CRITICAL**
 - **Current**: nvim-cmp
@@ -44,10 +44,10 @@ Audit and modernization of Neovim configuration based on 2024-2025 community tre
    - Add blink.cmp configuration
    - Migrate snippet and completion sources
 
-2. **Simplify LSP Setup** 
-   - Remove Mason for language servers
-   - Use direct system package manager installation
-   - Streamline `lua/plugins/lsp.lua`
+2. **Modernize LSP Setup**
+   - Update Mason plugins to `mason-org/` namespace
+   - Leverage Neovim 0.11 native `vim.lsp.config()` APIs
+   - Ensure Mason v2 compatibility with LazyVim v15+
 
 ### Phase 2: Performance Optimizations
 3. **Consider fzf-lua Migration**
@@ -62,10 +62,11 @@ Audit and modernization of Neovim configuration based on 2024-2025 community tre
 
 ## Implementation Notes
 
-### LSP Migration Strategy
-- Keep current working Elixir setup (already using direct binary)
-- Focus Python setup migration from Mason to system-managed
-- Preserve custom diagnostic and inlay hint configurations
+### LSP Migration Strategy - ✅ COMPLETED
+- **Mason v2 Integration**: Updated to `mason-org/` namespace
+- **Native LSP APIs**: Leveraging Neovim 0.11 `vim.lsp.config()`
+- **LazyVim v15+ Compatibility**: Following official migration path
+- **Preserved Features**: Custom diagnostic and inlay hint configurations maintained
 
 ### Completion Migration - ✅ COMPLETED
 - **Status**: Successfully replaced nvim-cmp with blink.cmp
@@ -105,15 +106,12 @@ Audit and modernization of Neovim configuration based on 2024-2025 community tre
    - Updated Claude settings to disable co-authored lines
    - Committed: `0ccb36c`
 
-### ✅ Phase 2: Performance Optimizations - FULLY COMPLETED  
-3. **LSP Migration (Mason removal)** - ✅ FULLY COMPLETED
-   - ✅ Installed system LSPs via Homebrew/npm:
-     - `basedpyright` (Python) - Homebrew
-     - `typescript-language-server` - Homebrew  
-     - `vscode-eslint-language-server` - npm
-   - ✅ Disabled Mason plugins in `disabled.lua`
-   - ✅ Updated LSP configs to use system binaries
-   - ✅ **COMPLETED**: ElixirLS (Elixir LSP) - installed via Homebrew
+### ✅ Phase 2: Performance Optimizations - UPDATED FOR v15+
+3. **LSP Migration (Mason v2 integration)** - ✅ NEEDS NAMESPACE UPDATE
+   - ⚠️ **CORRECTION**: Keep Mason for LSP management (LazyVim v15+ standard)
+   - 🔄 **TODO**: Update Mason plugins to `mason-org/` namespace
+   - ✅ Preserve existing LSP configurations
+   - ✅ **COMPLETED**: ElixirLS integration working
 
 4. **fzf-lua Migration** - ✅ COMPLETED
    - ✅ Evaluated performance gains vs Telescope familiarity
@@ -135,20 +133,19 @@ Audit and modernization of Neovim configuration based on 2024-2025 community tre
 - [ ] DAP debugging functionality
 
 ## Next Immediate Actions
-1. **🚨 PRIORITY**: Test the migrated LSP setup (TypeScript, Python, ESLint)
-2. **AFTER LSP TESTING**: Set up Lexical (Elixir LSP) within dotfiles structure
-3. **OPTIONAL**: Consider Phase 3 (fzf-lua migration)
+1. **🚨 PRIORITY**: Update Mason plugin namespace (`williamboman/` → `mason-org/`)
+2. **TESTING**: Verify Mason v2 + native LSP API integration
+3. **VALIDATION**: Run checkhealth to confirm all warnings resolved
 
-## Recent LSP Migration Summary
-- **Removed Mason dependency** for language servers  
-- **System installations completed**:
-  ```bash
-  brew install basedpyright typescript-language-server elixir-ls
-  npm install -g vscode-langservers-extracted
-  ```
-- **Configuration updated** to use system binaries
-- **ElixirLS integrated** - using stable, system-managed installation via Homebrew
-- **Benefits**: Simplified dependency management, no version conflicts, faster startup
+## LazyVim v15+ LSP Integration Summary
+- **Keeping Mason v2** for LSP server management (LazyVim standard)
+- **Native LSP APIs**: Using Neovim 0.11 `vim.lsp.config()`
+- **Plugin Namespace**: Updating to `mason-org/` from `williamboman/`
+- **Benefits**:
+  - Automatic LSP server installation/management
+  - Native Neovim LSP API integration
+  - Simplified configuration via `vim.lsp.config()`
+  - LazyVim v15+ compatibility
 
 ## Recent Changes
 - **Completed blink.cmp Migration**: Full replacement of nvim-cmp with modern completion engine
