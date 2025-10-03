@@ -56,6 +56,9 @@ path=(
 )
 typeset -U path  # Ensures unique entries in PATH
 
+# asdf completions (initialization moved to ~/.zshenv)
+fpath=(/opt/homebrew/opt/asdf/libexec/completions $fpath)
+
 # New options
 setopt AUTO_PUSHD           # Push directories automatically
 setopt PUSHD_IGNORE_DUPS    # Don't push duplicates
