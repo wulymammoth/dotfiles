@@ -1,13 +1,15 @@
 .DS_Store
+.channels_cache.json
 .claude-context.md
 .claude/
-CLAUDE.local.md
 .envrc
 .null-ls*
 .tags
 .tags_sorted_by_file
 .tool-versions
+.users_cache.json
 Brewfile.lock.json
+CLAUDE.local.md
 Session.vim
 TAGS
 __pycache__/
