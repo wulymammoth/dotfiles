@@ -1,5 +1,6 @@
 .DS_Store
 .channels_cache.json
+.channels_cache_v2.json
 .claude-context.md
 .claude/
 .envrc
