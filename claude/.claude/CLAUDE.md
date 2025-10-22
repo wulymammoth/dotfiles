@@ -69,3 +69,4 @@
 - **MANDATORY**: Commit all completed work before proceeding to new tasks
 - Ensure each commit represents a complete, working feature or milestone
 - Always test implementations and provide clear instructions for reproducing results
+- remember to use rg instead of grep and fd instead of find
