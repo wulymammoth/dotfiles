@@ -14,3 +14,110 @@ function mkd() {
 function gi() {
   curl -sL "https://www.toptal.com/developers/gitignore/api/$@"
 } 
+
+# rgg — ripgrep only files changed in your branch (default base = origin/main)
+rgg() {
+  emulate -L zsh
+  set -o pipefail
+
+  local mode="branch"
+  local base="origin/main"
+  local -a pass_args
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -s|--staged)
+        mode="staged"
+        shift
+        ;;
+      -u|--unstaged)
+        mode="unstaged"
+        shift
+        ;;
+      -l|--last)
+        mode="last"
+        shift
+        ;;
+      -b|--base)
+        if [[ -z "$2" || "$2" == -* ]]; then
+          print -u2 "rgg: option '-b' requires a base branch argument"
+          return 1
+        fi
+        base="$2"
+        shift 2
+        ;;
+      -h|--help)
+        cat <<'USAGE'
+rgg: ripgrep only files changed in your branch (default base = origin/main)
+
+Usage:
+  rgg [rg-options-and-pattern ...]           # compare branch vs origin/main
+  rgg -b <base> [rg-args ...]                # compare branch vs specific base (e.g., origin/dev)
+  rgg -s [rg-args ...]                       # staged changes only
+  rgg -u [rg-args ...]                       # unstaged (working tree) changes only
+  rgg -l [rg-args ...]                       # files in the last commit only
+Examples:
+  rgg -n "TODO|FIXME"
+  rgg -b origin/dev "myFunc"
+  rgg -s "pattern"
+  rgg -u -n "foo.*bar"
+  rgg -l "initDatabase"
+USAGE
+        return 0
+        ;;
+      --)
+        shift
+        pass_args+=("$@")
+        break
+        ;;
+      *)
+        pass_args+=("$1")
+        shift
+        ;;
+    esac
+  done
+
+  if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    print -u2 "rgg: not inside a git repository"
+    return 2
+  fi
+
+  if [[ "$mode" == "branch" ]]; then
+    if ! git rev-parse --verify --quiet "${base}^{commit}" >/dev/null 2>&1; then
+      print -u2 "rgg: invalid base reference: '$base'"
+      return 1
+    fi
+  fi
+
+  local -a git_cmd
+  case "$mode" in
+    staged)
+      git_cmd=(git diff --cached --name-only -z --diff-filter=ACMR)
+      ;;
+    unstaged)
+      git_cmd=(git diff --name-only -z --diff-filter=ACMR)
+      ;;
+    last)
+      git_cmd=(git diff-tree --no-commit-id --name-only -z -r --diff-filter=ACMR HEAD)
+      ;;
+    branch)
+      git_cmd=(git diff --name-only -z --diff-filter=ACMR "${base}...HEAD")
+      ;;
+  esac
+
+  local files_raw
+  if ! files_raw="$(${git_cmd[@]})"; then
+    print -u2 "rgg: failed to list changed files"
+    return 1
+  fi
+
+  local -a files
+  files=(${(0)files_raw})
+
+  if (( ${#files[@]} == 0 )); then
+    print -u2 "rgg: no matching files in '$mode' mode"
+    return 0
+  fi
+
+  rg --no-messages "${pass_args[@]}" -- "${files[@]}"
+}
