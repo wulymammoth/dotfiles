@@ -10,3 +10,5 @@ tmux/.tmux/resurrect/
 # Temp/editor artifacts
 Session.vim
 nvim/.config/nvim/Session.vim
+tags
+nvim/.config/nvim/tags
