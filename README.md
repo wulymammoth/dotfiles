@@ -2,6 +2,22 @@
 
 ![](./shellshot.png)
 
+## quick setup
+- install basics: `bundle install && brew bundle --file=$HOME/dotfiles/homebrew/Brewfile`
+- symlink with stow (allow-list so you only link what you use): `cd ~/dotfiles && stow zsh git tmux ghostty wezterm nvim bash starship ssh ripgrep gdircolors`
+- preview before linking: `stow -nv <pkg>`; apply with `stow -v <pkg>`
+- skip deprecated packages (e.g., `alacritty`) and add new ones only when in active use
+
+## where things land (stow packages)
+- `zsh/` → `~/.zshrc`, `~/.zprofile`, `~/.zshenv`, and companion dotfiles
+- `bash/` → `~/.bashrc`, `~/.bash_profile`, and helper dotfiles
+- `nvim/` → `~/.config/nvim` (LazyVim + blink.cmp, Mason v2)
+- `tmux/` → `~/.tmux.conf` and plugins dir
+- `wezterm/` → `~/.config/wezterm/wezterm.lua`
+- `ghostty/` → `~/.config/ghostty/config`
+- `git/` → git helpers under `~/.config/git/`
+- `ssh/` → `~/.ssh/config`
+
 ## tooling (macOS)
 
 - [asdf](https://asdf-vm.com/) : Extendable version manager with support for Ruby, Node.js, Erlang & more
