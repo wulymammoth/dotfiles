@@ -11,19 +11,13 @@ mkdir -p "$XDG_CACHE_HOME/zsh"
 # Use Emacs keybindings
 bindkey -e
 
-# Source core configurations in specific order
+# Source core configurations in specific order (interactive only)
 for config in {exports,exports_local,options,completions,utilities,aliases,functions}; do
-    # Load base config if it exists
     config_path="$HOME/.${config}"
-    if [[ -r "$config_path" ]]; then
-        source "$config_path"
-    fi
+    [[ -r "$config_path" ]] && source "$config_path"
 
-    # Load work-specific config if it exists
     work_config_path="$HOME/.${config}_work"
-    if [[ -r "$work_config_path" ]]; then
-        source "$work_config_path"
-    fi
+    [[ -r "$work_config_path" ]] && source "$work_config_path"
 done
 
 # Load zsh-autosuggestions
