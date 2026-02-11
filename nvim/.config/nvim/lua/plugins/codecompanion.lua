@@ -8,16 +8,15 @@ return {
       { "<leader>ac", "<cmd>CodeCompanionChat Toggle<cr>", mode = { "n", "v" }, desc = "CodeCompanion Chat Toggle" },
     },
     opts = {
+      log_level = "DEBUG",
       adapters = {
-        acp = {
-          codex = function()
-            return require("codecompanion.adapters").extend("codex", {
-              defaults = {
-                auth_method = "chatgpt",
-              },
-            })
-          end,
-        },
+        codex = function()
+          return require("codecompanion.adapters").extend("codex", {
+            defaults = {
+              auth_method = "chatgpt",
+            },
+          })
+        end,
       },
       strategies = {
         chat = {

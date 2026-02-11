@@ -6,6 +6,9 @@ if not vim.env.ASDF_NODEJS_VERSION or vim.env.ASDF_NODEJS_VERSION == "" then
   vim.env.ASDF_NODEJS_VERSION = "24.8.0"
 end
 
+-- ensure local user binaries are available to spawned processes (e.g., codex-acp)
+vim.env.PATH = "/Users/wulymammoth/.local/bin:" .. (vim.env.PATH or "")
+
 -- disable perl provider to remove warnings
 vim.g.loaded_perl_provider = 0
 
