@@ -30,6 +30,13 @@ return {
         use_nvim_cmp_as_default = true,
         nerd_font_variant = "mono",
       },
+      -- Hard guard: avoid loading native fuzzy matcher binaries.
+      fuzzy = {
+        implementation = "lua",
+        prebuilt_binaries = {
+          download = false,
+        },
+      },
       sources = {
         default = { "lsp", "path", "snippets", "buffer", "copilot" },
         providers = {
