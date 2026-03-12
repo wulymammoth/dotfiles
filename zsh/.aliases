@@ -1,5 +1,4 @@
 alias cat='bat'
-alias claude="~/.local/bin/claude"
 alias desk='cd ~/Desktop'
 alias dig='dog'
 alias dotfiles='cd ~/dotfiles'
