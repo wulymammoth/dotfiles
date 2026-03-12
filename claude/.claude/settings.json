@@ -11,5 +11,6 @@
     "playwright@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true
   },
-  "model": "opus"
+  "model": "opus",
+  "includeCoAuthoredBy": false
 }
