@@ -40,5 +40,3 @@ bindkey '^X^E' edit-command-line
 
 # Add $HOME/.local/bin to $PATH for Claude Code - added by Kandji
 export PATH="$HOME/.local/bin:$PATH"
-
-. "$HOME/.local/bin/env"
