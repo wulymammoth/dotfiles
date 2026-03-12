@@ -4,8 +4,8 @@ nvim/.config/nvim/plugged/
 tmux/.tmux/plugins/
 tmux/.tmux/resurrect/
 
-# Claude local settings (environment-specific, should not be committed)
-.claude/settings.local.json
+# Override global gitignore for claude stow package
+!claude/.claude/
 
 # Temp/editor artifacts
 Session.vim

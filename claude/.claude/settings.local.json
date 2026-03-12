@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(which bun:*)",
+      "Bash(brew list:*)",
+      "Bash(cp ~/.claude/settings.json ~/dotfiles/claude/.claude/settings.json && cp ~/.claude/settings.local.json ~/dotfiles/claude/.claude/settings.local.json && cp ~/.claude/statusline-command.sh ~/dotfiles/claude/.claude/statusline-command.sh)"
+    ]
+  }
+}
