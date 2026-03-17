@@ -5,6 +5,7 @@ return {
       opts.modes = opts.modes or {}
 
       opts.modes.symbols = vim.tbl_deep_extend("force", opts.modes.symbols or {}, {
+        auto_preview = false,
         win = {
           position = "right",
           size = { width = 0.35 },
