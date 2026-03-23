@@ -7,7 +7,67 @@ vim.g.loaded_ruby_provider = 0  -- disable Ruby provider for cross-machine compa
 vim.g.python3_host_prog = vim.fn.system("which python3"):gsub("\n", "")
 vim.g.python_host_prog = vim.fn.system("which python"):gsub("\n", "")
 
--- Set clipboard to use system clipboard (macOS)
+local function executable(bin)
+  return vim.fn.executable(bin) == 1
+end
+
+local function clipboard_provider()
+  if vim.fn.has("macunix") == 1 and executable("pbcopy") and executable("pbpaste") then
+    return {
+      name = "pbcopy",
+      copy = {
+        ["+"] = "pbcopy",
+        ["*"] = "pbcopy",
+      },
+      paste = {
+        ["+"] = "pbpaste",
+        ["*"] = "pbpaste",
+      },
+      cache_enabled = 0,
+    }
+  end
+
+  if executable("wl-copy") and executable("wl-paste") then
+    return {
+      name = "wl-clipboard",
+      copy = {
+        ["+"] = "wl-copy --foreground --type text/plain",
+        ["*"] = "wl-copy --foreground --primary --type text/plain",
+      },
+      paste = {
+        ["+"] = "wl-paste --no-newline",
+        ["*"] = "wl-paste --no-newline --primary",
+      },
+      cache_enabled = 0,
+    }
+  end
+
+  if executable("xclip") then
+    return {
+      name = "xclip",
+      copy = {
+        ["+"] = "xclip -quiet -in -selection clipboard",
+        ["*"] = "xclip -quiet -in -selection primary",
+      },
+      paste = {
+        ["+"] = "xclip -o -selection clipboard",
+        ["*"] = "xclip -o -selection primary",
+      },
+      cache_enabled = 0,
+    }
+  end
+
+  local ok, osc52 = pcall(require, "vim.ui.clipboard.osc52")
+  if ok then
+    osc52.name = "osc52"
+    osc52.cache_enabled = 0
+    return osc52
+  end
+end
+
+vim.g.clipboard = clipboard_provider()
+
+-- Use the system clipboard whenever a provider is available.
 vim.opt.clipboard = "unnamedplus"
 
 vim.o.hlsearch = false -- disable highlight search
