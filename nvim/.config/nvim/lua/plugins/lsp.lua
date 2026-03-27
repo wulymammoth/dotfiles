@@ -14,13 +14,8 @@ end
 return {
   {
     "neovim/nvim-lspconfig",
-    dependencies = {
-      "mason-org/mason.nvim",
-      "mason-org/mason-lspconfig.nvim",
-    },
-
-    opts = {
-      diagnostics = {
+    opts = function(_, opts)
+      opts.diagnostics = vim.tbl_deep_extend("force", opts.diagnostics or {}, {
         underline = false,
         update_in_insert = false,
         virtual_text = {
@@ -31,137 +26,51 @@ return {
           spacing = 5,
           underline = false,
         },
-      },
+      })
 
-      -- inline type information
-      inlay_hints = {
-        aligned = true,
+      opts.inlay_hints = vim.tbl_deep_extend("force", opts.inlay_hints or {}, {
         enabled = true,
-        only_current_line = false,
-      },
-    },
+      })
 
-    config = function(_, opts)
-      local lspconfig = require("lspconfig")
-      
-      -- Apply diagnostic and inlay hints settings
-      vim.diagnostic.config(opts.diagnostics or {})
-      if opts.inlay_hints then
-        vim.lsp.inlay_hint.enable(opts.inlay_hints.enabled)
-      end
-      
-      -- Global LSP error handling to prevent sync errors
-      vim.lsp.set_log_level("error")
-      
-      -- Add error handler for LSP sync issues
-      local original_handler = vim.lsp.handlers["textDocument/didChange"]
-      if original_handler then
-        vim.lsp.handlers["textDocument/didChange"] = function(...)
-          local ok, result = pcall(original_handler, ...)
-          if not ok then
-            vim.notify("LSP sync error ignored: " .. tostring(result), vim.log.levels.DEBUG)
-          end
-          return result
-        end
-      end
+      opts.servers = opts.servers or {}
+      opts.servers["*"] = vim.tbl_deep_extend("force", opts.servers["*"] or {}, {})
+      opts.servers["*"].keys = opts.servers["*"].keys or {}
+      vim.list_extend(opts.servers["*"].keys, {
+        { "gd", vim.lsp.buf.definition, desc = "Goto Definition", has = "definition" },
+        { "gD", vim.lsp.buf.declaration, desc = "Goto Declaration" },
+        { "gr", vim.lsp.buf.references, desc = "References", nowait = true },
+        { "gi", vim.lsp.buf.implementation, desc = "Goto Implementation" },
+        { "K", vim.lsp.buf.hover, desc = "Hover", has = "hover" },
+        { "<C-k>", vim.lsp.buf.signature_help, mode = "n", desc = "Signature Help", has = "signatureHelp" },
+        { "<leader>rn", vim.lsp.buf.rename, desc = "Rename", has = "rename" },
+        { "<leader>ca", vim.lsp.buf.code_action, mode = { "n", "x" }, desc = "Code Action", has = "codeAction" },
+      })
 
-      -- LSP keymaps setup
-      local on_attach = function(client, bufnr)
-        local opts = { buffer = bufnr, silent = true }
-        vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-        vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-        vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-        vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-        vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-        vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-        vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-        vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
-      end
-
-      -- Common LSP setup options to prevent sync issues
-      local default_setup = {
-        capabilities = require("blink.cmp").get_lsp_capabilities(),
-        on_attach = on_attach,
+      opts.servers.basedpyright = vim.tbl_deep_extend("force", opts.servers.basedpyright or {}, {
         flags = {
-          debounce_text_changes = 150, -- Reduce sync frequency
+          debounce_text_changes = 150,
+          allow_incremental_sync = false,
         },
-      }
-
-      -- Python-specific setup with Poetry/virtual environment detection
-      local python_setup = vim.tbl_deep_extend("force", default_setup, {
-        -- Fix hover in Python
-        on_attach = function(client, bufnr)
-          on_attach(client, bufnr)
-          vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = bufnr })
-        end,
         settings = {
-          python = {
+          basedpyright = {
             analysis = {
               autoSearchPaths = true,
-              useLibraryCodeForTypes = true,
               diagnosticMode = "workspace",
-              pythonPath = get_python_path(), -- Dynamically resolved Python path
             },
+          },
+          python = {
+            pythonPath = get_python_path(),
           },
         },
       })
 
-      -- Get the Poetry virtual environment path
-      local poetry_venv = nil
-      local poetry_handle = io.popen("poetry env info --path 2>/dev/null") -- Ignore errors
-      if poetry_handle then
-        poetry_venv = poetry_handle:read("*a"):gsub("\n", "")
-        poetry_handle:close()
-      end
-
-      -- Get the Python version
-      local python_version = nil
-      local python_handle = io.popen("python --version 2>&1 || python3 --version 2>&1") -- Try both python and python3
-      if python_handle then
-        python_version = python_handle:read("*a"):gsub("Python ", ""):gsub("\n", "")
-        python_handle:close()
-      end
-
-      -- Extract the major and minor version
-      local python_major_minor = python_version and python_version:match("^(%d+%.%d+)") or nil
-
-      -- Set the PYTHONPATH environment variable dynamically if both values exist
-      if poetry_venv and poetry_venv ~= "" and python_major_minor then
-        vim.env.PYTHONPATH = string.format("%s/lib/python%s/site-packages", poetry_venv, python_major_minor)
-      end
-
-      -- Setup individual LSP servers
-      -- Expert LSP (Elixir) - Mason installed using new Neovim 0.11+ native API
-      vim.lsp.config('expert', {
-        cmd = { vim.fn.expand("~/.local/share/nvim/mason/bin/expert") },
-        filetypes = { 'elixir', 'eelixir', 'heex' },
-        root_markers = { 'mix.exs', '.git' },
-        capabilities = require("blink.cmp").get_lsp_capabilities(),
-        on_attach = on_attach,
-        settings = {},
-      })
-
-      -- Setup basedpyright
-      lspconfig.basedpyright.setup(python_setup)
-      
-      -- Setup TypeScript/JavaScript
-      lspconfig.ts_ls.setup(default_setup)
-      
-      -- Setup ESLint
-      lspconfig.eslint.setup(default_setup)
-      
-      -- Setup Lua LS
-      lspconfig.lua_ls.setup(vim.tbl_deep_extend("force", default_setup, {
+      opts.servers.lua_ls = vim.tbl_deep_extend("force", opts.servers.lua_ls or {}, {
         settings = {
           Lua = {
-            runtime = {
-              version = "LuaJIT",
-            },
             diagnostics = {
               globals = { "vim" },
             },
             workspace = {
-              library = vim.api.nvim_get_runtime_file("", true),
               checkThirdParty = false,
             },
             telemetry = {
@@ -169,31 +78,21 @@ return {
             },
           },
         },
-      }))
-      
-      -- Setup JSON LS
-      lspconfig.jsonls.setup(default_setup)
-      
-      -- Setup YAML LS
-      lspconfig.yamlls.setup(default_setup)
-      
-      -- Register copilot config to suppress warning
-      -- Copilot is handled via copilot.lua, not as an LSP server
-      vim.lsp.config("copilot", {})
-      
-      -- Setup Mason and mason-lspconfig
-      require("mason").setup()
-      require("mason-lspconfig").setup({
-        ensure_installed = {
-          "basedpyright",
-          "ts_ls",
-          "eslint",
-          "lua_ls",
-          "jsonls",
-          "yamlls",
-        },
-        automatic_installation = true,
       })
+
+      opts.servers.expert = vim.tbl_deep_extend("force", opts.servers.expert or {}, {
+        mason = false,
+        cmd = { vim.fn.expand("~/.local/share/nvim/mason/bin/expert") },
+        filetypes = { "elixir", "eelixir", "heex" },
+        root_markers = { "mix.exs", ".git" },
+      })
+
+      if opts.servers.tsserver then
+        opts.servers.tsserver.enabled = false
+      end
+      if opts.servers.ts_ls then
+        opts.servers.ts_ls.enabled = false
+      end
     end,
   },
 }

@@ -1,55 +1,23 @@
 return {
-  -- Mason for managing LSP servers, formatters, and linters
   {
     "mason-org/mason.nvim",
-    cmd = "Mason",
-    build = ":MasonUpdate",
-    opts = {
-      ui = {
+    opts = function(_, opts)
+      opts.ui = vim.tbl_deep_extend("force", opts.ui or {}, {
         icons = {
           package_installed = "✓",
           package_pending = "➜",
-          package_uninstalled = "✗"
+          package_uninstalled = "✗",
         },
         border = "rounded",
-      },
-      install_root_dir = (vim and vim.fn and vim.fn.stdpath("data") .. "/mason") or nil,
-    },
+      })
+    end,
   },
 
-  -- Mason integration with nvim-lspconfig
-  {
-    "mason-org/mason-lspconfig.nvim",
-    event = { "BufReadPre", "BufNewFile" },
-    dependencies = {
-      "mason-org/mason.nvim",
-      "neovim/nvim-lspconfig",
-    },
-    opts = {
-      -- Automatically install LSP servers
-      ensure_installed = {
-        "basedpyright",      -- Python LSP
-        "ts_ls",             -- TypeScript/JavaScript LSP  
-        "eslint",            -- ESLint language server
-        "lua_ls",            -- Lua LSP
-        "jsonls",            -- JSON LSP
-        "yamlls",            -- YAML LSP
-      },
-      automatic_installation = true,
-    },
-  },
-
-  -- Mason integration with nvim-dap for debugging
   {
     "jay-babu/mason-nvim-dap.nvim",
-    dependencies = {
-      "mason-org/mason.nvim",
-      "mfussenegger/nvim-dap",
-    },
     opts = {
       ensure_installed = {
-        "python",    -- Python debugger
-        "node2",     -- Node.js debugger
+        "python",
       },
       automatic_installation = true,
     },
