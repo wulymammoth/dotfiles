@@ -1,4 +1,6 @@
 {
+  "includeCoAuthoredBy": false,
+  "model": "opus",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline-command.sh"
@@ -11,6 +13,5 @@
     "playwright@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true
   },
-  "model": "opus",
-  "includeCoAuthoredBy": false
+  "effortLevel": "high"
 }
