@@ -1,0 +1,5 @@
+# Files/directories that stow should NOT manage/symlink
+# These will remain untouched in ~/.config/opencode/
+node_modules
+package.json
+bun.lock

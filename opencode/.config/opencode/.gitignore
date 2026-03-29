@@ -1,0 +1,24 @@
+# OpenCode sensitive files - do not commit!
+# API keys and credentials
+.env.local
+.env
+*.key
+*.pem
+*.p12
+
+# Backup and temporary files
+*.bak
+*.backup
+*.tmp
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local-only configurations that may contain sensitive paths
+local.json
+local.jsonc
+
+# Private instruction files that might contain project-specific secrets
+custom-instructions-private.md
