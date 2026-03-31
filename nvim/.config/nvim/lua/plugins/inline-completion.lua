@@ -16,12 +16,10 @@ return {
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("kickstart-lsp-attach-inline-completion", { clear = true }),
         callback = function(args)
-          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          local client_id = args.data and args.data.client_id
+          local client = client_id and vim.lsp.get_client_by_id(client_id)
           if client and client.server_capabilities.inlineCompletionProvider then
-            inline_completion.enable({
-              debounce = 150,
-              show_on_undo = false,
-            })
+            inline_completion.enable(true, { client_id = client.id })
           end
         end,
       })
