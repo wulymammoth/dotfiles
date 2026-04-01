@@ -19,8 +19,15 @@ fi
 ## direnv
 eval "$(direnv hook bash)"
 
-# activate NORD theme (directory colors for utilities such as ls, tree, fd)
-eval $(gdircolors ~/.dir_colors)
+# activate NORD theme for GNU-style tools and BSD colors for macOS ls
+export CLICOLOR=1
+export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
+
+if command -v gdircolors >/dev/null 2>&1; then
+  eval "$(gdircolors ~/.dir_colors)"
+elif command -v dircolors >/dev/null 2>&1; then
+  eval "$(dircolors ~/.dir_colors)"
+fi
 
 ## fzf
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash

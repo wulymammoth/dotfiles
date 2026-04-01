@@ -2,43 +2,74 @@
 
 ![](./shellshot.png)
 
-## quick setup
-- install basics: `bundle install && brew bundle --file=$HOME/dotfiles/homebrew/Brewfile`
-- symlink with stow (allow-list so you only link what you use): `cd ~/dotfiles && stow zsh git tmux ghostty wezterm nvim bash starship ssh ripgrep gdircolors`
-- preview before linking: `stow -nv <pkg>`; apply with `stow -v <pkg>`
-- skip deprecated packages (e.g., `alacritty`) and add new ones only when in active use
+Personal macOS dotfiles managed with GNU Stow and Homebrew. Most configs live in self-contained package directories so you can link only the pieces you actively use.
 
-## where things land (stow packages)
-- `zsh/` → `~/.zshrc`, `~/.zprofile`, `~/.zshenv`, and companion dotfiles
-- `bash/` → `~/.bashrc`, `~/.bash_profile`, and helper dotfiles
-- `nvim/` → `~/.config/nvim` (LazyVim + blink.cmp, Mason v2)
-- `tmux/` → `~/.tmux.conf` and plugins dir
-- `wezterm/` → `~/.config/wezterm/wezterm.lua`
-- `ghostty/` → `~/.config/ghostty/config`
-- `git/` → git helpers under `~/.config/git/`
-- `ssh/` → `~/.ssh/config`
+## Setup
 
-## tooling (macOS)
+1. Clone the repo to `~/dotfiles`.
+2. Optionally run [`bootstrap.sh`](./bootstrap.sh) to create an SSH key and install Homebrew.
+3. Install packages from [`homebrew/Brewfile`](./homebrew/Brewfile):
 
-- [asdf](https://asdf-vm.com/) : Extendable version manager with support for Ruby, Node.js, Erlang & more
-- [bat](https://github.com/sharkdp/bat) : cat clone with syntax highlighting and git integration
-- [direnv](https://direnv.net/) : Load/unload environment variables based on $PWD
-- [eza](https://github.com/eza-community/eza) : Modern, maintained replacement for ls
-- [fd](https://github.com/sharkdp/fd) : simple, fast and user-friendly alternative to find
-- [fzf](https://github.com/junegunn/fzf) : command-line fuzzy finder and file system navigation
-- [gh](https://github.com/cli/cli) : Github command-line tool
-- [htop](https://github.com/htop-dev/htop) : interactive process viewer
-- [jq](https://stedolan.github.io/jq/) : lightweight and flexible command-line json processor
-- [neovim](https://github.com/neovim/neovim) : text editor
-- [ripgrep](https://github.com/burntsushi/ripgrep) : command-line search utility (faster than grep and ag)
-- [starship](https://starship.rs) : cross-shell prompt for astronauts
-- [tldr](https://tldr.sh/) : Simplified and community-driven man pages
-- [tmux](https://github.com/tmux/tmux) : terminal multiplexer
-- [tree](http://mama.indstate.edu/users/ice/tree) : display directories as trees (with optional color/html output)
-- [wezterm](https://wezfurlong.org/wezterm/) : A GPU-accelerated cross-platform terminal emulator and multiplexer written by @wez and implemented in Rust
-- [zoxide](https://github.com/ajeetdsouza/zoxide) : a faster way to navigate the filesystem
+   ```sh
+   brew bundle --file="$HOME/dotfiles/homebrew/Brewfile"
+   ```
 
-other utilities and applications can be found in my [Brewfile](./homebrew/Brewfile)
+4. Preview the default Stow allow-list:
 
-- installation: `bundle install && brew bundle --file=$HOME/dotfiles/homebrew/Brewfile`
-- help: `brew bundle --help`
+   ```sh
+   cd ~/dotfiles
+   make stow-preview
+   ```
+
+5. Apply those links when the preview looks correct:
+
+   ```sh
+   make stow-apply
+   ```
+
+If you want tighter control than the default allow-list in [`Makefile`](./Makefile), use Stow directly:
+
+```sh
+cd ~/dotfiles
+stow -nv zsh git tmux nvim ghostty starship ssh ripgrep gdircolors
+stow -v zsh git tmux nvim ghostty starship ssh ripgrep gdircolors
+```
+
+Use `make stow-list` to inspect the current default package set.
+
+## Package map
+
+### Core packages
+
+| Package | Target | Notes |
+| --- | --- | --- |
+| `zsh/` | `~/.zshrc`, `~/.zprofile`, `~/.zshenv`, helpers | Primary shell setup |
+| `bash/` | `~/.bashrc`, `~/.bash_profile`, helpers | Secondary shell config |
+| `git/` | `~/.gitconfig`, `~/.gitignore_global`, `~/.config/git/` | Git defaults and scripts |
+| `ssh/` | `~/.ssh/config` | SSH host aliases and options |
+| `tmux/` | `~/.tmux.conf`, `~/.tmux/` | Tmux config and plugins |
+| `nvim/` | `~/.config/nvim/` | Neovim configuration |
+| `ghostty/` | `~/.config/ghostty/config` | Primary terminal config |
+| `starship/` | `~/.config/starship.toml` | Cross-shell prompt |
+| `ripgrep/` | `~/.ripgreprc` | Shared ripgrep defaults |
+| `gdircolors/` | `~/.dir_colors` | Shared directory color theme for shell tools |
+| `asdf/` | `~/.asdfrc`, `~/.tool-versions` | Runtime version management |
+| `bat/` | `~/.config/bat/` | `bat` theme/config |
+| `homebrew/` | Brew bundle files | Package bootstrap via Brewfile |
+
+### Optional or machine-specific packages
+
+These packages are kept in the repo for selective use and are not part of the default `make stow-*` allow-list:
+
+`alacritty/`, `claude/`, `cursor/`, `iterm2/`, `neofetch/`, `opencode/`, `wezterm/`, `wtf/`
+
+## Tooling
+
+The Brewfile installs the CLI tools and desktop apps this repo expects, including:
+
+- shells and prompt: `bash`, `starship`, `asdf`, `direnv`, `coreutils`
+- terminal/editor workflow: `tmux`, `neovim`, `ghostty`
+- search/navigation: `ripgrep`, `fd`, `fzf`, `zoxide`, `bat`, `eza`
+- git/dev utilities: `git`, `gh`, `git-delta`, `lazygit`, `pre-commit`
+
+See [`homebrew/Brewfile`](./homebrew/Brewfile) for the full package list, casks, MAS apps, and VS Code extensions.

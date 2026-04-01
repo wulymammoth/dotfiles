@@ -18,14 +18,14 @@ eval "$(direnv hook zsh)"
 eval "$(zoxide init zsh)"
 
 # Directory colors
+export CLICOLOR=1
+export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
+
 if (( $+commands[gdircolors] )); then
     eval $(gdircolors ~/.dir_colors)
 elif (( $+commands[dircolors] )); then
     eval $(dircolors ~/.dir_colors)
 else
-    export CLICOLOR=1
-    export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
-    
     if (( $+commands[brew] )); then
         debug "Installing coreutils for gdircolors..."
         brew install coreutils

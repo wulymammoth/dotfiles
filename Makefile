@@ -1,8 +1,8 @@
 SHELL := /bin/bash
 
 # Adjust this allow-list to only the packages you actively use.
-# Example: add/remove ghostty, wezterm, yabai, cursor, etc.
-ALLOW_PACKAGES := asdf bat ghostty git homebrew nvim ripgrep ssh starship tmux zsh
+# Example: add/remove ghostty, wezterm, neofetch, cursor, etc.
+ALLOW_PACKAGES := asdf bat gdircolors ghostty git homebrew nvim ripgrep ssh starship tmux zsh
 
 STOW ?= stow
 
