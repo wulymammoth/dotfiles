@@ -44,7 +44,6 @@ brew "luarocks"
 brew "macos-trash"
 brew "mas"
 brew "navi"
-brew "neofetch"
 brew "neovim", args: ["HEAD"]
 brew "ngrep"
 brew "node"
@@ -65,11 +64,27 @@ brew "universal-ctags"
 brew "yamllint"
 brew "zoxide"
 brew "tj/mmake/mmake"
-cask "docker", args: { appdir: "~/Applications" }
+cask "alfred"
+cask "claude-code"
+cask "chatgpt"
+cask "codex"
+cask "discord"
+cask "docker-desktop", args: { appdir: "~/Applications" }
+cask "figma"
 cask "font-fira-mono-for-powerline"
+cask "font-hack-nerd-font"
+cask "gcloud-cli"
+cask "ghostty"
+cask "google-chrome"
 cask "ngrok"
+cask "obsidian"
 cask "postman", args: { appdir: "~/Applications" }
+cask "protonvpn"
+cask "rectangle"
+cask "spotify"
+cask "vlc"
 cask "wezterm"
+cask "zoom"
 mas "1Password 7", id: 1333542190
 mas "Fantastical", id: 975937182
 mas "ImageOne", id: 1237328432
