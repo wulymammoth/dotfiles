@@ -1,3 +1,5 @@
+.playwright-mcp/
+
 nvim/.config/nvim/.netrwhist
 nvim/.config/nvim/lazy-lock.json
 nvim/.config/nvim/plugged/
