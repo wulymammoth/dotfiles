@@ -5,6 +5,14 @@ unsetopt EXTENDED_HISTORY
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
 
+# Raise the soft fd limit for long-lived interactive tools like Codex.
+if [[ -o interactive ]]; then
+    current_nofile_limit=$(ulimit -n 2>/dev/null)
+    if [[ "$current_nofile_limit" == <-> ]] && (( current_nofile_limit < 10240 )); then
+        ulimit -n 10240 2>/dev/null || true
+    fi
+fi
+
 # Create only the directories we actually use
 mkdir -p "$XDG_CACHE_HOME/zsh"
 
