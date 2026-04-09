@@ -1,4 +1,5 @@
 {
+  "autoUpdatesChannel": "stable",
   "includeCoAuthoredBy": false,
   "statusLine": {
     "type": "command",
