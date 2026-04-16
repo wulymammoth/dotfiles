@@ -23,6 +23,41 @@
     "*": "allow",
     "bash": "ask"
   },
+  "mcp": {
+    "playwright": {
+      "type": "local",
+      "command": ["npx", "@playwright/mcp@latest"],
+      "enabled": true
+    },
+    "XcodeBuildMCP": {
+      "type": "local",
+      "command": ["/opt/homebrew/bin/xcodebuildmcp", "mcp"],
+      "enabled": true
+    },
+    "stitch": {
+      "type": "remote",
+      "url": "https://stitch.googleapis.com/mcp",
+      "headers": {
+        "X-Goog-Api-Key": "{env:STITCH_API_KEY}"
+      },
+      "enabled": true
+    },
+    "vercel": {
+      "type": "remote",
+      "url": "https://mcp.vercel.com",
+      "enabled": true
+    },
+    "posthog": {
+      "type": "remote",
+      "url": "https://mcp.posthog.com/mcp",
+      "enabled": true
+    },
+    "supabase": {
+      "type": "remote",
+      "url": "{env:SUPABASE_MCP_URL}",
+      "enabled": true
+    }
+  },
   "provider": {
     "openai": {
       "options": {
