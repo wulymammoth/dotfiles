@@ -6,6 +6,7 @@ font-family-bold = Hack Bold Nerd Font Complete Mono
 font-size = 13
 font-thicken = true
 macos-option-as-alt = true
+bell-features = attention,title
 window-decoration = false
 window-padding-balance = true
 window-padding-x = 15  
