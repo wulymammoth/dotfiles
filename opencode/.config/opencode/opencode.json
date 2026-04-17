@@ -21,17 +21,29 @@
   },
   "permission": {
     "*": "allow",
-    "bash": "ask"
+    "bash": "ask",
+    "read": {
+      "~/.config/opencode/get-shit-done/*": "allow"
+    },
+    "external_directory": {
+      "~/.config/opencode/get-shit-done/*": "allow"
+    }
   },
   "mcp": {
     "playwright": {
       "type": "local",
-      "command": ["npx", "@playwright/mcp@latest"],
+      "command": [
+        "npx",
+        "@playwright/mcp@latest"
+      ],
       "enabled": true
     },
     "XcodeBuildMCP": {
       "type": "local",
-      "command": ["/opt/homebrew/bin/xcodebuildmcp", "mcp"],
+      "command": [
+        "/opt/homebrew/bin/xcodebuildmcp",
+        "mcp"
+      ],
       "enabled": true
     },
     "stitch": {
