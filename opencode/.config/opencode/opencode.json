@@ -46,6 +46,27 @@
       ],
       "enabled": true
     },
+    "gsc": {
+      "type": "local",
+      "command": [
+        "/opt/homebrew/bin/uvx",
+        "mcp-search-console"
+      ],
+      "environment": {
+        "GSC_OAUTH_CLIENT_SECRETS_FILE": "{env:GSC_OAUTH_CLIENT_SECRETS_FILE}",
+        "GSC_CREDENTIALS_PATH": "{env:GSC_CREDENTIALS_PATH}",
+        "GSC_SKIP_OAUTH": "{env:GSC_SKIP_OAUTH}"
+      },
+      "enabled": true
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "{env:CONTEXT7_API_KEY}"
+      },
+      "enabled": true
+    },
     "stitch": {
       "type": "remote",
       "url": "https://stitch.googleapis.com/mcp",

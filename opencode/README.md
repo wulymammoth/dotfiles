@@ -65,6 +65,37 @@ Then set in your shell profile or `.env.local` (which is gitignored):
 export ANTHROPIC_API_KEY="your-api-key-here"
 ```
 
+### Google Search Console MCP
+
+The `gsc` MCP server uses [`mcp-search-console`](https://github.com/AminForou/mcp-gsc) through `uvx`.
+
+For OAuth, set an absolute path to the Google OAuth desktop client JSON:
+
+```bash
+export GSC_OAUTH_CLIENT_SECRETS_FILE="/Users/you/path/to/client_secrets.json"
+```
+
+For a service account, set both variables:
+
+```bash
+export GSC_CREDENTIALS_PATH="/Users/you/path/to/service_account.json"
+export GSC_SKIP_OAUTH="true"
+```
+
+After updating credentials, restart OpenCode and ask it to `call get_capabilities using gsc` or `list my GSC properties using gsc`.
+
+### Context7 MCP
+
+The `context7` MCP server uses the remote Context7 endpoint for up-to-date library documentation.
+
+Create a free API key at <https://context7.com/dashboard>, then set:
+
+```bash
+export CONTEXT7_API_KEY="your-api-key-here"
+```
+
+Restart OpenCode, then ask for current docs with prompts like `use context7 for Next.js middleware docs` or `use context7 with /supabase/supabase for auth docs`.
+
 ### Using File References
 
 Reference secrets from private files:
