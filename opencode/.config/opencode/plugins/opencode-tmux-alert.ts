@@ -36,13 +36,8 @@ export const TmuxAlertPlugin: Plugin = async ({ $ }) => {
   return {
     event: async ({ event }) => {
       try {
-        // Notify only when OpenCode is ready for the next user action: either
-        // the assistant turn is complete, or an explicit permission prompt is
-        // blocking progress. Progress/UI events are intentionally ignored.
-        if (event.type === "session.idle") {
-          await alert()
-        }
-
+        // Notify only for explicit user-blocking prompts. Generic idle events
+        // can fire between subagent/task phases while the main run continues.
         if (event.type === "permission.asked") {
           await alert()
         }

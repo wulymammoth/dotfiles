@@ -33,7 +33,7 @@ process.env.TMUX = "/tmp/tmux-test"
 delete process.env.OPENCODE_ALERT_SCRIPT
 delete process.env.OPENCODE_CLEAR_SCRIPT
 
-assert.equal(await recordsAlert({ type: "session.idle" }), true)
+assert.equal(await recordsAlert({ type: "session.idle" }), false)
 assert.equal(await recordsAlert({ type: "permission.asked" }), true)
 assert.equal(await recordsAlert({ type: "permission.updated" }), false)
 assert.equal(
