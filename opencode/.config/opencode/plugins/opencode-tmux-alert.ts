@@ -12,6 +12,8 @@ import { fileURLToPath } from "url"
 export const TmuxAlertPlugin: Plugin = async ({ $ }) => {
   const pluginDir = dirname(fileURLToPath(import.meta.url))
   const scriptsDir = resolve(pluginDir, "opencode-tmux-alert")
+  const alertDelay = Number(process.env.OPENCODE_ALERT_DELAY_MS ?? 1500)
+  let alertTimer: ReturnType<typeof setTimeout> | undefined
 
   const alertScript =
     process.env.OPENCODE_ALERT_SCRIPT ?? resolve(scriptsDir, "alert.sh")
@@ -30,16 +32,45 @@ export const TmuxAlertPlugin: Plugin = async ({ $ }) => {
   }
 
   const clear = async () => {
+    if (alertTimer) {
+      clearTimeout(alertTimer)
+      alertTimer = undefined
+    }
     await $`${clearScript}`
+  }
+
+  const scheduleAlert = () => {
+    if (alertTimer) {
+      clearTimeout(alertTimer)
+    }
+
+    alertTimer = setTimeout(async () => {
+      alertTimer = undefined
+      await alert()
+    }, alertDelay)
   }
 
   return {
     event: async ({ event }) => {
       try {
-        // Notify only for explicit user-blocking prompts. Generic idle events
-        // can fire between subagent/task phases while the main run continues.
+        // Notify only if an explicit permission prompt remains unresolved.
+        // Generic idle events can fire between subagent/task phases while the
+        // main run continues, and some permission prompts are resolved quickly
+        // before user attention is useful.
         if (event.type === "permission.asked") {
-          await alert()
+          scheduleAlert()
+        }
+
+        if (event.type === "permission.updated") {
+          await clear()
+        }
+
+        if (
+          event.type === "message.part.updated" &&
+          event.properties.part.type === "tool" &&
+          event.properties.part.state.status === "pending"
+        ) {
+          await clear()
         }
 
         if (
