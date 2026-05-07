@@ -50,26 +50,39 @@ export const TmuxAlertPlugin: Plugin = async ({ $ }) => {
     }, alertDelay)
   }
 
+  const isPendingQuestion = (event: unknown) => {
+    if (!event || typeof event !== "object" || !("type" in event)) {
+      return false
+    }
+
+    if (event.type !== "message.part.updated") {
+      return false
+    }
+
+    const part = (event as { properties?: { part?: unknown } }).properties?.part
+    if (!part || typeof part !== "object") {
+      return false
+    }
+
+    return (
+      (part as { type?: string }).type === "tool" &&
+      (part as { tool?: string }).tool === "question" &&
+      (part as { state?: { status?: string } }).state?.status === "pending"
+    )
+  }
+
   return {
     event: async ({ event }) => {
       try {
-        // Notify only if an explicit permission prompt remains unresolved.
-        // Generic idle events can fire between subagent/task phases while the
-        // main run continues, and some permission prompts are resolved quickly
-        // before user attention is useful.
-        if (event.type === "permission.asked") {
+        // Notify only if OpenCode is blocked waiting for user input. Generic
+        // idle events can fire between subagent/task phases while the main run
+        // continues. Permission prompts and pending question tools are the
+        // documented/observed user-blocking states.
+        if (event.type === "permission.asked" || isPendingQuestion(event)) {
           scheduleAlert()
         }
 
         if (event.type === "permission.updated") {
-          await clear()
-        }
-
-        if (
-          event.type === "message.part.updated" &&
-          event.properties.part.type === "tool" &&
-          event.properties.part.state.status === "pending"
-        ) {
           await clear()
         }
 
