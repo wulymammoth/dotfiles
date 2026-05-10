@@ -76,13 +76,23 @@ export const TmuxAlertPlugin: Plugin = async ({ $ }) => {
       try {
         // Notify only if OpenCode is blocked waiting for user input. Generic
         // idle events can fire between subagent/task phases while the main run
-        // continues. Permission prompts and pending question tools are the
-        // documented/observed user-blocking states.
-        if (event.type === "permission.asked" || isPendingQuestion(event)) {
+        // continues. Permission and question events are the canonical
+        // user-blocking states; the message-part check keeps the older
+        // question tool fallback working if the bus event is missed.
+        if (
+          event.type === "permission.asked" ||
+          event.type === "question.asked" ||
+          isPendingQuestion(event)
+        ) {
           scheduleAlert()
         }
 
-        if (event.type === "permission.updated") {
+        if (
+          event.type === "permission.updated" ||
+          event.type === "permission.replied" ||
+          event.type === "question.replied" ||
+          event.type === "question.rejected"
+        ) {
           await clear()
         }
 
