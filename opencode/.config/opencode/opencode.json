@@ -32,26 +32,17 @@
   "mcp": {
     "playwright": {
       "type": "local",
-      "command": [
-        "npx",
-        "@playwright/mcp@latest"
-      ],
+      "command": ["npx", "@playwright/mcp@latest"],
       "enabled": true
     },
     "XcodeBuildMCP": {
       "type": "local",
-      "command": [
-        "/opt/homebrew/bin/xcodebuildmcp",
-        "mcp"
-      ],
+      "command": ["/opt/homebrew/bin/xcodebuildmcp", "mcp"],
       "enabled": true
     },
     "gsc": {
       "type": "local",
-      "command": [
-        "/opt/homebrew/bin/uvx",
-        "mcp-search-console"
-      ],
+      "command": ["/opt/homebrew/bin/uvx", "mcp-search-console"],
       "environment": {
         "GSC_OAUTH_CLIENT_SECRETS_FILE": "/Users/wulymammoth/dotfiles/gsc_mcp_client_secret.json"
       },
@@ -121,7 +112,8 @@
               "reasoningSummary": "detailed"
             },
             "xhigh": {
-              "disabled": true
+              "reasoningEffort": "xhigh",
+              "reasoningSummary": "detailed"
             }
           },
           "limit": {
