@@ -57,11 +57,12 @@
       "enabled": true
     },
     "stitch": {
-      "type": "remote",
-      "url": "https://stitch.googleapis.com/mcp",
-      "headers": {
-        "X-Goog-Api-Key": "{env:STITCH_API_KEY}"
+      "type": "local",
+      "command": ["node", "/Users/wulymammoth/.config/opencode/bin/stitch-mcp-proxy.mjs"],
+      "environment": {
+        "STITCH_API_KEY": "{env:STITCH_API_KEY}"
       },
+      "timeout": 30000,
       "enabled": true
     },
     "vercel": {

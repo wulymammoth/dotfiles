@@ -96,6 +96,28 @@ export CONTEXT7_API_KEY="your-api-key-here"
 
 Restart OpenCode, then ask for current docs with prompts like `use context7 for Next.js middleware docs` or `use context7 with /supabase/supabase for auth docs`.
 
+### Stitch MCP
+
+The `stitch` MCP server follows the Stitch MCP setup docs by running the local [`@_davideast/stitch-mcp`](https://www.npmjs.com/package/@_davideast/stitch-mcp) stdio proxy.
+
+Set your Stitch API key in the shell that launches OpenCode:
+
+```bash
+export STITCH_API_KEY="your-api-key-here"
+```
+
+Then restart OpenCode and verify with:
+
+```bash
+opencode mcp list
+```
+
+If the server fails, run:
+
+```bash
+npx -y @_davideast/stitch-mcp doctor --verbose
+```
+
 ### Using File References
 
 Reference secrets from private files:
