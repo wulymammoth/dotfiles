@@ -5,6 +5,8 @@ docs/superpowers/
 # google search console client secret file
 gsc_mcp_client_secret.json
 
+cursor/*.code-profile
+
 nvim/.config/nvim/.netrwhist
 nvim/.config/nvim/lazy-lock.json
 nvim/.config/nvim/plugged/
