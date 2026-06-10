@@ -61,7 +61,7 @@ Use `make stow-list` to inspect the current default package set.
 
 These packages are kept in the repo for selective use and are not part of the default `make stow-*` allow-list:
 
-`alacritty/`, `claude/`, `cursor/`, `iterm2/`, `neofetch/`, `opencode/`, `wezterm/`, `wtf/`
+`alacritty/`, `cursor/`, `iterm2/`, `neofetch/`, `opencode/`, `wezterm/`, `wtf/`
 
 ## Tooling
 

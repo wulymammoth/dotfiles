@@ -13,9 +13,6 @@ nvim/.config/nvim/plugged/
 tmux/.tmux/plugins/
 tmux/.tmux/resurrect/
 
-# Override global gitignore for claude stow package
-!claude/.claude/
-
 # Temp/editor artifacts
 Session.vim
 nvim/.config/nvim/Session.vim

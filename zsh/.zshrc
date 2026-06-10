@@ -38,5 +38,5 @@ autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^X^E' edit-command-line
 
-# Add $HOME/.local/bin to $PATH for Claude Code - added by Kandji
+# Add $HOME/.local/bin to $PATH for user-installed tools.
 export PATH="$HOME/.local/bin:$PATH"

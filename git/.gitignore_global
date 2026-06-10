@@ -1,8 +1,6 @@
 .DS_Store
 .channels_cache.json
 .channels_cache_v2.json
-.claude-context.md
-.claude/
 .envrc
 .null-ls*
 .tags
@@ -10,7 +8,6 @@
 .tool-versions
 .users_cache.json
 Brewfile.lock.json
-CLAUDE.local.md
 Session.vim
 TAGS
 __pycache__/

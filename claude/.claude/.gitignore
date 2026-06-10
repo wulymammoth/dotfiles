@@ -1,8 +1,0 @@
-# Ignore everything by default
-*
-
-# Track only portable config
-!.gitignore
-!CLAUDE.md
-!settings.json
-!statusline-command.sh

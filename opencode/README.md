@@ -50,9 +50,9 @@ Reference secrets via environment variables in your configs:
 ```json
 {
   "provider": {
-    "anthropic": {
+    "openai": {
       "options": {
-        "apiKey": "{env:ANTHROPIC_API_KEY}"
+        "apiKey": "{env:OPENAI_API_KEY}"
       }
     }
   }
@@ -62,7 +62,7 @@ Reference secrets via environment variables in your configs:
 Then set in your shell profile or `.env.local` (which is gitignored):
 
 ```bash
-export ANTHROPIC_API_KEY="your-api-key-here"
+export OPENAI_API_KEY="your-api-key-here"
 ```
 
 ### Google Search Console MCP
