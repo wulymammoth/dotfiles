@@ -17,3 +17,5 @@ tags
 tags.lock
 tags.temp
 tags.temp.tmp
+
+**/.claude/settings.local.json
