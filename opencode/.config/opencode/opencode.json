@@ -78,6 +78,9 @@
     "supabase": {
       "type": "remote",
       "url": "{env:SUPABASE_MCP_URL}",
+      "headers": {
+        "Authorization": "Bearer {env:SUPABASE_ACCESS_TOKEN}"
+      },
       "enabled": true
     }
   },

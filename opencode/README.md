@@ -84,6 +84,17 @@ export GSC_SKIP_OAUTH="true"
 
 After updating credentials, restart OpenCode and ask it to `call get_capabilities using gsc` or `list my GSC properties using gsc`.
 
+### Supabase MCP
+
+The `supabase` MCP server is a remote MCP endpoint. Keep the project URL and access token in the shell environment that launches OpenCode:
+
+```bash
+export SUPABASE_MCP_URL="https://mcp.supabase.com/mcp?project_ref=your-project-ref&features=storage%2Cbranching%2Cfunctions%2Cdevelopment%2Cdebugging%2Cdatabase%2Cdocs"
+export SUPABASE_ACCESS_TOKEN="your-supabase-access-token"
+```
+
+The committed config sends `SUPABASE_ACCESS_TOKEN` as the `Authorization` bearer token. If `opencode mcp list` reports `Invalid MCP URL for "supabase"`, `SUPABASE_MCP_URL` is missing or empty. If it reports `needs authentication`, check `SUPABASE_ACCESS_TOKEN`.
+
 ### Context7 MCP
 
 The `context7` MCP server uses the remote Context7 endpoint for up-to-date library documentation.
