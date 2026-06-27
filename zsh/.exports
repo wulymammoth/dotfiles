@@ -5,17 +5,21 @@ export HISTFILE="$HOME/.zsh_history"
 export HISTSIZE=20000
 export SAVEHIST=20000
 
+# Homebrew
+if [[ -x "/opt/homebrew/bin/brew" ]]; then
+    export HOMEBREW_PREFIX="/opt/homebrew"
+elif [[ -x "/usr/local/bin/brew" ]]; then
+    export HOMEBREW_PREFIX="/usr/local"
+fi
+
+if [[ -n "$HOMEBREW_PREFIX" ]]; then
+    eval "$("$HOMEBREW_PREFIX/bin/brew" shellenv)"
+fi
+export HOMEBREW_BUNDLE_FILE="$HOME/dotfiles/homebrew/Brewfile"
+
 # Editor
 export EDITOR="nvim"
-local brew_prefix
-if [[ -f "/opt/homebrew/bin/brew" ]]; then
-    brew_prefix=$(/opt/homebrew/bin/brew --prefix)
-elif [[ -f "/usr/local/bin/brew" ]]; then
-    brew_prefix=$(/usr/local/bin/brew --prefix)
-else
-    echo "Homebrew not found"
-fi
-export VIMRUNTIME="$brew_prefix/share/nvim/runtime"
+[[ -n "$HOMEBREW_PREFIX" ]] && export VIMRUNTIME="$HOMEBREW_PREFIX/share/nvim/runtime"
 
 # Word characters
 export WORDCHARS='*?_[]~=&;!#$%^(){}<>'
@@ -38,14 +42,15 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 # ripgrep
 export RIPGREP_CONFIG_PATH=$HOME/.ripgreprc
 
-# Homebrew
-export HOMEBREW_BUNDLE_FILE=$HOME/dotfiles/homebrew/Brewfile
+# pnpm
+export PNPM_HOME="$HOME/Library/pnpm"
 
 # Path segments
 path=(
     "$HOME/.asdf/shims"
     "$HOME/.cargo/bin"
     "$HOME/.local/bin"
+    "$PNPM_HOME"
     "/usr/local/opt/llvm/bin"
     "/usr/local/opt/openssl@3/bin"
     "/opt/homebrew/bin"
@@ -55,11 +60,3 @@ path=(
     $path
 )
 typeset -U path  # Ensures unique entries in PATH
-
-# asdf completions (initialization moved to ~/.zshenv)
-fpath=(/opt/homebrew/opt/asdf/libexec/completions $fpath)
-
-# New options
-setopt AUTO_PUSHD           # Push directories automatically
-setopt PUSHD_IGNORE_DUPS    # Don't push duplicates
-setopt PUSHD_SILENT         # Don't print directory stack 

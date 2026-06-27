@@ -1,6 +1,18 @@
 # Load completion system
 autoload -Uz compinit
 
+# Completion paths
+fpath=(
+    "${ASDF_DATA_DIR:-$HOME/.asdf}/completions"
+    $fpath
+)
+[[ -n "$HOMEBREW_PREFIX" ]] && fpath=(
+    "$HOMEBREW_PREFIX/opt/asdf/libexec/completions"
+    "$HOMEBREW_PREFIX/share/zsh/site-functions"
+    $fpath
+)
+typeset -U fpath
+
 # Setup cache
 zstyle ':completion:*' cache-path "$XDG_CACHE_HOME/zsh/.zcompcache"
 zstyle ':completion:*' use-cache on
@@ -11,10 +23,3 @@ compinit -u -d "$XDG_CACHE_HOME/zsh/.zcompdump"
 # Completion options
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
-
-# fpath setup for completions
-fpath=(
-    "${ASDF_DATA_DIR:-$HOME/.asdf}/completions"
-    "$HOMEBREW_PREFIX/share/zsh/site-functions"
-    $fpath
-) 

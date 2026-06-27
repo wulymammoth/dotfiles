@@ -1,4 +1,5 @@
 # History options
+unsetopt EXTENDED_HISTORY    # Keep command history compact
 setopt INC_APPEND_HISTORY    # Write after each command
 setopt HIST_IGNORE_DUPS      # Ignore duplicates
 setopt HIST_IGNORE_SPACE     # Ignore commands starting with space

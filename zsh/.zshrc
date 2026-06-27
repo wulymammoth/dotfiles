@@ -2,9 +2,6 @@
 # non-interactive environment setup belongs in .zprofile/.zshenv.
 [[ -o interactive ]] || return
 
-# Disable extended history to not screw up my command history
-unsetopt EXTENDED_HISTORY
-
 # Simplified XDG setup - only what's needed for zsh
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-$HOME/.config}"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:-$HOME/.cache}"
@@ -37,6 +34,3 @@ done
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey '^X^E' edit-command-line
-
-# Add $HOME/.local/bin to $PATH for user-installed tools.
-export PATH="$HOME/.local/bin:$PATH"

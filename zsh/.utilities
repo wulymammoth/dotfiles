@@ -1,14 +1,3 @@
-# Homebrew setup
-if [[ -f "/opt/homebrew/bin/brew" ]]; then
-    HOMEBREW_PREFIX="/opt/homebrew"
-elif [[ -f "/usr/local/bin/brew" ]]; then
-    HOMEBREW_PREFIX="/usr/local"
-else
-    echo "Homebrew not found"
-fi
-
-[[ -n "$HOMEBREW_PREFIX" ]] && eval "$(${HOMEBREW_PREFIX}/bin/brew shellenv)"
-
 # cargo
 [[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"
 
@@ -21,23 +10,19 @@ eval "$(zoxide init zsh)"
 export CLICOLOR=1
 export LSCOLORS=ExGxBxDxCxEgEdxbxgxcxd
 
-if (( $+commands[gdircolors] )); then
-    eval $(gdircolors ~/.dir_colors)
-elif (( $+commands[dircolors] )); then
-    eval $(dircolors ~/.dir_colors)
-else
-    if (( $+commands[brew] )); then
-        debug "Installing coreutils for gdircolors..."
-        brew install coreutils
-        (( $+commands[gdircolors] )) && eval $(gdircolors ~/.dir_colors)
+if [[ -r "$HOME/.dir_colors" ]]; then
+    if (( $+commands[gdircolors] )); then
+        eval "$(gdircolors "$HOME/.dir_colors")"
+    elif (( $+commands[dircolors] )); then
+        eval "$(dircolors "$HOME/.dir_colors")"
     fi
 fi
 
 # fzf
 [[ -f ~/.fzf.zsh ]] && source ~/.fzf.zsh
 
-if (( $+commands[brew] )); then
-    FZF_BASE="$(brew --prefix)/opt/fzf"
+if [[ -n "$HOMEBREW_PREFIX" ]]; then
+    FZF_BASE="$HOMEBREW_PREFIX/opt/fzf"
     source "$FZF_BASE/shell/completion.zsh" 2>/dev/null
     source "$FZF_BASE/shell/key-bindings.zsh" 2>/dev/null
 fi 
