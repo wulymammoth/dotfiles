@@ -9,6 +9,9 @@ gsc_mcp_client_secret.json
 
 cursor/*.code-profile
 
+# Local Codex context can include machine-specific MCP and workflow details.
+.Codex-context.md
+
 nvim/.config/nvim/.netrwhist
 nvim/.config/nvim/lazy-lock.json
 nvim/.config/nvim/plugged/
