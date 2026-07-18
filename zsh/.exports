@@ -55,6 +55,7 @@ path=(
     "/usr/local/opt/openssl@3/bin"
     "/opt/homebrew/bin"
     "/opt/homebrew/sbin"
+    "/Applications/Obsidian.app/Contents/MacOS"
     "/usr/local/bin"
     "/usr/local/sbin"
     $path
