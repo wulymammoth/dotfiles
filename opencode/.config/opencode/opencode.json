@@ -74,14 +74,6 @@
       "type": "remote",
       "url": "https://mcp.posthog.com/mcp",
       "enabled": true
-    },
-    "supabase": {
-      "type": "remote",
-      "url": "{env:SUPABASE_MCP_URL}",
-      "headers": {
-        "Authorization": "Bearer {env:SUPABASE_ACCESS_TOKEN}"
-      },
-      "enabled": true
     }
   },
   "provider": {
