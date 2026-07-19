@@ -96,6 +96,16 @@ export CONTEXT7_API_KEY="your-api-key-here"
 
 Restart OpenCode, then ask for current docs with prompts like `use context7 for Next.js middleware docs` or `use context7 with /supabase/supabase for auth docs`.
 
+### GitHub MCP
+
+The `github` MCP server uses GitHub's hosted MCP endpoint with a personal access token from the launch environment:
+
+```bash
+export GITHUB_PERSONAL_ACCESS_TOKEN="your-github-pat"
+```
+
+The committed config sends the token as an `Authorization` bearer header via `{env:GITHUB_PERSONAL_ACCESS_TOKEN}` and sets `oauth: false` so OpenCode does not try an OAuth flow first. Keep the token in a private shell file such as `~/.exports_local`; do not commit it.
+
 ### Stitch MCP
 
 The `stitch` MCP server follows the Stitch MCP setup docs by running the local [`@_davideast/stitch-mcp`](https://www.npmjs.com/package/@_davideast/stitch-mcp) stdio proxy.
