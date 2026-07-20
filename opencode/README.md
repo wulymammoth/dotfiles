@@ -106,6 +106,22 @@ export GITHUB_PERSONAL_ACCESS_TOKEN="your-github-pat"
 
 The committed config sends the token as an `Authorization` bearer header via `{env:GITHUB_PERSONAL_ACCESS_TOKEN}` and sets `oauth: false` so OpenCode does not try an OAuth flow first. Keep the token in a private shell file such as `~/.exports_local`; do not commit it.
 
+### Linear MCP
+
+The `linear` MCP server uses Linear's hosted Streamable HTTP endpoint through the `mcp-remote` compatibility proxy:
+
+```text
+https://mcp.linear.app/mcp
+```
+
+OpenCode's native remote OAuth flow can fail with browser-profile state errors such as `Invalid or expired state parameter`. The committed config therefore uses Linear's documented generic-client route:
+
+```bash
+npx -y mcp-remote https://mcp.linear.app/mcp
+```
+
+This keeps authentication out of the committed config. `mcp-remote` stores its OAuth cache under `~/.mcp-auth`.
+
 ### Stitch MCP
 
 The `stitch` MCP server follows the Stitch MCP setup docs by running the local [`@_davideast/stitch-mcp`](https://www.npmjs.com/package/@_davideast/stitch-mcp) stdio proxy.
