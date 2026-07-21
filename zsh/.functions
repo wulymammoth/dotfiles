@@ -15,6 +15,17 @@ function gi() {
   curl -sL "https://www.toptal.com/developers/gitignore/api/$@"
 } 
 
+# Install Homebrew packages and record them in the dotfiles Brewfile.
+binstall() {
+  emulate -L zsh
+  brew bundle add --global --install --formula "$@"
+}
+
+bcask() {
+  emulate -L zsh
+  brew bundle add --global --install --cask "$@"
+}
+
 # rgg — ripgrep only files changed in your branch (default base = origin/main)
 rgg() {
   emulate -L zsh
