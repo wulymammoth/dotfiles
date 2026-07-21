@@ -1,109 +1,73 @@
-tap "homebrew/bundle"
-tap "homebrew/cask-fonts"
-tap "homebrew/cask-versions"
-tap "tj/mmake", "https://github.com/tj/mmake.git"
-brew "unixodbc"
-brew "asdf"
-brew "bash"
-brew "bash-completion@2"
-brew "bat"
-brew "black"
-brew "checkmake"
-brew "coreutils"
-brew "direnv"
-brew "docutils"
-brew "dog"
-brew "dotenv-linter"
-brew "dust"
-brew "editorconfig-checker"
-brew "entr"
-brew "eza"
-brew "fd"
-brew "fzf"
-brew "gh"
-brew "git"
-brew "git-delta"
-brew "gitlint"
-brew "glances"
-brew "glib"
-brew "glow"
-brew "gnupg"
-brew "gping"
-brew "hadolint"
-brew "helm"
-brew "htop"
-brew "hyperfine"
-brew "libheif"
-brew "imagemagick"
-brew "jq"
-brew "lazygit"
-brew "luacheck"
-brew "luarocks"
-brew "macos-trash"
-brew "mas"
-brew "navi"
-brew "neovim", args: ["HEAD"]
-brew "ngrep"
-brew "node"
-brew "pastel"
-brew "pre-commit"
-brew "prettierd"
-brew "ripgrep"
-brew "ruff"
-brew "shellcheck"
-brew "sloccount"
-brew "sqlfluff"
-brew "starship"
-brew "stow"
-brew "tldr"
-brew "tmux"
-brew "tree"
-brew "universal-ctags"
-brew "yamllint"
-brew "zoxide"
-brew "tj/mmake/mmake"
-cask "alfred"
-cask "chatgpt"
-cask "codex"
-cask "discord"
-cask "docker-desktop", args: { appdir: "~/Applications" }
-cask "figma"
-cask "font-fira-mono-for-powerline"
-cask "font-hack-nerd-font"
-cask "gcloud-cli"
-cask "ghostty"
-cask "google-chrome"
-cask "ngrok"
-cask "obsidian"
-cask "postman", args: { appdir: "~/Applications" }
-cask "protonvpn"
-cask "rectangle"
-cask "spotify"
-cask "vlc"
-cask "wezterm"
-cask "zoom"
-mas "1Password 7", id: 1333542190
-mas "Fantastical", id: 975937182
-mas "ImageOne", id: 1237328432
-mas "Kindle Classic", id: 405399194
-mas "Messenger", id: 1480068668
-mas "Numbers", id: 409203825
-mas "Okta Verify", id: 490179405
-mas "Telegram", id: 747648890
-mas "TickTick", id: 966085870
-mas "Vimari", id: 1480933944
-mas "WeChat", id: 836500024
-mas "WhatsApp", id: 1147396723
-mas "Xcode", id: 497799835
-vscode "atomiks.moonlight"
-vscode "dbaeumer.vscode-eslint"
-vscode "esbenp.prettier-vscode"
-vscode "github.copilot"
-vscode "github.copilot-chat"
-vscode "github.github-vscode-theme"
-vscode "gmsgarcia.min-darker-theme"
-vscode "miguelsolorio.min-theme"
-vscode "ms-azuretools.vscode-docker"
-vscode "ms-vscode-remote.remote-containers"
-vscode "rvest.vs-code-prettier-eslint"
-vscode "vscodevim.vim"
+brew 'asdf'
+brew 'bash'
+brew 'bash-completion@2'
+brew 'bat'
+brew 'black'
+brew 'checkmake'
+brew 'coreutils'
+brew 'direnv'
+brew 'docutils'
+brew 'doggo'
+brew 'dotenv-linter'
+brew 'dust'
+brew 'editorconfig-checker'
+brew 'entr'
+brew 'eza'
+brew 'fd'
+brew 'fzf'
+brew 'gh'
+brew 'git'
+brew 'git-delta'
+brew 'gitlint'
+brew 'glances'
+brew 'glib'
+brew 'glow'
+brew 'gnupg'
+brew 'gping'
+brew 'hadolint'
+brew 'helm'
+brew 'hyperfine'
+brew 'libheif'
+brew 'imagemagick'
+brew 'jq'
+brew 'lazygit'
+brew 'luacheck'
+brew 'mas'
+brew 'navi'
+brew 'neovim', args: ['HEAD']
+brew 'ngrep'
+brew 'node'
+brew 'pastel'
+brew 'pre-commit'
+brew 'ripgrep'
+brew 'ruff'
+brew 'shellcheck'
+brew 'sloccount'
+brew 'sqlfluff'
+brew 'starship'
+brew 'stow'
+brew 'tlrc'
+brew 'tmux'
+brew 'tree'
+brew 'universal-ctags'
+brew 'yamllint'
+brew 'zoxide'
+cask '1password-cli'
+cask 'brave-browser'
+cask 'discord'
+cask 'font-fira-mono-for-powerline'
+cask 'font-hack-nerd-font'
+cask 'gcloud-cli'
+cask 'ghostty'
+cask 'ngrok'
+cask 'postman', args: { appdir: '~/Applications' }
+cask 'rectangle'
+cask 'wezterm'
+mas 'Fantastical', id: 975_937_182
+mas 'ImageOne', id: 1_237_328_432
+mas 'Numbers', id: 409_203_825
+mas 'Okta Verify', id: 490_179_405
+mas 'Telegram', id: 747_648_890
+mas 'Vimari', id: 1_480_933_944
+mas 'WhatsApp', id: 310_633_997
+mas 'Xcode', id: 497_799_835

@@ -1,6 +1,6 @@
 alias cat='bat'
 alias desk='cd ~/Desktop'
-alias dig='dog'
+alias dig='doggo'
 alias dotfiles='cd ~/dotfiles'
 alias hist='history | tail -n 9'
 alias ping='gping'
