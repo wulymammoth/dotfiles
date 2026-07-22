@@ -16,6 +16,7 @@ if [[ -n "$HOMEBREW_PREFIX" ]]; then
     eval "$("$HOMEBREW_PREFIX/bin/brew" shellenv)"
 fi
 export HOMEBREW_BUNDLE_FILE_GLOBAL="$HOME/dotfiles/homebrew/Brewfile"
+export HOMEBREW_NO_ASK=1
 
 # Editor
 export EDITOR="nvim"
