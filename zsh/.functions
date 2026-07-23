@@ -15,10 +15,73 @@ function gi() {
   curl -sL "https://www.toptal.com/developers/gitignore/api/$@"
 } 
 
+_binstall_mark_formula_trusted() {
+  emulate -L zsh
+
+  local formula="$1"
+  local brewfile="$2"
+  local perl_status
+
+  BINSTALL_TRUST_FORMULA="$formula" perl -i -pe '
+    BEGIN { $found = 0 }
+    my $formula = $ENV{"BINSTALL_TRUST_FORMULA"};
+    if (/^(\s*brew\s+)(["\x27])\Q$formula\E\2(.*?)(\s+#.*)?(\r?\n)?$/) {
+      $found = 1;
+      unless ($3 =~ /\btrusted\s*:/) {
+        my ($prefix, $quote, $options, $comment, $newline) =
+          ($1, $2, $3, $4 // "", $5 // "");
+        $options =~ s/\s+$//;
+        $_ = "$prefix$quote$formula$quote$options, trusted: true$comment$newline";
+      }
+    }
+    END { exit 3 unless $found }
+  ' "$brewfile"
+  perl_status=$?
+
+  if (( perl_status == 3 )); then
+    print -u2 -- "binstall: formula declaration not found in $brewfile: $formula"
+    return 1
+  fi
+  if (( perl_status != 0 )); then
+    print -u2 -- "binstall: failed to update trust metadata in $brewfile"
+    return "$perl_status"
+  fi
+}
+
 # Install Homebrew packages and record them in the dotfiles Brewfile.
 binstall() {
   emulate -L zsh
-  brew bundle add --global --install --formula "$@"
+
+  if (( $# == 0 )); then
+    print -u2 -- "usage: binstall formula [...]"
+    return 2
+  fi
+
+  local formula
+  local brewfile="${HOMEBREW_BUNDLE_FILE_GLOBAL:-}"
+  local -a third_party_formulae
+
+  for formula in "$@"; do
+    [[ "$formula" == */*/* ]] && third_party_formulae+=("$formula")
+  done
+
+  if (( ${#third_party_formulae[@]} > 0 )); then
+    if [[ -z "$brewfile" ]]; then
+      print -u2 -- "binstall: HOMEBREW_BUNDLE_FILE_GLOBAL must be set for third-party formulae"
+      return 1
+    fi
+    if [[ ! -f "$brewfile" || ! -w "$brewfile" ]]; then
+      print -u2 -- "binstall: global Brewfile is missing or not writable: $brewfile"
+      return 1
+    fi
+    brew trust --formula "${third_party_formulae[@]}" || return
+  fi
+
+  brew bundle add --global --install --formula "$@" || return
+
+  for formula in "${third_party_formulae[@]}"; do
+    _binstall_mark_formula_trusted "$formula" "$brewfile" || return
+  done
 }
 
 bcask() {
