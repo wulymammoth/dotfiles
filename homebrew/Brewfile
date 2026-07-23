@@ -63,11 +63,5 @@ cask 'ngrok'
 cask 'postman', args: { appdir: '~/Applications' }
 cask 'rectangle'
 cask 'wezterm'
-mas 'Fantastical', id: 975_937_182
-mas 'ImageOne', id: 1_237_328_432
-mas 'Numbers', id: 409_203_825
-mas 'Okta Verify', id: 490_179_405
-mas 'Telegram', id: 747_648_890
-mas 'Vimari', id: 1_480_933_944
-mas 'WhatsApp', id: 310_633_997
-mas 'Xcode', id: 497_799_835
+# Persistent memory for AI coding agents. Agent-agnostic, single binary, zero dependencies.
+brew "gentleman-programming/tap/engram"
