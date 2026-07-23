@@ -32,7 +32,9 @@ If you want tighter control than the default allow-list in [`Makefile`](./Makefi
 ```sh
 cd ~/dotfiles
 stow -nv zsh git tmux nvim ghostty starship ssh ripgrep gdircolors
+stow --no-folding -nv ctx
 stow -v zsh git tmux nvim ghostty starship ssh ripgrep gdircolors
+stow --no-folding -v ctx
 ```
 
 Use `make stow-list` to inspect the current default package set.
@@ -55,7 +57,16 @@ Use `make stow-list` to inspect the current default package set.
 | `gdircolors/` | `~/.dir_colors` | Shared directory color theme for shell tools |
 | `asdf/` | `~/.asdfrc`, `~/.tool-versions` | Runtime version management |
 | `bat/` | `~/.config/bat/` | `bat` theme/config |
+| `ctx/` | `~/.ctx/config.toml` | Durable ctx preferences; private index/runtime state remains local |
 | `homebrew/` | Brew bundle files | Package bootstrap via Brewfile |
+
+The `ctx` package is state-adjacent: `~/.ctx` must remain a real local directory
+because it contains private, mutable search indexes and runtime files. The
+Makefile therefore stows `ctx` separately with `--no-folding`, linking only
+`config.toml`. The installer-managed `~/.local/bin/ctx` binary is not part of
+the package. Bundled ctx agent skills also remain installer-managed; the
+OpenCode copy is ignored by Git because its global skills directory links into
+this repository.
 
 ### Optional or machine-specific packages
 

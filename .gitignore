@@ -19,6 +19,9 @@ nvim/.config/nvim/plugged/
 tmux/.tmux/plugins/
 tmux/.tmux/resurrect/
 
+# Generated and updated by the ctx installer through the OpenCode Stow link.
+opencode/.config/opencode/skills/ctx-agent-history-search/
+
 # Temp/editor artifacts
 Session.vim
 nvim/.config/nvim/Session.vim
