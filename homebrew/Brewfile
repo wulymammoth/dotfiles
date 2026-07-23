@@ -64,4 +64,4 @@ cask 'postman', args: { appdir: '~/Applications' }
 cask 'rectangle'
 cask 'wezterm'
 # Persistent memory for AI coding agents. Agent-agnostic, single binary, zero dependencies.
-brew "gentleman-programming/tap/engram"
+brew 'gentleman-programming/tap/engram', trusted: true
