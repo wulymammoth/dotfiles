@@ -109,7 +109,9 @@ green.
 
 - Run the dedicated Zsh regression test.
 - Parse the updated function file with `zsh -n`.
-- Run ShellCheck in Zsh mode where its checks apply.
+- Confirm `perl` is available for the focused Brewfile edit. ShellCheck does
+  not parse Zsh, so `zsh -n` and the regression suite are the authoritative
+  shell checks.
 - Confirm the user's existing Brewfile entry remains:
   `brew 'gentleman-programming/tap/engram', trusted: true`.
 - Do not perform a real package install as part of automated tests.
