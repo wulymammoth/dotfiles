@@ -3,6 +3,7 @@
 .playwright-mcp/
 
 docs/superpowers/
+.worktrees/
 
 # google search console client secret file
 gsc_mcp_client_secret.json
