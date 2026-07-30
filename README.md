@@ -32,9 +32,9 @@ If you want tighter control than the default allow-list in [`Makefile`](./Makefi
 ```sh
 cd ~/dotfiles
 stow -nv zsh git tmux nvim ghostty starship ssh ripgrep gdircolors
-stow --no-folding -nv ctx
+stow --no-folding -nv ctx codex-config
 stow -v zsh git tmux nvim ghostty starship ssh ripgrep gdircolors
-stow --no-folding -v ctx
+stow --no-folding -v ctx codex-config
 ```
 
 Use `make stow-list` to inspect the current default package set.
@@ -58,6 +58,7 @@ Use `make stow-list` to inspect the current default package set.
 | `asdf/` | `~/.asdfrc`, `~/.tool-versions` | Runtime version management |
 | `bat/` | `~/.config/bat/` | `bat` theme/config |
 | `ctx/` | `~/.ctx/config.toml` | Durable ctx preferences; private index/runtime state remains local |
+| `codex-config/` | `~/.codex/AGENTS.md` | Global Codex policy; private runtime state remains local |
 | `homebrew/` | Brew bundle files | Package bootstrap via Brewfile |
 
 The `ctx` package is state-adjacent: `~/.ctx` must remain a real local directory
@@ -67,6 +68,11 @@ Makefile therefore stows `ctx` separately with `--no-folding`, linking only
 the package. Bundled ctx agent skills also remain installer-managed; the
 OpenCode copy is ignored by Git because its global skills directory links into
 this repository.
+
+The `codex-config` package follows the same state-adjacent pattern. `~/.codex`
+must remain a real local directory because it contains private, mutable runtime
+state. Stowing `codex-config` with `--no-folding` links only the global
+`AGENTS.md` policy.
 
 ### Optional or machine-specific packages
 
