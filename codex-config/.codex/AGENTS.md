@@ -27,6 +27,21 @@ and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
   current repository with what works, what is next, and how to continue. Replace
   `/` in branch names with `-`. Do not log every minor action.
 
+## GitHub operations
+
+- Use local `git` for repository operations, including branch, commit, fetch,
+  merge, and push.
+- Use GitHub MCP for pull requests, issues, reviews, comments, labels, and
+  GitHub-hosted metadata or mutations.
+- Do not check or require `gh` authentication when `git` and GitHub MCP cover
+  the requested operation.
+- Use `gh` only as a fallback after GitHub MCP lacks the capability or returns
+  a concrete failure.
+- This policy supersedes workflow-skill defaults that require `gh` when local
+  `git` and GitHub MCP can complete the operation.
+- Tool selection does not grant mutation authority. Preserve explicit approval
+  gates for pushes, pull-request or issue changes, reviews, merges, and releases.
+
 ## Development workflow
 
 1. Understand the problem, then inspect existing code, tests, and established
