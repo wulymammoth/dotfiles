@@ -83,10 +83,15 @@ work; otherwise obtain separate approval to create a narrowly scoped Linear
 issue. Do not invent or reuse an unrelated issue number. The owner approved this
 gate and `LEA-252` now owns the pilot.
 
-**Owned state:** Worktree
+**Historical owned state:** Worktree
 `/Users/wulymammoth/Desktop/lab/soundcoaster/.worktrees/lea-252-codex-harness-pilot`
 on branch `lea-252-codex-harness-pilot`;
 `local_checkpoint_commits: forbidden`; `max_fix_rounds: 2`.
+
+Task 3 predates the expanded envelope schema. Retrospectively, the active Codex
+agent executed inline and no native Goal or retry was used. That classification
+is not contemporaneous approval evidence and does not make this setup task a
+qualifying run.
 
 **Files:**
 
@@ -118,9 +123,81 @@ remove repeated friction before they are implemented.
 
 ## Task 4: Evaluate Real Runs
 
-For each of two or three later medium SoundCoaster tasks, record the approved
-envelope, owner interventions, elapsed time, review findings, repair rounds,
-runtime-evidence quality, residual defects, and cleanup required. Policy setup
-does not count as a run. Afterward, decide whether one thin automation and a
-report-only schedule have measurable value, then transfer-test the contract in a
-less mature repository before changing the global default.
+Before the first attempt, name the comparable pre-automation baseline and a
+fixed escaped-defect observation window. If no comparable historical task
+exists, use the first manual attempt as the baseline and do not make a promotion
+claim until later comparable measurements exist.
+
+For every attempted medium SoundCoaster task, including one that ends
+`BLOCKED`, record:
+
+- the approved goal, definition of done, base, worktree, branch, scope, commands,
+  network reads, execution authority, commit setting, Goal mode/reference,
+  retry policy, risk, evidence classes, fix cap, and prohibited actions;
+- start/end time and terminal state;
+- every owner intervention, classified as product/risk judgment or avoidable
+  process friction;
+- verification outcomes, retry attempts, review findings, repair rounds,
+  runtime-evidence quality, residual debt, and cleanup required;
+- any acceptance-criteria restatement, repeated request for required review or
+  verification, escaped defect, scope escape, or unrelated-state disturbance.
+
+Policy setup does not count. A run qualifies only when isolation and scope hold,
+canonical verification and required evidence complete, a fresh review completes,
+no unwaived Critical or Important finding remains at `LOCAL_READY`, and the
+terminal report is accurate. Keep all attempts in the denominator. A scope or
+worktree escape, unrelated-state disturbance, or unexplained policy failure
+vetoes promotion until its root cause is fixed and a later qualifying run proves
+the correction.
+
+After two or three planned attempts:
+
+1. Report the total attempt count, qualifying count, every blocker, and the
+   baseline measurements; do not select only successful runs.
+2. Identify friction that appeared in at least two recorded attempts with the
+   same trigger, bounded input, and desired report-only output. Require at least
+   two qualifying runs in the sample.
+3. Reject a universal mechanism when the signal is limited to one path, risk
+   class, provider, or repository.
+4. Transfer-test the refined manual contract once in a less mature repository
+   and confirm that the candidate friction generalizes.
+5. Only then, under a separate approved plan, implement at most one thin
+   report-only prototype.
+6. Run one bounded canary that reaches `LOCAL_READY` and qualifies against the
+   same baseline and observation window. Promote the prototype for reuse only if
+   it removes the repeated process intervention without increasing defects,
+   evidence ambiguity, cost, or cleanup.
+
+Candidates remain conditional: repeated status-wait friction may justify an
+event-driven report; repeated high-signal findings may justify scoped native
+review; repeated documentation drift that escapes deterministic checks may
+justify a report-only freshness audit. None may auto-write, submit a hosted
+review, merge, deploy, or release.
+
+## Task 5: Retire The Superseded SoundCoaster Proposal
+
+The July 2026 multi-vendor governance proposal is historical, not an active
+implementation plan. It produced no substantive external review and no CLI,
+workflow, or repository integration. This design preserves its useful lessons:
+separate authority from history, minimize reviewer inputs, isolate writable
+state, and fail closed on unavailable evidence.
+
+The unique payload is untracked and therefore is not protected by a
+no-unique-commits check:
+
+- `docs/agent-governance/architecture.md`
+- `docs/agent-governance/memory-backend-evaluation.md`
+- `docs/agent-governance/reviewer-protocol.md`
+- `docs/agent-governance/security-model.md`
+- `plans/agent-governance-setup.md`
+
+Before any separate destructive-action approval, re-verify worktree
+`/Users/wulymammoth/Desktop/lab/soundcoaster-agent-governance` and branch
+`chore/agent-governance-planning` have no unique commits; record each untracked
+file's exact path, size, and SHA-256; and obtain an explicit retain, archive, or
+destroy disposition for each one. Also inventory the exact symlinks and targets
+under `/private/tmp/soundcoaster-governance-bootstrap` and
+`/private/tmp/soundcoaster-governance-review-tools`; these roots contain
+dangling symlinks and are not empty. Remove only the paths named in that later
+approval, and stop if any inventory has drifted. Do not merge or revive the
+proposed coordinator, memory bakeoff, or multi-vendor quorum.

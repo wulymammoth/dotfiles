@@ -1,6 +1,6 @@
 # Codex Harness and Bounded Autonomy Design
 
-**Status:** Accepted on 2026-08-05
+**Status:** Accepted on 2026-08-05; reconciled and re-approved on 2026-08-06
 
 **Scope:** Cross-project Codex workflow policy, followed by repository-local pilots
 
@@ -20,8 +20,9 @@ orchestrator. Existing tools supply the layers:
 
 - the repository supplies current authority and exact verification commands;
 - GSD may help select and plan milestone or phase work;
-- Superpowers subagent-driven development supplies the stricter execution and
-  review loop;
+- one named execution authority supplies implementation and dispatches fresh
+  review: Superpowers subagent-driven development when local task commits are
+  approved, otherwise the inline policy executor;
 - ctx retrieves source-session provenance when it is actually needed;
 - Engram preserves curated decisions and discoveries;
 - Codex Goal mode is optional execution continuity after the goal and contract
@@ -49,6 +50,30 @@ The challenge found four reasons to narrow the rollout:
 4. A prior SoundCoaster governance design grew into a large custom CLI and
    multi-vendor review system before one real pilot. It stalled on vendor,
    privacy, and account constraints and is now materially stale.
+
+## Disposition Of The Four Constraints
+
+The constraints are resolved by narrowing authority, not by composing more
+automation:
+
+1. Every run names one `execution_authority`. GSD remains optional
+   selection/planning input. Superpowers SDD may execute only when local
+   task-branch commits are approved; commit-forbidden runs use the inline policy
+   executor. The tracked policy overrides installed worktree fallback, repair,
+   finding-parking, branch-finishing, and cleanup behavior.
+2. Goal mode remains `off` or `continuity_only`. The approved plan supplies the
+   acceptance, evidence, and terminal contract. A declared retry policy governs
+   transient command/tool attempts separately from fix rounds.
+3. Scheduled polling, universal review, and documentation agents remain an
+   evidence question. Two or three real medium-task attempts plus a manual
+   contract transfer test must confirm the same repeated friction before one
+   separately approved report-only prototype is built and canaried.
+4. The unimplemented SoundCoaster governance proposal is superseded. Preserve
+   only this compact retrospective; removal of its stale worktree, branch, and
+   untracked planning files is a separate destructive-action gate.
+
+Installer-managed GSD and Superpowers files remain untouched. Their ordinary,
+explicitly invoked workflows outside a bounded run keep their own semantics.
 
 ## Goals
 
@@ -90,7 +115,7 @@ One layer owns each responsibility:
 | Product goal and risk acceptance | Human | Never inferred from automation output |
 | Milestone or phase selection | GSD or human | GSD is optional and planning-only during the pilot |
 | Task plan | One approved plan | No duplicate plan state across tools |
-| Implementation and review loop | Superpowers SDD | Must obey this policy's fail-closed overrides |
+| Implementation and review dispatch | One named executor | SDD requires approved local commits; otherwise use the inline policy executor |
 | Verification and evidence | Project repository | Exact commands and proof categories are declared locally |
 | Historical retrieval | ctx | Focused lookup; never current authority |
 | Curated durable memory | Engram | Save decisions and non-obvious learnings, not duplicate task state |
@@ -107,9 +132,14 @@ Bounded autonomy is opt-in per goal. Before execution, the plan must state:
 - repository, base revision, owned worktree path, and task branch;
 - permitted file or subsystem scope;
 - exact local commands and any allowed network reads;
+- exactly one execution authority;
 - whether local checkpoint commits are allowed (default: no);
-- risk class and required verification, review, and runtime evidence;
-- maximum repair rounds (at most two during the pilot);
+- Goal mode (`off` or continuity-only with a non-empty plan reference) and an
+  explicit retry policy, including replay safety for any bounded retry;
+- risk class, at least one required deterministic proof, and explicit
+  required/not-applicable classifications for runtime-local and external
+  evidence;
+- a run-wide maximum repair budget (at most two rounds during the pilot);
 - prohibited actions and expiration at a terminal state.
 
 Approval covers only the listed envelope. Ambiguous scope, a material design
@@ -142,6 +172,12 @@ Any state -----------------------------------------------> BLOCKED
 - Never bypass repository hooks, secret scanning, or security checks.
 - A local checkpoint commit is permitted only when its envelope says so, and
   only on the owned task branch. Otherwise leave a reviewable uncommitted diff.
+- Superpowers SDD is compatible only with an envelope that permits local task
+  commits. The inline policy executor owns commit-forbidden runs. Neither may
+  create another worktree, fall back to the current checkout, or invoke branch
+  finishing or cleanup.
+- GSD may help select or plan the task, but it is not a second executor,
+  reviewer-fixer, shipper, or worktree manager inside the run.
 
 ### `VERIFY`
 
@@ -161,6 +197,27 @@ Any state -----------------------------------------------> BLOCKED
 - Reviewer failure or an unreadable/missing review artifact blocks.
 - Re-run affected checks after every fix. Stop after the approved repair limit,
   which is at most two rounds during the pilot.
+- A fix round begins with implementation changes responding to one or more
+  findings and ends after affected verification and scoped re-review. Every
+  task-level or final-review fix consumes the same run-wide budget.
+
+### Goal Continuity And Retry Safety
+
+- Goal mode may preserve only the approved plan reference. It does not own plan
+  state or acceptance criteria. When `LOCAL_READY` conditions hold, complete
+  the native Goal immediately before the report. A `BLOCKED` run never completes
+  it; if the native blocked transition is not yet permitted, report it as active
+  with execution halted. Any automatic continuation may only restate the recorded
+  blocker and attempt the permitted native status transition; it may not inspect
+  the repository, call other tools or networks, or resume expired work.
+- The default retry policy is fail-fast. Bounded retries must declare the exact
+  operation and transient failure class in advance, use at most two attempts for
+  unchanged work during the pilot, and report attempts separately from repairs.
+  Replay must be read-only or idempotent, or follow a named reconciliation that
+  proves a partial or unknown outcome safe to retry.
+- An undeclared, non-transient, or exhausted failure returns `BLOCKED`; token or
+  continuation budget never weakens verification or evidence. Ambiguous
+  completion without safe replay also returns `BLOCKED`.
 
 ### `EVIDENCE`
 
@@ -218,21 +275,43 @@ The tier changes review depth, not the consequential-action gates.
 2. **Pilot preparation:** In SoundCoaster, create a compact authority/start map,
    point startup instructions at it instead of requiring full historical files,
    and declare existing deterministic and runtime-proof commands.
-3. **Measured manual runs:** Use the contract on two or three real, medium tasks.
-   Do not count policy setup as a successful run.
+3. **Baseline and measured attempts:** Declare a comparable baseline and fixed
+   observation window, then use the contract on two or three real, medium tasks.
+   Record every attempt, including `BLOCKED`; policy setup is not a run.
 4. **Evaluate:** Compare owner interventions, elapsed time, review signal,
-   escaped defects, runtime-proof quality, and cleanup effort with the baseline.
-5. **Transfer test:** Run the refined contract once in a less mature repository.
-6. **Extract automation:** Only then implement the smallest repeated mechanism as
-   a thin skill, report-only schedule, or native review configuration.
+   escaped defects, runtime-proof quality, cost, and cleanup effort across the
+   complete attempt denominator.
+5. **Transfer test:** Run the refined manual contract once in a less mature
+   repository and confirm that the candidate friction generalizes.
+6. **Prototype:** Under a separate approved plan, implement at most one smallest
+   repeated mechanism as a thin report-only skill, schedule, or native review
+   configuration.
+7. **Canary and promote:** Run the prototype in one bounded, qualifying canary
+   that reaches `LOCAL_READY`, using the same baseline and observation window.
+   Promote it for reuse only if it removes the repeated process intervention
+   without worsening defects, evidence, cost, or cleanup.
+
+A run qualifies only when it preserves scope/isolation, completes canonical
+verification and required evidence, receives a fresh review, has no unwaived
+Critical or Important finding at `LOCAL_READY`, and records every owner
+intervention as product/risk judgment or avoidable process friction. All
+attempts remain in the denominator. A mechanism is a candidate only when the
+same avoidable friction appears in at least two recorded attempts with the same
+deterministic trigger and bounded inputs, and the sample contains at least two
+qualifying runs. A scope/worktree escape vetoes promotion until its cause is
+fixed and a later qualifying run proves the correction.
 
 ## Success and Reconsideration Criteria
 
-Proceed to thin automation only if the measured runs reduce avoidable owner
-interventions without increasing escaped defects, ambiguous evidence, cost, or
-cleanup. Revisit the design if reviews are noisy, fix loops repeat, task
-worktrees become hard to reconcile, or the owner still has to restate acceptance
-criteria.
+Proceed from prototype to reusable automation only if the bounded canary has zero
+acceptance-criteria restatements, zero prompts merely to request required review
+or verification, no unwaived Critical or Important terminal finding, no scope or
+worktree escape, and correctly classified runtime evidence. Against the declared
+baseline and observation window, it must remove the repeated intervention
+without increasing escaped defects, ambiguous evidence, cost, or cleanup.
+Blocked attempts remain evidence rather than disappearing from the sample.
+Revisit the design if reviews are noisy, fix loops repeat, task worktrees become
+hard to reconcile, or the owner still has to restate acceptance criteria.
 
 The intended endpoint is not a developer absent from outcomes. It is a developer
 who is consulted for product and risk judgment rather than process babysitting.
