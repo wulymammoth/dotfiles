@@ -4,6 +4,36 @@ export LC_ALL=en_US.UTF-8
 export EDITOR="nvim"
 export XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-$HOME/.config}
 
+# Long-lived apps can retain a launchd SSH-agent socket after macOS replaces
+# it. ssh-add exits 2 only when it cannot contact the configured agent; exit 1
+# still means the agent is reachable but currently has no identities.
+_ssh_add_status=2
+if [[ -n "${SSH_AUTH_SOCK:-}" ]]; then
+  /usr/bin/ssh-add -l >/dev/null 2>&1
+  _ssh_add_status=$?
+fi
+
+if [[ "$OSTYPE" == darwin* ]] && (( _ssh_add_status == 2 )); then
+  _launchd_ssh_auth_sock="$(
+    /bin/launchctl print "gui/${UID}/com.openssh.ssh-agent" 2>/dev/null \
+      | /usr/bin/awk '$1 == "SSH_AUTH_SOCK" && $2 == "=>" { print $3; exit }'
+  )"
+
+  if [[ -S "$_launchd_ssh_auth_sock" ]]; then
+    SSH_AUTH_SOCK="$_launchd_ssh_auth_sock" /usr/bin/ssh-add -l \
+      >/dev/null 2>&1
+    _ssh_add_status=$?
+    if (( _ssh_add_status != 2 )); then
+      export SSH_AUTH_SOCK="$_launchd_ssh_auth_sock"
+    fi
+  fi
+fi
+
+if (( _ssh_add_status == 2 )); then
+  unset SSH_AUTH_SOCK
+fi
+unset _launchd_ssh_auth_sock _ssh_add_status
+
 # Keep non-interactive shells clean
 if [[ $- != *i* ]]; then
   return
