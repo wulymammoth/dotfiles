@@ -35,7 +35,7 @@ export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 
 # fzf configuration
 export FZF_DEFAULT_COMMAND='fd --type f'
-export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+export FZF_DEFAULT_OPTS='
   --border
   --color fg:#D8DEE9,hl:#89b8c2,fg+:#D8DEE9,hl+:#e27878
   --color pointer:#BF616A,info:#4C566A,spinner:#4C566A,header:#4C566A,prompt:#81A1C1,marker:#EBCB8B'

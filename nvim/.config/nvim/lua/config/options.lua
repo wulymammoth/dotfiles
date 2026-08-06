@@ -3,9 +3,9 @@
 -- Add any additional options here
 vim.g.editorconfig = 1 -- enable editorconfig
 vim.g.lazyvim_python_lsp = "basedpyright"
-vim.g.loaded_ruby_provider = 0  -- disable Ruby provider for cross-machine compatibility
+vim.g.loaded_perl_provider = 0 -- disable Perl provider for cross-machine compatibility
+vim.g.loaded_ruby_provider = 0 -- disable Ruby provider for cross-machine compatibility
 vim.g.python3_host_prog = vim.fn.expand("~/.local/share/nvim-python/bin/python")
-vim.g.python_host_prog = vim.fn.system("which python"):gsub("\n", "")
 
 local function executable(bin)
   return vim.fn.executable(bin) == 1

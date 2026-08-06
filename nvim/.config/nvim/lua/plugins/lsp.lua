@@ -33,18 +33,6 @@ return {
       })
 
       opts.servers = opts.servers or {}
-      opts.servers["*"] = vim.tbl_deep_extend("force", opts.servers["*"] or {}, {})
-      opts.servers["*"].keys = opts.servers["*"].keys or {}
-      vim.list_extend(opts.servers["*"].keys, {
-        { "gd", vim.lsp.buf.definition, desc = "Goto Definition", has = "definition" },
-        { "gD", vim.lsp.buf.declaration, desc = "Goto Declaration" },
-        { "gr", vim.lsp.buf.references, desc = "References", nowait = true },
-        { "gi", vim.lsp.buf.implementation, desc = "Goto Implementation" },
-        { "K", vim.lsp.buf.hover, desc = "Hover", has = "hover" },
-        { "<C-k>", vim.lsp.buf.signature_help, mode = "n", desc = "Signature Help", has = "signatureHelp" },
-        { "<leader>rn", vim.lsp.buf.rename, desc = "Rename", has = "rename" },
-        { "<leader>ca", vim.lsp.buf.code_action, mode = { "n", "x" }, desc = "Code Action", has = "codeAction" },
-      })
 
       opts.servers.basedpyright = vim.tbl_deep_extend("force", opts.servers.basedpyright or {}, {
         flags = {
@@ -87,9 +75,6 @@ return {
         root_markers = { "mix.exs", ".git" },
       })
 
-      if opts.servers.tsserver then
-        opts.servers.tsserver.enabled = false
-      end
       if opts.servers.ts_ls then
         opts.servers.ts_ls.enabled = false
       end

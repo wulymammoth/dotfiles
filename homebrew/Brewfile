@@ -34,7 +34,7 @@ brew 'lazygit'
 brew 'luacheck'
 brew 'mas'
 brew 'navi'
-brew 'neovim', args: ['HEAD']
+brew 'neovim'
 brew 'ngrep'
 brew 'node'
 brew 'pastel'
