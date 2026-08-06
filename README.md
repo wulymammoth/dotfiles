@@ -58,7 +58,7 @@ Use `make stow-list` to inspect the current default package set.
 | `asdf/` | `~/.asdfrc`, `~/.tool-versions` | Runtime version management |
 | `bat/` | `~/.config/bat/` | `bat` theme/config |
 | `ctx/` | `~/.ctx/config.toml` | Durable ctx preferences; private index/runtime state remains local |
-| `codex-config/` | `~/.codex/AGENTS.md` | Global Codex policy; private runtime state remains local |
+| `codex-config/` | `~/.codex/AGENTS.md`, `~/.codex/policies/` | Global Codex policy and progressive-disclosure policy documents; private runtime state remains local |
 | `homebrew/` | Brew bundle files | Package bootstrap via Brewfile |
 
 The `ctx` package is state-adjacent: `~/.ctx` must remain a real local directory
@@ -71,8 +71,9 @@ this repository.
 
 The `codex-config` package follows the same state-adjacent pattern. `~/.codex`
 must remain a real local directory because it contains private, mutable runtime
-state. Stowing `codex-config` with `--no-folding` links only the global
-`AGENTS.md` policy.
+state. Stowing `codex-config` with `--no-folding` links the global `AGENTS.md`
+and its supporting progressive-disclosure policy documents without folding the
+private runtime directory into the repository.
 
 ### Optional or machine-specific packages
 

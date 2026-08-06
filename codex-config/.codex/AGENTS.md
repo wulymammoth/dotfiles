@@ -64,6 +64,18 @@ and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
    approval before committing. Commit only complete, verified milestones; no
    commit is required when no tracked repository files changed.
 
+## Bounded autonomous work
+
+When the user explicitly approves a named plan or goal for bounded autonomous
+execution, first read `~/.codex/policies/bounded-autonomy.md`. That approval may
+cover only the envelope recorded in the plan: one harness-owned isolated
+worktree, named local commands, and local checkpoint commits only when expressly
+allowed. Isolation, verification, review, and required evidence fail closed.
+The run ends at `LOCAL_READY` or `BLOCKED`; all hosted, production, provider,
+paid, destructive, authentication, provisioning, device/store, and shipping
+actions retain their separate approval gates. Otherwise, the normal per-action
+and per-commit rules above remain in force.
+
 ## Decision and historical memory
 
 Before planning substantial work on an existing subsystem:
