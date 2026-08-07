@@ -124,6 +124,50 @@ Installer-managed skill files are not modified. Policy overrides live in the
 tracked global policy and repository-local instructions so plugin updates do not
 erase them.
 
+## Concurrent Session Coordination
+
+Multiple Codex sessions are useful when their writable and external boundaries
+are explicit. A worktree isolates source and index state, but it does not isolate
+project-scoped memory recency, hosted artifacts, simulators, devices, provider
+budgets, staging environments, or eventual integration. The global policy
+therefore defines coordination invariants without assuming that every repository
+uses Git worktrees, Linear, pnpm, or pull requests.
+
+The unit of exclusivity is an **active writer session**, not every process it
+dispatches. Its named executor may use repository-approved workers with explicit,
+non-overlapping ownership and remains the integration owner. A separate session
+may inspect read-only, but a review verdict must target a named commit or
+explicitly quiescent checkpoint rather than a changing checkout. Independent
+writer sessions use isolated checkouts or worktrees, each with its own task
+branch. Each mutable hosted artifact or environment has one writer until an
+explicit handoff, and shared runtime resources remain exclusive unless isolation
+is proven.
+
+Overlapping central files do not force blanket serialization. Parallel changes
+may proceed when a named integration owner owns the reconciliation order and
+re-runs the combined verification boundary. Before readiness, each writer
+refreshes the target base and proves current mergeability; the repository chooses
+whether that means merge, rebase, merge queue, or another supported strategy.
+
+After compaction or resume, generated summaries and recent project memory are
+routing hints rather than ownership evidence. The session reconciles repository
+root, branch, HEAD, dirty state, task identity, and any review artifact against
+live sources before acting. A contradiction is corrected explicitly instead of
+being used for further work. Mandatory preservation calls may capture a supplied
+summary first; they do not make that summary authoritative.
+
+Rejected alternatives:
+
+- **Serialize every session:** safe but discards useful read-only review and
+  independent implementation throughput.
+- **Serialize every shared or high-conflict file:** unnecessary when a named
+  integrator and combined verification can reconcile independent branches.
+- **Treat worktrees as total isolation:** false for hosted state, memory,
+  runtimes, caches, quotas, and final integration.
+- **Add a mutable session lease registry:** creates synchronization, expiry, and
+  cleanup state that can itself become stale. Repository ownership primitives
+  and explicit handoffs remain the source of truth.
+
 ## Approval Envelope
 
 Bounded autonomy is opt-in per goal. Before execution, the plan must state:
