@@ -20,6 +20,18 @@ print -r -- "sentinel runtime state" >"$test_root/.codex/state.json"
 [[ -f "$repo_root/codex-config/.codex/policies/bounded-autonomy.md" ]] \
   || fail "bounded-autonomy policy is missing"
 
+global_agents="$repo_root/codex-config/.codex/AGENTS.md"
+for required_policy in \
+  "## Concurrent sessions" \
+  "one active writer" \
+  "read-only" \
+  "shared runtime" \
+  "After compaction"
+do
+  rg --fixed-strings --quiet "$required_policy" "$global_agents" \
+    || fail "global AGENTS policy is missing: $required_policy"
+done
+
 stow --no-folding \
   --dir "$repo_root" \
   --target "$test_root" \

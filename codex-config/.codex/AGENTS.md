@@ -12,6 +12,31 @@ If a file is large, inspect its headings and only the sections relevant to the
 current task. Current repository code, tests, specifications, design documents,
 and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
 
+## Concurrent sessions
+
+- A writable checkout and branch have one active writer session at a time. Its
+  named executor may dispatch project-approved workers with explicit,
+  non-overlapping ownership and remains responsible for integration. Other
+  sessions may inspect read-only, but a review verdict must target a named
+  commit or explicitly quiescent checkpoint. Independent writer sessions must
+  use isolated checkouts or worktrees, each on its own task branch.
+- A mutable hosted artifact or environment also has one active writer. This
+  includes a pull request, tracker issue, deployment, staging environment, and
+  provider configuration; hand off ownership before another session mutates it.
+- Treat a simulator, physical device, shared database, provider budget, or
+  other shared runtime as exclusive unless the project proves isolation.
+- Parallel changes to overlapping or high-conflict files are allowed only with
+  a named integration owner and reconciliation order. Do not serialize all work
+  merely because eventual integration may produce conflicts.
+- After compaction or resume, and at session start, reconcile the repository
+  root, branch, HEAD, dirty state, current task, and any active review artifact
+  against live state before acting on summaries. Engram and ctx support
+  recovery; they do not establish current ownership.
+- Before declaring work ready, refresh the target base and prove the result is
+  current and mergeable. Use the repository's chosen merge or rebase policy
+  rather than imposing one globally. Repository-local instructions define the
+  concrete ownership tuple, isolation commands, and runtime boundaries.
+
 ## Tools and context
 
 - Prefer `fd` over `find` and `rg` over `grep`; use fallbacks when unavailable.
