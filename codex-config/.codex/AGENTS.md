@@ -67,6 +67,12 @@ and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
 - Tool selection does not grant mutation authority. Preserve explicit approval
   gates for pushes, pull-request or issue changes, reviews, merges, and releases.
 
+## Linear operations
+
+- Prefer direct Linear MCP (`mcp__linear__*`); use the bundled connector only
+  after a concrete capability gap or failure. This supersedes skill defaults.
+- Preserve explicit approval gates for Linear mutations.
+
 ## Development workflow
 
 1. Understand the problem, then inspect existing code, tests, and established
