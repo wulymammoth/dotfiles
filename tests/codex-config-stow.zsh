@@ -25,6 +25,12 @@ profile_source="$repo_root/codex-config/.codex/parallel-work.config.toml"
 [[ "$(<"$profile_source")" == $'[plugins."engram@engram"]\nenabled = false' ]] \
   || fail "parallel-work profile must contain only the Engram plugin override"
 
+skill_source="$repo_root/codex-config/.codex/skills/orchestrating-parallel-worktrees/SKILL.md"
+helper_source="$repo_root/codex-config/.codex/skills/orchestrating-parallel-worktrees/scripts/worktree-session"
+[[ -f "$skill_source" ]] || fail "parallel worktree orchestration skill is missing"
+[[ -f "$helper_source" ]] || fail "parallel worktree session helper is missing"
+[[ -x "$helper_source" ]] || fail "parallel worktree session helper must be executable"
+
 global_agents="$repo_root/codex-config/.codex/AGENTS.md"
 for required_policy in \
   "## Concurrent sessions" \
@@ -47,6 +53,18 @@ stow --no-folding \
 profile_link="$test_root/.codex/parallel-work.config.toml"
 [[ "${profile_link:A}" == "$profile_source" ]] \
   || fail "parallel-work profile must resolve to the codex-config package"
+
+skill_link="$test_root/.codex/skills/orchestrating-parallel-worktrees/SKILL.md"
+helper_link="$test_root/.codex/skills/orchestrating-parallel-worktrees/scripts/worktree-session"
+scripts_target="$test_root/.codex/skills/orchestrating-parallel-worktrees/scripts"
+[[ -L "$skill_link" ]] || fail "orchestration SKILL.md must be a symlink"
+[[ -L "$helper_link" ]] || fail "worktree-session helper must be a symlink"
+[[ "${skill_link:A}" == "$skill_source" ]] \
+  || fail "orchestration skill must resolve to the codex-config package"
+[[ "${helper_link:A}" == "$helper_source" ]] \
+  || fail "worktree-session helper must resolve to the codex-config package"
+[[ -d "$scripts_target" && ! -L "$scripts_target" ]] \
+  || fail "orchestration scripts must remain a real directory"
 
 [[ -d "$test_root/.codex" && ! -L "$test_root/.codex" ]] \
   || fail ".codex must remain a real directory"
