@@ -1,0 +1,1161 @@
+#!/usr/bin/env zsh
+
+emulate -LR zsh
+setopt errexit nounset pipefail
+umask 077
+
+readonly schema_version=1
+readonly metadata_rel=".superpowers/parallel"
+readonly helper_path="${0:A}"
+
+die() {
+  print -u2 -- "ERROR: $*"
+  exit 1
+}
+
+info() {
+  print -- "$*"
+}
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  worktree-session prepare --worktree ABS_ROOT --task-id ID --task-slug SLUG \
+    --plan REPO_RELATIVE_PATH --base-ref REF --base-sha FULL_SHA \
+    --shared-project NAME --task-project NAME --target-branch REF \
+    --integration-owner LABEL [--replace]
+  worktree-session launch --worktree ABS_ROOT
+  worktree-session resume --worktree ABS_ROOT
+  worktree-session claim
+  worktree-session verify --memory-project NAME
+  worktree-session report --state STATE --freshness-source SOURCE [OPTIONS]
+  worktree-session report --check
+  worktree-session handoff --to THREAD_ID
+  worktree-session release
+USAGE
+}
+
+require_command() {
+  command -v -- "$1" >/dev/null 2>&1 || die "required command is missing: $1"
+}
+
+reject_control_chars() {
+  local label="$1" value="$2"
+  [[ -n "$value" ]] || die "$label must not be empty"
+  [[ "$value" != *[[:cntrl:]]* ]] \
+    || die "$label contains a control character"
+}
+
+require_simple_name() {
+  local label="$1" value="$2"
+  reject_control_chars "$label" "$value"
+  [[ "$value" =~ '^[A-Za-z0-9][A-Za-z0-9._-]*$' ]] \
+    || die "$label must use only letters, numbers, dot, underscore, or hyphen"
+}
+
+require_full_sha() {
+  local value="$1"
+  (( ${#value} == 40 || ${#value} == 64 )) \
+    || die "base SHA must be a full 40- or 64-character lowercase hexadecimal value"
+  [[ "$value" != *[^0-9a-f]* ]] \
+    || die "base SHA must be a full 40- or 64-character lowercase hexadecimal value"
+}
+
+physical_dir() {
+  local directory="$1"
+  [[ -d "$directory" ]] || die "directory does not exist: $directory"
+  (cd -P -- "$directory" && pwd -P)
+}
+
+sha256_file() {
+  shasum -a 256 -- "$1" | awk '{print $1}'
+}
+
+metadata_path() {
+  print -r -- "$1/$metadata_rel"
+}
+
+assert_metadata_paths_safe() {
+  local root="$1" mode="${2:-optional}" metadata_entry
+  local metadata="$(metadata_path "$root")"
+  local -a paths=(
+    "$root/.superpowers"
+    "$metadata"
+    "$metadata/.gitignore"
+    "$metadata/session.conf"
+    "$metadata/owner"
+    "$metadata/owner/claim.conf"
+    "$metadata/completion.conf"
+  )
+  for metadata_entry in "${paths[@]}"; do
+    [[ ! -L "$metadata_entry" ]] \
+      || die "metadata path is a symlink: $metadata_entry"
+  done
+
+  [[ ! -e "$root/.superpowers" || -d "$root/.superpowers" ]] \
+    || die ".superpowers must be a directory"
+  [[ ! -e "$metadata" || -d "$metadata" ]] \
+    || die "parallel metadata must be a directory"
+  [[ ! -e "$metadata/.gitignore" || -f "$metadata/.gitignore" ]] \
+    || die "parallel metadata ignore must be a regular file"
+  [[ ! -e "$metadata/session.conf" || -f "$metadata/session.conf" ]] \
+    || die "session.conf must be a regular file"
+  [[ ! -e "$metadata/owner" || -d "$metadata/owner" ]] \
+    || die "owner must be a directory"
+  [[ ! -e "$metadata/owner/claim.conf" || -f "$metadata/owner/claim.conf" ]] \
+    || die "claim.conf must be a regular file"
+  [[ ! -e "$metadata/completion.conf" || -f "$metadata/completion.conf" ]] \
+    || die "completion.conf must be a regular file"
+
+  if [[ "$mode" == "required" ]]; then
+    [[ -d "$root/.superpowers" && -d "$metadata" ]] \
+      || die "parallel metadata directory is missing: $metadata"
+    [[ -f "$metadata/.gitignore" ]] \
+      || die "parallel metadata ignore is missing: $metadata/.gitignore"
+    require_command cmp
+    cmp -s -- "$metadata/.gitignore" <(print -r -- "*") \
+      || die "parallel metadata ignore must contain exactly two bytes: *\\n"
+    [[ -f "$metadata/session.conf" ]] \
+      || die "parallel session descriptor is missing: $metadata/session.conf"
+  fi
+}
+
+conf_require() {
+  local file="$1" key="$2" kind="${3:-descriptor}" value
+  value="$(git config --file "$file" --get "$key" 2>/dev/null)" \
+    || die "missing $kind field: $key"
+  reject_control_chars "$key" "$value"
+  print -r -- "$value"
+}
+
+write_narrow_ignore() {
+  local metadata="$1" ignore_file="$metadata/.gitignore" expected
+  expected="$(mktemp "$metadata/.gitignore.expected.XXXXXX")"
+  {
+    print -r -- "*" >"$expected"
+    if [[ -e "$ignore_file" ]]; then
+      [[ -f "$ignore_file" && ! -L "$ignore_file" ]] \
+        || die "parallel metadata ignore is not a regular file"
+      cmp -s -- "$expected" "$ignore_file" \
+        || die "refusing to overwrite parallel metadata ignore with different content"
+    else
+      mv -f -- "$expected" "$ignore_file"
+      expected=""
+    fi
+  } always {
+    [[ -z "$expected" ]] || rm -f -- "$expected"
+  }
+}
+
+current_root() {
+  local root
+  root="$(git rev-parse --path-format=absolute --show-toplevel 2>/dev/null)" \
+    || die "current directory is not inside a Git worktree"
+  physical_dir "$root"
+}
+
+load_descriptor() {
+  local root="$1"
+  typeset -g descriptor_root descriptor_metadata descriptor_file
+  typeset -g session_schema_version session_role session_prepared_at
+  typeset -g session_prepared_by_thread task_id task_slug task_plan_path
+  typeset -g task_plan_sha git_common_dir git_worktree_root git_branch
+  typeset -g git_base_ref git_base_sha memory_shared_project
+  typeset -g memory_task_project integration_target_branch integration_owner
+
+  descriptor_root="$(physical_dir "$root")" || return 1
+  descriptor_metadata="$(metadata_path "$descriptor_root")"
+  descriptor_file="$descriptor_metadata/session.conf"
+
+  assert_metadata_paths_safe "$descriptor_root" required
+
+  session_schema_version="$(conf_require "$descriptor_file" session.schemaVersion)" || return 1
+  session_role="$(conf_require "$descriptor_file" session.role)" || return 1
+  session_prepared_at="$(conf_require "$descriptor_file" session.preparedAt)" || return 1
+  session_prepared_by_thread="$(conf_require "$descriptor_file" session.preparedByThread)" || return 1
+  task_id="$(conf_require "$descriptor_file" task.id)" || return 1
+  task_slug="$(conf_require "$descriptor_file" task.slug)" || return 1
+  task_plan_path="$(conf_require "$descriptor_file" task.planPath)" || return 1
+  task_plan_sha="$(conf_require "$descriptor_file" task.planSha256)" || return 1
+  git_common_dir="$(conf_require "$descriptor_file" git.commonDir)" || return 1
+  git_worktree_root="$(conf_require "$descriptor_file" git.worktreeRoot)" || return 1
+  git_branch="$(conf_require "$descriptor_file" git.branch)" || return 1
+  git_base_ref="$(conf_require "$descriptor_file" git.baseRef)" || return 1
+  git_base_sha="$(conf_require "$descriptor_file" git.baseSha)" || return 1
+  memory_shared_project="$(conf_require "$descriptor_file" memory.sharedProject)" || return 1
+  memory_task_project="$(conf_require "$descriptor_file" memory.taskProject)" || return 1
+  integration_target_branch="$(conf_require "$descriptor_file" integration.targetBranch)" || return 1
+  integration_owner="$(conf_require "$descriptor_file" integration.owner)" || return 1
+}
+
+descriptor_identity_preflight() {
+  local root="$1" actual_root actual_common
+  load_descriptor "$root"
+
+  [[ "$session_schema_version" == "$schema_version" ]] \
+    || die "unsupported schema: expected $schema_version, actual $session_schema_version"
+  [[ "$session_role" == "implementation-controller" ]] \
+    || die "unsupported session role: expected implementation-controller, actual $session_role"
+
+  actual_root="$(physical_dir "$(git -C "$descriptor_root" rev-parse --path-format=absolute --show-toplevel)")"
+  [[ "$actual_root" == "$git_worktree_root" ]] \
+    || die "worktree root mismatch: expected $git_worktree_root, actual $actual_root"
+
+  actual_common="$(physical_dir "$(git -C "$descriptor_root" rev-parse --path-format=absolute --git-common-dir)")"
+  [[ "$actual_common" == "$git_common_dir" ]] \
+    || die "common Git directory mismatch: expected $git_common_dir, actual $actual_common"
+}
+
+descriptor_preflight() {
+  local root="$1" mode="${2:-non-owner}"
+  local actual_branch plan_file plan_physical actual_plan_sha
+  descriptor_identity_preflight "$root"
+
+  actual_branch="$(git -C "$descriptor_root" symbolic-ref --quiet --short HEAD 2>/dev/null)" \
+    || die "branch mismatch: expected $git_branch, actual detached HEAD"
+  [[ "$actual_branch" == "$git_branch" ]] \
+    || die "branch mismatch: expected $git_branch, actual $actual_branch"
+  [[ "$git_branch" != "$integration_target_branch" ]] \
+    || die "task branch must differ from integration target: $git_branch"
+
+  git -C "$descriptor_root" cat-file -e "$git_base_sha^{commit}" 2>/dev/null \
+    || die "base SHA is not a commit: $git_base_sha"
+  git -C "$descriptor_root" merge-base --is-ancestor "$git_base_sha" HEAD 2>/dev/null \
+    || die "base ancestry mismatch: $git_base_sha is not an ancestor of HEAD"
+
+  [[ "$task_plan_path" != /* ]] || die "plan path must be repository-relative"
+  plan_file="$descriptor_root/$task_plan_path"
+  [[ -f "$plan_file" ]] || die "approved plan is missing: $task_plan_path"
+  plan_physical="${plan_file:A}"
+  [[ "$plan_physical" == "$descriptor_root"/* ]] \
+    || die "plan must remain inside worktree: expected prefix $descriptor_root, actual $plan_physical"
+  actual_plan_sha="$(sha256_file "$plan_physical")"
+  [[ "$actual_plan_sha" == "$task_plan_sha" ]] \
+    || die "plan digest mismatch: expected $task_plan_sha, actual $actual_plan_sha"
+
+  [[ "$mode" != "worker" ]] || require_worker_project
+}
+
+require_worker_project() {
+  [[ -n "${ENGRAM_PROJECT:-}" ]] || die "ENGRAM_PROJECT is required"
+  [[ "$ENGRAM_PROJECT" == "$memory_task_project" ]] \
+    || die "Engram project mismatch: expected $memory_task_project, actual $ENGRAM_PROJECT"
+}
+
+parse_prepare_options() {
+  typeset -gA prepare_options=()
+  typeset -gA prepare_seen=()
+  typeset -g prepare_replace=false
+
+  local option key
+  while (( $# )); do
+    option="$1"
+    case "$option" in
+      --replace)
+        [[ "$prepare_replace" == false ]] || die "duplicate option: --replace"
+        prepare_replace=true
+        shift
+        ;;
+      --worktree|--task-id|--task-slug|--plan|--base-ref|--base-sha|--shared-project|--task-project|--target-branch|--integration-owner)
+        (( $# >= 2 )) || die "missing value for option: $option"
+        key="${option#--}"
+        (( ${+prepare_seen[$key]} == 0 )) || die "duplicate option: $option"
+        prepare_seen[$key]=1
+        prepare_options[$key]="$2"
+        shift 2
+        ;;
+      *)
+        die "unknown prepare option: $option"
+        ;;
+    esac
+  done
+}
+
+prepare_value() {
+  local key="$1" label="$2"
+  (( ${+prepare_options[$key]} == 1 )) || die "missing required option: --$key"
+  local value="${prepare_options[$key]}"
+  reject_control_chars "$label" "$value"
+  print -r -- "$value"
+}
+
+command_prepare() {
+  require_command git
+  require_command shasum
+  require_command awk
+  require_command mktemp
+  require_command cmp
+
+  parse_prepare_options "$@"
+  [[ -n "${CODEX_THREAD_ID:-}" ]] || die "CODEX_THREAD_ID is required for prepare"
+  reject_control_chars "CODEX_THREAD_ID" "$CODEX_THREAD_ID"
+
+  local worktree_arg task_id_arg task_slug_arg plan_arg base_ref_arg base_sha_arg
+  local shared_project_arg task_project_arg target_branch_arg integration_owner_arg
+  worktree_arg="$(prepare_value worktree worktree)"
+  task_id_arg="$(prepare_value task-id "task ID")"
+  task_slug_arg="$(prepare_value task-slug "task slug")"
+  plan_arg="$(prepare_value plan "plan path")"
+  base_ref_arg="$(prepare_value base-ref "base ref")"
+  base_sha_arg="$(prepare_value base-sha "base SHA")"
+  shared_project_arg="$(prepare_value shared-project "shared project")"
+  task_project_arg="$(prepare_value task-project "task project")"
+  target_branch_arg="$(prepare_value target-branch "target branch")"
+  integration_owner_arg="$(prepare_value integration-owner "integration owner")"
+
+  [[ "$worktree_arg" == /* ]] || die "worktree path must be absolute"
+  require_simple_name "task slug" "$task_slug_arg"
+  require_simple_name "shared project" "$shared_project_arg"
+  require_simple_name "task project" "$task_project_arg"
+  [[ "$task_project_arg" != "$shared_project_arg" ]] \
+    || die "task project must differ from shared project"
+  require_full_sha "$base_sha_arg"
+
+  local root input_root common_dir git_dir branch current_ref target_ref
+  local resolved_base plan_file plan_physical plan_sha metadata descriptor temporary
+  root="$(git -C "$worktree_arg" rev-parse --path-format=absolute --show-toplevel 2>/dev/null)" \
+    || die "worktree is not a Git checkout: $worktree_arg"
+  root="$(physical_dir "$root")"
+  input_root="$(physical_dir "$worktree_arg")"
+  [[ "$root" == "$input_root" ]] \
+    || die "worktree root mismatch: expected $input_root, actual $root"
+
+  common_dir="$(git -C "$root" rev-parse --path-format=absolute --git-common-dir)"
+  common_dir="$(physical_dir "$common_dir")"
+  git_dir="$(git -C "$root" rev-parse --path-format=absolute --git-dir)"
+  git_dir="$(physical_dir "$git_dir")"
+  [[ "$git_dir" != "$common_dir" ]] \
+    || die "prepare requires an existing linked worktree, not the primary checkout"
+
+  branch="$(git -C "$root" symbolic-ref --quiet --short HEAD 2>/dev/null)" \
+    || die "prepare requires a named task branch, not detached HEAD"
+  current_ref="$(git -C "$root" symbolic-ref HEAD)"
+  target_ref="$(git -C "$root" rev-parse --symbolic-full-name "$target_branch_arg" 2>/dev/null)" \
+    || die "target branch does not resolve locally: $target_branch_arg"
+  [[ -n "$target_ref" && "$target_ref" != "$current_ref" ]] \
+    || die "task branch must differ from integration target: $branch"
+  git -C "$root" rev-parse --verify "$target_branch_arg^{commit}" >/dev/null 2>&1 \
+    || die "target branch does not resolve locally: $target_branch_arg"
+
+  git -C "$root" cat-file -e "$base_sha_arg^{commit}" 2>/dev/null \
+    || die "base SHA is not a commit: $base_sha_arg"
+  resolved_base="$(git -C "$root" rev-parse --verify "$base_ref_arg^{commit}" 2>/dev/null)" \
+    || die "base ref does not resolve locally: $base_ref_arg"
+  [[ "$resolved_base" == "$base_sha_arg" ]] \
+    || die "base SHA mismatch: ref $base_ref_arg resolves to $resolved_base, expected $base_sha_arg"
+  git -C "$root" merge-base --is-ancestor "$base_sha_arg" HEAD 2>/dev/null \
+    || die "base ancestry mismatch: $base_sha_arg is not an ancestor of HEAD"
+
+  [[ "$plan_arg" != /* ]] || die "plan path must be repository-relative"
+  plan_file="$root/$plan_arg"
+  [[ -f "$plan_file" ]] || die "approved plan is missing: $plan_arg"
+  plan_physical="${plan_file:A}"
+  [[ "$plan_physical" == "$root"/* ]] \
+    || die "plan must remain inside worktree: expected prefix $root, actual $plan_physical"
+  plan_sha="$(sha256_file "$plan_physical")"
+
+  assert_metadata_paths_safe "$root"
+  metadata="$(metadata_path "$root")"
+  mkdir -p -- "$metadata"
+  assert_metadata_paths_safe "$root"
+  write_narrow_ignore "$metadata"
+
+  [[ ! -e "$metadata/owner" ]] \
+    || die "cannot prepare while an active owner boundary exists"
+  descriptor="$metadata/session.conf"
+  if [[ -e "$descriptor" && "$prepare_replace" != true ]]; then
+    die "descriptor already exists; use --replace while unclaimed"
+  fi
+
+  temporary="$(mktemp "$metadata/.session.conf.tmp.XXXXXX")"
+  {
+    git config --file "$temporary" session.schemaVersion "$schema_version"
+    git config --file "$temporary" session.role "implementation-controller"
+    git config --file "$temporary" session.preparedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    git config --file "$temporary" session.preparedByThread "$CODEX_THREAD_ID"
+    git config --file "$temporary" task.id "$task_id_arg"
+    git config --file "$temporary" task.slug "$task_slug_arg"
+    git config --file "$temporary" task.planPath "$plan_arg"
+    git config --file "$temporary" task.planSha256 "$plan_sha"
+    git config --file "$temporary" git.commonDir "$common_dir"
+    git config --file "$temporary" git.worktreeRoot "$root"
+    git config --file "$temporary" git.branch "$branch"
+    git config --file "$temporary" git.baseRef "$base_ref_arg"
+    git config --file "$temporary" git.baseSha "$base_sha_arg"
+    git config --file "$temporary" memory.sharedProject "$shared_project_arg"
+    git config --file "$temporary" memory.taskProject "$task_project_arg"
+    git config --file "$temporary" integration.targetBranch "$target_branch_arg"
+    git config --file "$temporary" integration.owner "$integration_owner_arg"
+    git config --file "$temporary" --list >/dev/null
+    mv -f -- "$temporary" "$descriptor"
+    temporary=""
+  } always {
+    [[ -z "$temporary" ]] || rm -f -- "$temporary"
+  }
+
+  info "PREPARED task=$task_id_arg root=$root branch=$branch"
+}
+
+worktree_option_root() {
+  local command_name="$1"
+  shift
+  (( $# == 2 )) \
+    || die "$command_name requires exactly --worktree ABS_ROOT"
+  [[ "$1" == "--worktree" ]] \
+    || die "unknown $command_name option: $1"
+  local worktree_arg="$2"
+  reject_control_chars "worktree" "$worktree_arg"
+  [[ "$worktree_arg" == /* ]] || die "worktree path must be absolute"
+  physical_dir "$worktree_arg"
+}
+
+worker_bootstrap_prompt() {
+  local mode="$1" recorded_owner="${2:-}"
+  local opening
+  if [[ "$mode" == "resume" ]]; then
+    opening="Resume recorded owner $recorded_owner for"
+  else
+    opening="Start"
+  fi
+
+  print -r -- "$opening task $task_id in $descriptor_root using approved plan $task_plan_path. Invoke superpowers:orchestrating-parallel-worktrees. Before any implementation read or write beyond these named gates, run \"$helper_path\" claim; call Engram mem_current_project and require exactly $memory_task_project; then run \"$helper_path\" verify --memory-project $memory_task_project. After every compaction or resume, repeat claim, mem_current_project, and verify before further repository work. Stop BLOCKED on any mismatch."
+}
+
+command_launch() {
+  require_command codex
+  local root bootstrap_prompt
+  root="$(worktree_option_root launch "$@")" || return 1
+  descriptor_preflight "$root"
+  [[ ! -e "$descriptor_metadata/owner" ]] \
+    || die "cannot launch while an active owner boundary exists"
+
+  bootstrap_prompt="$(worker_bootstrap_prompt launch)"
+  ENGRAM_PROJECT="$memory_task_project" \
+    command codex -p parallel-work -C "$descriptor_root" "$bootstrap_prompt"
+}
+
+command_resume() {
+  require_command codex
+  local root resume_prompt
+  root="$(worktree_option_root resume "$@")" || return 1
+  descriptor_preflight "$root"
+  read_owner_claim
+
+  resume_prompt="$(worker_bootstrap_prompt resume "$owner_thread_id")"
+  ENGRAM_PROJECT="$memory_task_project" \
+    command codex -p parallel-work -C "$descriptor_root" \
+      resume "$owner_thread_id" "$resume_prompt"
+}
+
+require_thread_id() {
+  [[ -n "${CODEX_THREAD_ID:-}" ]] || die "CODEX_THREAD_ID is required"
+  reject_control_chars "CODEX_THREAD_ID" "$CODEX_THREAD_ID"
+}
+
+read_owner_claim() {
+  local owner_dir="$descriptor_metadata/owner"
+  typeset -g owner_claim_file="$owner_dir/claim.conf"
+  typeset -g owner_thread_id owner_claimed_at
+  [[ -d "$owner_dir" && ! -L "$owner_dir" && -f "$owner_claim_file" && ! -L "$owner_claim_file" ]] \
+    || die "incomplete owner claim requires explicit owner action: $owner_dir"
+
+  owner_thread_id="$(git config --file "$owner_claim_file" --get owner.threadId 2>/dev/null)" \
+    || die "incomplete owner claim is missing owner.threadId"
+  owner_claimed_at="$(git config --file "$owner_claim_file" --get owner.claimedAt 2>/dev/null)" \
+    || die "incomplete owner claim is missing owner.claimedAt"
+  reject_control_chars "owner.threadId" "$owner_thread_id"
+  reject_control_chars "owner.claimedAt" "$owner_claimed_at"
+}
+
+require_owner() {
+  require_thread_id
+  read_owner_claim
+  [[ "$owner_thread_id" == "$CODEX_THREAD_ID" ]] \
+    || die "current owner mismatch: expected $owner_thread_id, actual $CODEX_THREAD_ID"
+}
+
+command_claim() {
+  (( $# == 0 )) || die "claim does not accept options"
+  require_thread_id
+  local root
+  root="$(current_root)" || return 1
+  descriptor_preflight "$root" worker
+
+  local owner_dir="$descriptor_metadata/owner"
+  local claim_file="$owner_dir/claim.conf" temporary
+  if mkdir -- "$owner_dir" 2>/dev/null; then
+    temporary="$(mktemp "$owner_dir/.claim.conf.tmp.XXXXXX")"
+    {
+      git config --file "$temporary" owner.threadId "$CODEX_THREAD_ID"
+      git config --file "$temporary" owner.claimedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+      git config --file "$temporary" --list >/dev/null
+      mv -f -- "$temporary" "$claim_file"
+      temporary=""
+    } always {
+      [[ -z "$temporary" ]] || rm -f -- "$temporary"
+    }
+    info "CLAIMED task=$task_id owner=$CODEX_THREAD_ID"
+    return 0
+  fi
+
+  read_owner_claim
+  if [[ "$owner_thread_id" == "$CODEX_THREAD_ID" ]]; then
+    info "CLAIMED task=$task_id owner=$CODEX_THREAD_ID already-owned"
+    return 0
+  fi
+  die "worktree is owned by another thread: expected $owner_thread_id, actual $CODEX_THREAD_ID"
+}
+
+command_verify() {
+  local memory_project="" memory_project_seen=false
+  while (( $# )); do
+    case "$1" in
+      --memory-project)
+        (( $# >= 2 )) || die "missing value for option: --memory-project"
+        [[ "$memory_project_seen" == false ]] \
+          || die "duplicate option: --memory-project"
+        memory_project_seen=true
+        memory_project="$2"
+        shift 2
+        ;;
+      *)
+        die "unknown verify option: $1"
+        ;;
+    esac
+  done
+  reject_control_chars "memory project confirmation" "$memory_project"
+
+  local root
+  root="$(current_root)" || return 1
+  descriptor_preflight "$root" worker
+  require_owner
+  [[ "$memory_project" == "$memory_task_project" ]] \
+    || die "memory project confirmation mismatch: expected $memory_task_project, actual $memory_project"
+
+  local head
+  head="$(git -C "$descriptor_root" rev-parse HEAD)" \
+    || die "cannot resolve current HEAD"
+  info "VERIFIED task=$task_id owner=$CODEX_THREAD_ID root=$descriptor_root branch=$git_branch head=$head memory=$memory_task_project"
+}
+
+command_handoff() {
+  local target_thread="" target_thread_seen=false
+  while (( $# )); do
+    case "$1" in
+      --to)
+        (( $# >= 2 )) || die "missing value for option: --to"
+        [[ "$target_thread_seen" == false ]] || die "duplicate option: --to"
+        target_thread_seen=true
+        target_thread="$2"
+        shift 2
+        ;;
+      *)
+        die "unknown handoff option: $1"
+        ;;
+    esac
+  done
+  reject_control_chars "handoff target" "$target_thread"
+
+  local root
+  root="$(current_root)" || return 1
+  descriptor_identity_preflight "$root"
+  require_owner
+  [[ "$target_thread" != "$CODEX_THREAD_ID" ]] \
+    || die "handoff target must differ from current owner"
+
+  local handoff_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)" temporary
+  temporary="$(mktemp "$descriptor_metadata/owner/.claim.conf.tmp.XXXXXX")"
+  {
+    git config --file "$temporary" owner.threadId "$target_thread"
+    git config --file "$temporary" owner.claimedAt "$handoff_at"
+    git config --file "$temporary" owner.previousClaimedAt "$owner_claimed_at"
+    git config --file "$temporary" owner.handedOffAt "$handoff_at"
+    git config --file "$temporary" --list >/dev/null
+    mv -f -- "$temporary" "$owner_claim_file"
+    temporary=""
+  } always {
+    [[ -z "$temporary" ]] || rm -f -- "$temporary"
+  }
+  info "HANDED_OFF task=$task_id from=$CODEX_THREAD_ID to=$target_thread"
+}
+
+command_release() {
+  (( $# == 0 )) || die "release does not accept options"
+  local root
+  root="$(current_root)" || return 1
+  descriptor_identity_preflight "$root"
+  require_owner
+
+  local owner_dir="$descriptor_metadata/owner"
+  local -a entries
+  entries=("$owner_dir"/*(DN))
+  (( ${#entries[@]} == 1 )) \
+    || die "owner directory contains unexpected files; refusing release"
+  [[ "${entries[1]:t}" == "claim.conf" && ! -L "${entries[1]}" ]] \
+    || die "owner directory contains unexpected files; refusing release"
+
+  rm -f -- "$owner_claim_file"
+  rmdir -- "$owner_dir" \
+    || die "owner directory changed during release; incomplete claim preserved"
+  info "RELEASED task=$task_id owner=$CODEX_THREAD_ID"
+}
+
+git_porcelain_digest() {
+  local root="$1" temporary digest
+  temporary="$(mktemp "${TMPDIR:-/tmp}/parallel-porcelain.XXXXXX")"
+  {
+    GIT_OPTIONAL_LOCKS=0 git -C "$root" status \
+      --porcelain=v1 -z --untracked-files=all \
+      >"$temporary" || die "cannot capture porcelain Git status"
+    digest="$(sha256_file "$temporary")" || return 1
+    print -r -- "$digest"
+  } always {
+    rm -f -- "$temporary"
+  }
+}
+
+git_snapshot_digest() {
+  local root="$1" temporary head digest
+  head="$(git -C "$root" rev-parse HEAD)" || die "cannot resolve current HEAD"
+  temporary="$(mktemp "${TMPDIR:-/tmp}/parallel-snapshot.XXXXXX")"
+  {
+    print -rn -- "$head"$'\0' >"$temporary"
+    GIT_OPTIONAL_LOCKS=0 git -C "$root" status \
+      --porcelain=v1 -z --untracked-files=all \
+      >>"$temporary" || die "cannot capture combined Git state"
+    digest="$(sha256_file "$temporary")" || return 1
+    print -r -- "$digest"
+  } always {
+    rm -f -- "$temporary"
+  }
+}
+
+git_branch_identity() {
+  local root="$1" branch head
+  if branch="$(git -C "$root" symbolic-ref --quiet --short HEAD 2>/dev/null)"; then
+    print -r -- "$branch"
+    return 0
+  fi
+  head="$(git -C "$root" rev-parse HEAD)" || die "cannot resolve detached HEAD"
+  print -r -- "DETACHED@$head"
+}
+
+capture_git_snapshot() {
+  local root="$1" human_status commits_text
+  typeset -g snapshot_head snapshot_branch snapshot_dirty
+  typeset -g snapshot_porcelain_sha snapshot_state_sha
+  typeset -ga snapshot_changed_paths=()
+  typeset -ga snapshot_local_commits=()
+
+  snapshot_head="$(git -C "$root" rev-parse HEAD)" \
+    || die "cannot resolve current HEAD"
+  snapshot_branch="$(git_branch_identity "$root")" || return 1
+  snapshot_porcelain_sha="$(git_porcelain_digest "$root")" || return 1
+  snapshot_state_sha="$(git_snapshot_digest "$root")" || return 1
+
+  human_status="$(mktemp "${TMPDIR:-/tmp}/parallel-status.XXXXXX")"
+  {
+    GIT_OPTIONAL_LOCKS=0 git -C "$root" -c core.quotePath=true status \
+      --porcelain=v1 --untracked-files=all >"$human_status" \
+      || die "cannot capture human-readable Git status"
+    if [[ -s "$human_status" ]]; then
+      snapshot_dirty=true
+      while IFS= read -r changed_path; do
+        reject_control_chars "changed path" "$changed_path"
+        snapshot_changed_paths+=("$changed_path")
+      done <"$human_status"
+    else
+      snapshot_dirty=false
+    fi
+  } always {
+    rm -f -- "$human_status"
+  }
+
+  commits_text="$(git -C "$root" rev-list --reverse "$git_base_sha..HEAD")" \
+    || die "cannot enumerate local commits after base $git_base_sha"
+  if [[ -n "$commits_text" ]]; then
+    snapshot_local_commits=("${(@f)commits_text}")
+  fi
+}
+
+parse_report_options() {
+  typeset -gA report_values=()
+  typeset -ga report_verifications=()
+  typeset -ga report_evidence=()
+  typeset -ga report_candidates=()
+  typeset -ga report_risks=()
+  typeset -ga report_next_actions=()
+
+  local option key label value
+  while (( $# )); do
+    option="$1"
+    case "$option" in
+      --state|--freshness-source|--freshness-ref|--fetched-at|--blocker|--last-successful-state)
+        (( $# >= 2 )) || die "missing value for option: $option"
+        key="${option#--}"
+        (( ${+report_values[$key]} == 0 )) || die "duplicate option: $option"
+        case "$option" in
+          --freshness-source) label="freshness source" ;;
+          --freshness-ref) label="freshness ref" ;;
+          --fetched-at) label="fetched-at" ;;
+          --last-successful-state) label="last successful state" ;;
+          *) label="${option#--}" ;;
+        esac
+        value="$2"
+        reject_control_chars "$label" "$value"
+        report_values[$key]="$value"
+        shift 2
+        ;;
+      --verification|--evidence|--candidate-discovery|--risk|--next-action)
+        (( $# >= 2 )) || die "missing value for option: $option"
+        value="$2"
+        case "$option" in
+          --verification)
+            reject_control_chars "verification" "$value"
+            report_verifications+=("$value")
+            ;;
+          --evidence)
+            reject_control_chars "evidence" "$value"
+            report_evidence+=("$value")
+            ;;
+          --candidate-discovery)
+            reject_control_chars "candidate discovery" "$value"
+            report_candidates+=("$value")
+            ;;
+          --risk)
+            reject_control_chars "risk" "$value"
+            report_risks+=("$value")
+            ;;
+          --next-action)
+            reject_control_chars "next action" "$value"
+            report_next_actions+=("$value")
+            ;;
+        esac
+        shift 2
+        ;;
+      *)
+        die "unknown report option: $option"
+        ;;
+    esac
+  done
+
+  typeset -g report_state="${report_values[state]-}"
+  typeset -g report_freshness_input="${report_values[freshness-source]-}"
+  typeset -g report_freshness_ref="${report_values[freshness-ref]-}"
+  typeset -g report_fetched_at="${report_values[fetched-at]-}"
+  typeset -g report_blocker="${report_values[blocker]-}"
+  typeset -g report_last_successful="${report_values[last-successful-state]-}"
+
+  [[ -n "$report_state" ]] || die "missing required option: --state"
+  [[ -n "$report_freshness_input" ]] \
+    || die "missing required option: --freshness-source"
+}
+
+validate_report_state() {
+  case "$report_state" in
+    LOCAL_READY_COMMITTED)
+      [[ "$snapshot_dirty" == false ]] \
+        || die "LOCAL_READY_COMMITTED requires a clean worktree"
+      (( ${#snapshot_local_commits[@]} >= 1 )) \
+        || die "LOCAL_READY_COMMITTED requires at least one local commit"
+      ;;
+    LOCAL_READY_UNCOMMITTED)
+      [[ "$snapshot_dirty" == true ]] \
+        || die "LOCAL_READY_UNCOMMITTED requires a dirty worktree"
+      (( ${#snapshot_local_commits[@]} == 0 )) \
+        || die "LOCAL_READY_UNCOMMITTED requires zero local commits"
+      ;;
+    BLOCKED)
+      [[ -n "$report_blocker" ]] || die "BLOCKED requires a blocker"
+      [[ -n "$report_last_successful" ]] \
+        || die "BLOCKED requires a last successful state"
+      (( ${#report_next_actions[@]} >= 1 )) \
+        || die "BLOCKED requires at least one next action"
+      (( ${#report_verifications[@]} == 0 )) \
+        || die "BLOCKED must not record successful verification commands"
+      ;;
+    *)
+      die "unsupported completion state: $report_state"
+      ;;
+  esac
+
+  if [[ "$report_state" == LOCAL_READY_* ]]; then
+    (( ${#report_verifications[@]} >= 1 )) \
+      || die "ready report requires at least one verification"
+    (( ${#report_evidence[@]} >= 1 )) \
+      || die "ready report requires at least one evidence classification"
+    (( ${#report_next_actions[@]} >= 1 )) \
+      || die "ready report requires at least one next action"
+    [[ -z "$report_blocker" && -z "$report_last_successful" ]] \
+      || die "ready report must not include blocker fields"
+  fi
+}
+
+resolve_report_freshness() {
+  local generated_at="$1" resolved
+  typeset -g recorded_freshness_source recorded_freshness_ref
+  typeset -g recorded_freshness_sha recorded_freshness_checked_at
+  recorded_freshness_ref=""
+  recorded_freshness_sha=""
+
+  case "$report_freshness_input" in
+    local)
+      [[ -z "$report_fetched_at" ]] \
+        || die "local freshness must not include --fetched-at"
+      recorded_freshness_ref="${report_freshness_ref:-$integration_target_branch}"
+      resolved="$(git -C "$descriptor_root" rev-parse --verify \
+        "$recorded_freshness_ref^{commit}" 2>/dev/null)" \
+        || die "freshness ref does not resolve locally: $recorded_freshness_ref"
+      recorded_freshness_sha="$resolved"
+      recorded_freshness_source="local-ref-only"
+      recorded_freshness_checked_at="$generated_at"
+      ;;
+    fetched)
+      [[ -n "$report_freshness_ref" ]] \
+        || die "fetched freshness requires --freshness-ref"
+      [[ -n "$report_fetched_at" ]] \
+        || die "fetched freshness requires --fetched-at"
+      [[ "$report_fetched_at" =~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$' ]] \
+        || die "fetched-at must be RFC3339"
+      resolved="$(git -C "$descriptor_root" rev-parse --verify \
+        "$report_freshness_ref^{commit}" 2>/dev/null)" \
+        || die "freshness ref does not resolve locally: $report_freshness_ref"
+      recorded_freshness_ref="$report_freshness_ref"
+      recorded_freshness_sha="$resolved"
+      recorded_freshness_source="fresh-fetch-asserted"
+      recorded_freshness_checked_at="$report_fetched_at"
+      ;;
+    unavailable)
+      [[ "$report_state" == "BLOCKED" ]] \
+        || die "freshness unavailable is accepted only for BLOCKED"
+      [[ -z "$report_freshness_ref" && -z "$report_fetched_at" ]] \
+        || die "unavailable freshness must not include ref or fetched-at"
+      recorded_freshness_source="unavailable"
+      recorded_freshness_checked_at="$generated_at"
+      ;;
+    *)
+      die "unsupported freshness source: $report_freshness_input"
+      ;;
+  esac
+}
+
+config_add_values() {
+  local file="$1" key="$2"
+  shift 2
+  local value
+  for value in "$@"; do
+    git config --file "$file" --add "$key" "$value"
+  done
+}
+
+validate_config_values() {
+  local file="$1" key="$2" label="$3" temporary value exit_status
+  typeset -g validated_config_value_count=0
+  temporary="$(mktemp "${TMPDIR:-/tmp}/parallel-config-values.XXXXXX")"
+  {
+    if git config --null --file "$file" --get-all "$key" >"$temporary" 2>/dev/null; then
+      exit_status=0
+    else
+      exit_status=$?
+      (( exit_status == 1 )) \
+        || die "cannot read completion values for $key"
+    fi
+    while IFS= read -r -d '' value; do
+      reject_control_chars "$label" "$value"
+      (( validated_config_value_count += 1 ))
+    done <"$temporary"
+  } always {
+    rm -f -- "$temporary"
+  }
+}
+
+assert_live_value() {
+  local label="$1" expected="$2" actual="$3"
+  [[ "$actual" == "$expected" ]] \
+    || die "$label mismatch: expected $expected, actual $actual"
+}
+
+command_report_write() {
+  require_command git
+  require_command shasum
+  require_command awk
+  require_command mktemp
+  parse_report_options "$@"
+
+  local root
+  root="$(current_root)" || return 1
+  if [[ "$report_state" == "BLOCKED" ]]; then
+    descriptor_identity_preflight "$root"
+    require_worker_project
+  else
+    descriptor_preflight "$root" worker
+  fi
+  require_owner
+
+  capture_git_snapshot "$descriptor_root"
+  validate_report_state
+
+  local generated_at descriptor_sha completion temporary reported_owner
+  generated_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  resolve_report_freshness "$generated_at"
+  descriptor_sha="$(sha256_file "$descriptor_file")" || return 1
+  reported_owner="$owner_thread_id"
+  completion="$descriptor_metadata/completion.conf"
+  [[ ! -e "$completion" || -f "$completion" ]] \
+    || die "completion path is not a regular file: $completion"
+
+  temporary="$(mktemp "$descriptor_metadata/.completion.conf.tmp.XXXXXX")"
+  {
+    git config --file "$temporary" completion.schemaVersion "$schema_version"
+    git config --file "$temporary" completion.state "$report_state"
+    git config --file "$temporary" completion.generatedAt "$generated_at"
+    git config --file "$temporary" completion.taskId "$task_id"
+    git config --file "$temporary" completion.ownerThreadId "$reported_owner"
+    git config --file "$temporary" completion.descriptorSha256 "$descriptor_sha"
+    git config --file "$temporary" git.branch "$snapshot_branch"
+    git config --file "$temporary" git.head "$snapshot_head"
+    git config --file "$temporary" git.baseSha "$git_base_sha"
+    git config --file "$temporary" git.dirty "$snapshot_dirty"
+    git config --file "$temporary" git.porcelainSha256 "$snapshot_porcelain_sha"
+    git config --file "$temporary" git.stateSha256 "$snapshot_state_sha"
+    config_add_values "$temporary" git.changedPath "${snapshot_changed_paths[@]}"
+    config_add_values "$temporary" git.localCommit "${snapshot_local_commits[@]}"
+    config_add_values "$temporary" verification.command "${report_verifications[@]}"
+    config_add_values "$temporary" evidence.classification "${report_evidence[@]}"
+    config_add_values "$temporary" discovery.candidate "${report_candidates[@]}"
+    config_add_values "$temporary" risk.item "${report_risks[@]}"
+    config_add_values "$temporary" gate.nextAction "${report_next_actions[@]}"
+    git config --file "$temporary" freshness.source "$recorded_freshness_source"
+    if [[ -n "$recorded_freshness_ref" ]]; then
+      git config --file "$temporary" freshness.ref "$recorded_freshness_ref"
+      git config --file "$temporary" freshness.sha "$recorded_freshness_sha"
+    fi
+    git config --file "$temporary" freshness.checkedAt "$recorded_freshness_checked_at"
+    if [[ "$report_state" == "BLOCKED" ]]; then
+      git config --file "$temporary" blocker.reason "$report_blocker"
+      git config --file "$temporary" blocker.lastSuccessfulState \
+        "$report_last_successful"
+    fi
+    git config --file "$temporary" --list >/dev/null
+
+    local live_descriptor_sha live_head live_branch live_porcelain live_state
+    live_descriptor_sha="$(sha256_file "$descriptor_file")" || return 1
+    assert_live_value "descriptor digest" "$descriptor_sha" "$live_descriptor_sha"
+    read_owner_claim
+    assert_live_value "recorded owner" "$reported_owner" "$owner_thread_id"
+    live_head="$(git -C "$descriptor_root" rev-parse HEAD)" \
+      || die "cannot re-resolve current HEAD"
+    assert_live_value "HEAD" "$snapshot_head" "$live_head"
+    live_branch="$(git_branch_identity "$descriptor_root")" || return 1
+    assert_live_value "branch" "$snapshot_branch" "$live_branch"
+    live_porcelain="$(git_porcelain_digest "$descriptor_root")" || return 1
+    assert_live_value "porcelain digest" "$snapshot_porcelain_sha" "$live_porcelain"
+    live_state="$(git_snapshot_digest "$descriptor_root")" || return 1
+    assert_live_value "Git state digest" "$snapshot_state_sha" "$live_state"
+    if [[ -n "$recorded_freshness_ref" ]]; then
+      local live_freshness_sha
+      live_freshness_sha="$(git -C "$descriptor_root" rev-parse --verify \
+        "$recorded_freshness_ref^{commit}" 2>/dev/null)" \
+        || die "freshness ref no longer resolves: $recorded_freshness_ref"
+      assert_live_value "freshness SHA" "$recorded_freshness_sha" \
+        "$live_freshness_sha"
+    fi
+
+    mv -f -- "$temporary" "$completion"
+    temporary=""
+  } always {
+    [[ -z "$temporary" ]] || rm -f -- "$temporary"
+  }
+
+  info "REPORTED state=$report_state task=$task_id owner=$reported_owner head=$snapshot_head freshness=$recorded_freshness_source"
+}
+
+load_completion() {
+  typeset -g completion_file="$descriptor_metadata/completion.conf"
+  [[ -f "$completion_file" && ! -L "$completion_file" ]] \
+    || die "completion report is missing or unsafe: $completion_file"
+  typeset -g completion_schema completion_state completion_generated_at
+  typeset -g completion_task_id completion_owner completion_descriptor_sha
+  typeset -g completion_branch completion_head completion_base_sha completion_dirty
+  typeset -g completion_porcelain_sha completion_state_sha
+  typeset -g completion_freshness_source completion_freshness_checked_at
+  typeset -g completion_freshness_ref="" completion_freshness_sha=""
+
+  completion_schema="$(conf_require "$completion_file" completion.schemaVersion completion)" || return 1
+  completion_state="$(conf_require "$completion_file" completion.state completion)" || return 1
+  completion_generated_at="$(conf_require "$completion_file" completion.generatedAt completion)" || return 1
+  completion_task_id="$(conf_require "$completion_file" completion.taskId completion)" || return 1
+  completion_owner="$(conf_require "$completion_file" completion.ownerThreadId completion)" || return 1
+  completion_descriptor_sha="$(conf_require "$completion_file" completion.descriptorSha256 completion)" || return 1
+  completion_branch="$(conf_require "$completion_file" git.branch completion)" || return 1
+  completion_head="$(conf_require "$completion_file" git.head completion)" || return 1
+  completion_base_sha="$(conf_require "$completion_file" git.baseSha completion)" || return 1
+  completion_dirty="$(conf_require "$completion_file" git.dirty completion)" || return 1
+  completion_porcelain_sha="$(conf_require "$completion_file" git.porcelainSha256 completion)" || return 1
+  completion_state_sha="$(conf_require "$completion_file" git.stateSha256 completion)" || return 1
+  completion_freshness_source="$(conf_require "$completion_file" freshness.source completion)" || return 1
+  completion_freshness_checked_at="$(conf_require "$completion_file" freshness.checkedAt completion)" || return 1
+
+  case "$completion_freshness_source" in
+    local-ref-only|fresh-fetch-asserted)
+      completion_freshness_ref="$(conf_require "$completion_file" freshness.ref completion)" || return 1
+      completion_freshness_sha="$(conf_require "$completion_file" freshness.sha completion)" || return 1
+      ;;
+    unavailable)
+      git config --file "$completion_file" --get freshness.ref >/dev/null 2>&1 \
+        && die "unavailable completion must omit freshness.ref"
+      git config --file "$completion_file" --get freshness.sha >/dev/null 2>&1 \
+        && die "unavailable completion must omit freshness.sha"
+      ;;
+    *)
+      die "unsupported recorded freshness source: $completion_freshness_source"
+      ;;
+  esac
+}
+
+assert_completion_shape() {
+  [[ "$completion_schema" == "$schema_version" ]] \
+    || die "unsupported completion schema: expected $schema_version, actual $completion_schema"
+
+  local verification_count evidence_count candidate_count risk_count next_action_count
+  validate_config_values "$completion_file" verification.command verification
+  verification_count=$validated_config_value_count
+  validate_config_values "$completion_file" evidence.classification evidence
+  evidence_count=$validated_config_value_count
+  validate_config_values "$completion_file" discovery.candidate "candidate discovery"
+  candidate_count=$validated_config_value_count
+  validate_config_values "$completion_file" risk.item risk
+  risk_count=$validated_config_value_count
+  validate_config_values "$completion_file" gate.nextAction "next action"
+  next_action_count=$validated_config_value_count
+
+  case "$completion_state" in
+    LOCAL_READY_COMMITTED|LOCAL_READY_UNCOMMITTED)
+      (( verification_count >= 1 )) \
+        || die "ready completion is missing verification.command"
+      (( evidence_count >= 1 )) \
+        || die "ready completion is missing evidence.classification"
+      (( next_action_count >= 1 )) \
+        || die "ready completion is missing gate.nextAction"
+      [[ "$completion_freshness_source" != "unavailable" ]] \
+        || die "ready completion cannot record unavailable freshness"
+      ;;
+    BLOCKED)
+      conf_require "$completion_file" blocker.reason completion >/dev/null
+      conf_require "$completion_file" blocker.lastSuccessfulState completion \
+        >/dev/null
+      (( next_action_count >= 1 )) \
+        || die "blocked completion is missing gate.nextAction"
+      (( verification_count == 0 )) \
+        || die "blocked completion must not record verification.command"
+      ;;
+    *)
+      die "unsupported completion state: $completion_state"
+      ;;
+  esac
+}
+
+command_report_check() {
+  local root
+  root="$(current_root)" || return 1
+  descriptor_identity_preflight "$root"
+  load_completion
+  assert_completion_shape
+
+  if [[ "$completion_state" == LOCAL_READY_* ]]; then
+    descriptor_preflight "$root"
+  fi
+  read_owner_claim
+
+  assert_live_value "completion task" "$task_id" "$completion_task_id"
+  assert_live_value "recorded owner" "$completion_owner" "$owner_thread_id"
+  assert_live_value "base SHA" "$git_base_sha" "$completion_base_sha"
+
+  local live_descriptor_sha
+  live_descriptor_sha="$(sha256_file "$descriptor_file")" || return 1
+  assert_live_value "descriptor digest" "$completion_descriptor_sha" \
+    "$live_descriptor_sha"
+
+  capture_git_snapshot "$descriptor_root"
+  assert_live_value "branch" "$completion_branch" "$snapshot_branch"
+  assert_live_value "HEAD" "$completion_head" "$snapshot_head"
+  assert_live_value "porcelain digest" "$completion_porcelain_sha" \
+    "$snapshot_porcelain_sha"
+  assert_live_value "Git state digest" "$completion_state_sha" \
+    "$snapshot_state_sha"
+  assert_live_value "dirty flag" "$completion_dirty" "$snapshot_dirty"
+
+  case "$completion_state" in
+    LOCAL_READY_COMMITTED)
+      [[ "$snapshot_dirty" == false ]] \
+        || die "LOCAL_READY_COMMITTED is no longer clean"
+      (( ${#snapshot_local_commits[@]} >= 1 )) \
+        || die "LOCAL_READY_COMMITTED no longer has a local commit"
+      ;;
+    LOCAL_READY_UNCOMMITTED)
+      [[ "$snapshot_dirty" == true ]] \
+        || die "LOCAL_READY_UNCOMMITTED is no longer dirty"
+      (( ${#snapshot_local_commits[@]} == 0 )) \
+        || die "LOCAL_READY_UNCOMMITTED now has local commits"
+      ;;
+  esac
+
+  if [[ -n "$completion_freshness_ref" ]]; then
+    local live_freshness_sha
+    live_freshness_sha="$(git -C "$descriptor_root" rev-parse --verify \
+      "$completion_freshness_ref^{commit}" 2>/dev/null)" \
+      || die "freshness ref no longer resolves: $completion_freshness_ref"
+    assert_live_value "freshness SHA" "$completion_freshness_sha" \
+      "$live_freshness_sha"
+  fi
+
+  info "CHECKED_READ_ONLY state=$completion_state task=$task_id owner=$completion_owner head=$completion_head freshness=$completion_freshness_source"
+}
+
+command_report() {
+  if (( $# == 1 )) && [[ "$1" == "--check" ]]; then
+    command_report_check
+    return
+  fi
+  command_report_write "$@"
+}
+
+main() {
+  local command_name="${1:-}"
+  [[ -n "$command_name" ]] || { usage; exit 1; }
+  shift
+  case "$command_name" in
+    prepare)
+      command_prepare "$@"
+      ;;
+    launch)
+      command_launch "$@"
+      ;;
+    resume)
+      command_resume "$@"
+      ;;
+    claim)
+      command_claim "$@"
+      ;;
+    verify)
+      command_verify "$@"
+      ;;
+    report)
+      command_report "$@"
+      ;;
+    handoff)
+      command_handoff "$@"
+      ;;
+    release)
+      command_release "$@"
+      ;;
+    -h|--help|help)
+      usage
+      ;;
+    *)
+      die "unknown command: $command_name"
+      ;;
+  esac
+}
+
+main "$@"

@@ -20,6 +20,11 @@ print -r -- "sentinel runtime state" >"$test_root/.codex/state.json"
 [[ -f "$repo_root/codex-config/.codex/policies/bounded-autonomy.md" ]] \
   || fail "bounded-autonomy policy is missing"
 
+profile_source="$repo_root/codex-config/.codex/parallel-work.config.toml"
+[[ -f "$profile_source" ]] || fail "parallel-work profile is missing"
+[[ "$(<"$profile_source")" == $'[plugins."engram@engram"]\nenabled = false' ]] \
+  || fail "parallel-work profile must contain only the Engram plugin override"
+
 global_agents="$repo_root/codex-config/.codex/AGENTS.md"
 for required_policy in \
   "## Concurrent sessions" \
@@ -36,6 +41,12 @@ stow --no-folding \
   --dir "$repo_root" \
   --target "$test_root" \
   codex-config
+
+[[ -L "$test_root/.codex/parallel-work.config.toml" ]] \
+  || fail "parallel-work.config.toml must be a symlink"
+profile_link="$test_root/.codex/parallel-work.config.toml"
+[[ "${profile_link:A}" == "$profile_source" ]] \
+  || fail "parallel-work profile must resolve to the codex-config package"
 
 [[ -d "$test_root/.codex" && ! -L "$test_root/.codex" ]] \
   || fail ".codex must remain a real directory"
