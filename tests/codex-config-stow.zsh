@@ -37,7 +37,11 @@ for required_policy in \
   "one active writer" \
   "read-only" \
   "shared runtime" \
-  "After compaction"
+  "After compaction" \
+  ".superpowers/parallel/session.conf" \
+  "orchestrating-parallel-worktrees" \
+  "claim" \
+  "mem_current_project"
 do
   rg --fixed-strings --quiet "$required_policy" "$global_agents" \
     || fail "global AGENTS policy is missing: $required_policy"

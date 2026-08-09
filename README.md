@@ -58,7 +58,7 @@ Use `make stow-list` to inspect the current default package set.
 | `asdf/` | `~/.asdfrc`, `~/.tool-versions` | Runtime version management |
 | `bat/` | `~/.config/bat/` | `bat` theme/config |
 | `ctx/` | `~/.ctx/config.toml` | Durable ctx preferences; private index/runtime state remains local |
-| `codex-config/` | `~/.codex/AGENTS.md`, `~/.codex/policies/` | Global Codex policy and progressive-disclosure policy documents; private runtime state remains local |
+| `codex-config/` | `~/.codex/AGENTS.md`, `~/.codex/policies/`, `~/.codex/parallel-work.config.toml`, `~/.codex/skills/orchestrating-parallel-worktrees/` | Global and progressive Codex policy plus the opt-in parallel-work profile and local orchestration skill; private runtime state remains local |
 | `homebrew/` | Brew bundle files | Package bootstrap via Brewfile |
 
 The `ctx` package is state-adjacent: `~/.ctx` must remain a real local directory
@@ -71,9 +71,35 @@ this repository.
 
 The `codex-config` package follows the same state-adjacent pattern. `~/.codex`
 must remain a real local directory because it contains private, mutable runtime
-state. Stowing `codex-config` with `--no-folding` links the global `AGENTS.md`
-and its supporting progressive-disclosure policy documents without folding the
-private runtime directory into the repository.
+state. Stowing `codex-config` with `--no-folding` links tracked policy, profile,
+and skill files without replacing or folding the real runtime directory. The
+parallel profile remains inactive unless Codex is launched with
+`-p parallel-work`.
+
+Coordinators prepare and launch an existing linked worktree through the tracked
+helper rather than reconstructing `ENGRAM_PROJECT`, the profile, or `-C`
+arguments manually:
+
+```sh
+session_helper="${CODEX_HOME:-$HOME/.codex}/skills/orchestrating-parallel-worktrees/scripts/worktree-session"
+task_root="/path/to/repository/.worktrees/task-slug"
+
+CODEX_THREAD_ID="coordinator-thread" "$session_helper" prepare \
+  --worktree "$task_root" \
+  --task-id "TASK-123" \
+  --task-slug "task-slug" \
+  --plan "docs/plans/task-plan.md" \
+  --base-ref "main" \
+  --base-sha "0123456789abcdef0123456789abcdef01234567" \
+  --shared-project "repository" \
+  --task-project "repository-task-123" \
+  --target-branch "main" \
+  --integration-owner "integration-coordinator"
+"$session_helper" launch --worktree "$task_root"
+```
+
+Stow activation and provider-backed canary execution remain separate approval
+gates; installing these tracked files does not prove live multi-worker behavior.
 
 ### Optional or machine-specific packages
 

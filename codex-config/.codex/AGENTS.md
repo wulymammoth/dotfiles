@@ -32,6 +32,11 @@ and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
   root, branch, HEAD, dirty state, current task, and any active review artifact
   against live state before acting on summaries. Engram and ctx support
   recovery; they do not establish current ownership.
+- When `.superpowers/parallel/session.conf` exists, invoke
+  `orchestrating-parallel-worktrees`: claim the descriptor, call
+  `mem_current_project`, and pass its result to mechanical verification before
+  any write. Repeat claim and verification after compaction or resume. Git plus
+  the descriptor and owner claim are current authority; Engram and ctx are not.
 - Before declaring work ready, refresh the target base and prove the result is
   current and mergeable. Use the repository's chosen merge or rebase policy
   rather than imposing one globally. Repository-local instructions define the
