@@ -47,6 +47,20 @@ do
     || fail "global AGENTS policy is missing: $required_policy"
 done
 
+for required_shell_guard in \
+  '`status` (read-only)' \
+  '`path` (tied to `PATH`)' \
+  '`git_status_text`' \
+  '`changed_paths_text`' \
+  'Bash-specific multiline wrappers' \
+  'explicitly with `bash`'
+do
+  rg --fixed-strings --quiet "$required_shell_guard" "$global_agents" \
+    || fail "global AGENTS shell guard is missing: $required_shell_guard"
+  rg --fixed-strings --quiet "$required_shell_guard" "$skill_source" \
+    || fail "parallel worktree skill shell guard is missing: $required_shell_guard"
+done
+
 stow --no-folding \
   --dir "$repo_root" \
   --target "$test_root" \

@@ -52,6 +52,13 @@ against current source.
 Use SDD only when local checkpoint commits are authorized; otherwise use inline
 execution. Never mutate another worktree or shared runtime.
 
+Build verification commands for their declared interpreter. In zsh, the special
+parameters `status` (read-only) and `path` (tied to `PATH`) can terminate a
+wrapper or replace its executable search path. Use descriptive names such as
+`git_status_text` and `changed_paths_text`. Run
+Bash-specific multiline wrappers explicitly with `bash` rather than through the
+default shell.
+
 ## Completion
 
 Run approved verification/review, then create a consistent

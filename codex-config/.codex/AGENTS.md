@@ -48,6 +48,12 @@ and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
 - Use Context7 when current external library or framework documentation matters.
 - Use the available planning/task tool for substantial multi-step work and keep
   its status current.
+- Write shell snippets for their declared interpreter. In zsh, the special
+  parameters `status` (read-only) and `path` (tied to `PATH`) can terminate a
+  wrapper or replace its executable search path. Use descriptive names such as
+  `git_status_text` and `changed_paths_text`. Run
+  Bash-specific multiline wrappers explicitly with `bash` rather than relying
+  on the default shell.
 - Keep durable project knowledge in committed `.Codex-context.md`: architecture,
   dependencies, recurring regressions, root causes, and prevention strategies.
 - Keep machine-specific, non-secret setup in uncommitted `Codex.local.md`. Never
