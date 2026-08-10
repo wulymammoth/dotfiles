@@ -344,8 +344,10 @@ source /private/tmp/superpowers-design-lock-v2-local-trial-20260809/env
 test -z "$(git -C "$REPO" status --porcelain=v1)"
 ```
 
-Expected: both exit 0 (last verified: 144/0 brainstorm-server, 134/0 shell),
-and tests leave primary clean. Do not silently install missing dependencies.
+Expected: brainstorm-server reports 134 passed and 0 failed at the exact
+pre-dev checkpoint. The shell linter exits 0 and may report `No shell files
+found` because every changed shell path in this v2 delta is a deletion. Tests
+leave primary clean. Do not silently install missing dependencies.
 
 - [ ] **Step 4: Prove v2 content, source hashes, and preserved state**
 
@@ -458,7 +460,7 @@ jq -e --arg root "$ISOLATED_HOME/plugins/cache/superpowers-dev/superpowers/6.2.0
   .version == "6.2.0" and .installedPath == $root
 ' "$PROOF/isolated-plugin-add.json"
 jq -e --arg repo "$REPO" '
-  .installed | length == 1 and
+  (.installed | length) == 1 and
   .installed[0].pluginId == "superpowers@superpowers-dev" and
   .installed[0].enabled == true and
   .installed[0].marketplaceSource.source == $repo
@@ -523,7 +525,7 @@ test "$(git -C "$LIVE_CACHE" rev-parse HEAD)" = \
 test "$(git -C "$LIVE_CACHE" status --porcelain=v1)" = ' D AGENTS.md'
 
 jq -e --arg repo "$REPO" '
-  .installed | length == 1 and
+  (.installed | length) == 1 and
   .installed[0].pluginId == "superpowers@superpowers-dev" and
   .installed[0].enabled == true and
   .installed[0].marketplaceSource.source == $repo
@@ -569,7 +571,7 @@ cmp "$PROOF/live-config-before.sha256" "$PROOF/live-config-after.sha256"
 codex plugin list --json --marketplace superpowers-dev \
   | tee "$PROOF/live-plugin-after.json"
 jq -e --arg repo "$REPO" '
-  .installed | length == 1 and
+  (.installed | length) == 1 and
   .installed[0].pluginId == "superpowers@superpowers-dev" and
   .installed[0].enabled == true and
   .installed[0].marketplaceSource.source == $repo
