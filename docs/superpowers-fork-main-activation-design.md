@@ -25,7 +25,7 @@ the existing feature worktree.
 | Complete Design Lock v2 checkpoint | `47e868d`, exactly 20 commits ahead of `2b0104c` |
 | Upstream-PR feature head | `3cad75a`, which adds a final merge of `upstream/dev` |
 | Codex marketplace | `superpowers-dev`, sourced from the primary fork checkout |
-| Installed Codex cache | Version `6.2.0`, currently matching `2b0104c` rather than v2 |
+| Installed Codex cache | Version `6.2.0`; inspected runtime skills are v1 and the embedded cache HEAD is `4f6a227`, not v2 |
 | Primary untracked spec | Byte-identical to the tracked v2 spec |
 | Primary untracked plan | An earlier copy that differs from the completed tracked v2 plan |
 
@@ -132,10 +132,13 @@ Any failed check stops the trial before plugin activation.
 ### 4. Refresh the installed Codex plugin
 
 Keep the existing local marketplace source pointed at the primary fork
-checkout. Use Codex's plugin remove/add workflow rather than editing the cache
-directly. Direct cache edits are installer-hostile and are not durable.
+checkout. Re-run `codex plugin add superpowers@superpowers-dev`; Codex 0.147.0
+refreshes an already-installed same-version plugin to the local source's current
+Git commit. Do not remove the working plugin first, and do not edit the cache
+directly. Removal creates an unnecessary failure window, while direct cache
+edits are installer-hostile and are not durable.
 
-After reinstalling, verify:
+After refreshing, verify:
 
 - `codex plugin list` reports `superpowers@superpowers-dev` installed and
   enabled from the expected primary checkout;
@@ -224,7 +227,7 @@ Stop without improvising when:
 - the stash cannot be proven to contain the exact untracked files;
 - the proposed update is not fast-forward-only to `47e868d`;
 - any deterministic test fails;
-- plugin removal or installation changes unrelated configuration;
+- plugin refresh changes unrelated configuration;
 - source and cache hashes differ;
 - a fresh session cannot prove it loaded v2.
 
