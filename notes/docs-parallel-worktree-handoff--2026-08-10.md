@@ -12,9 +12,10 @@ Engram, ctx, a stale note, or a terminal label as current ownership.
 
 ## Authoritative current state
 
-- Local dotfiles `main` is at `6b4889f` (`fix(codex): guard zsh reserved
-  parameters in parallel work`). Reconcile live Git before relying on this
-  dated snapshot.
+- The foundation checkpoint immediately before this handoff was `6b4889f`
+  (`fix(codex): guard zsh reserved parameters in parallel work`). Commit
+  `fcffc17` introduced this note; reconcile live Git before relying on either
+  dated checkpoint.
 - The operating invariant is one task, task branch, linked worktree, active
   top-level writer, and task-scoped Engram project. An integration owner is
   required before overlapping results are reconciled.
@@ -36,9 +37,11 @@ Engram, ctx, a stale note, or a terminal label as current ownership.
 - Linear LEA-252 and LEA-254 are completed historical trackers. Do not reopen or
   reuse them for a future product-task pilot. A real pilot should be owned by
   the actual tasks selected from the relevant repository backlog.
-- At this snapshot, local `main` is ten commits ahead of the cached
-  `origin/main`. Fetch/reconciliation and push are separate approval gates; the
-  cached remote ref is not proof of current hosted state.
+- Immediately before `fcffc17`, local `main` was ten commits ahead of the
+  cached `origin/main`. The count changed when this handoff was committed and
+  can change again, so compute it from live refs. Fetch/reconciliation and push
+  are separate approval gates; the cached remote ref is not proof of current
+  hosted state.
 
 The durable architecture and approval model remain in
 [`docs/codex-harness-autonomy.md`](../docs/codex-harness-autonomy.md). The older
