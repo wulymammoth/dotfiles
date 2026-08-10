@@ -7,7 +7,7 @@ task project but the Codex-managed Engram MCP child still derived the shared Git
 project. Preserve the no-fork architecture and all existing ownership,
 instruction, hook-suppression, and verification gates.
 
-## What works locally
+## Verified state
 
 - `worktree-session launch` and `resume` retain `ENGRAM_PROJECT` for worker-side
   verification and pass the same descriptor project through Codex's
@@ -24,6 +24,9 @@ instruction, hook-suppression, and verification gates.
 - Fresh independent review found no Critical or Important issues. Its sole
   Minor stale cross-reference was corrected and the scoped re-review returned
   `APPROVED`.
+- The implementation was committed on the remediation branch as `554107f`,
+  integrated locally to `main` as `d423441`, and passed the full deterministic
+  suite again after integration.
 
 ## Verification
 
@@ -47,17 +50,22 @@ received a fresh provider-backed canary.
 
 ## Next steps and separate gates
 
-The owner separately approved one local commit with message
-`fix(codex): isolate Engram MCP per task launch`. That approval does not extend
-to any later gate.
+The owner separately approved the implementation commit and its local
+integration as `d423441`. The installed helper was already a Stow link to the
+tracked dotfiles source, so integration also changed the live installed helper
+without another Stow command. After that topology was discovered, the owner
+chose to keep `d423441` and explicitly accepted the effective activation.
 
-1. Preserve the isolated worktree after the approved local commit.
-2. Activation/Stow, a new provider-backed canary, push/integration, and cleanup
-   each remain separately gated.
+1. Preserve the isolated remediation worktree and verification evidence until
+   cleanup is separately approved.
+2. A fresh provider-backed canary, any remote push, and cleanup each remain
+   separately gated. The accepted activation is not provider-behavior proof.
 
 ## Relevant paths
 
 - Worktree: `.worktrees/engram-task-project-remediation`
 - Branch: `fix/engram-task-project-remediation`
+- Source commit: `554107f`
+- Main integration commit: `d423441`
 - Helper: `codex-config/.codex/skills/orchestrating-parallel-worktrees/scripts/worktree-session`
 - Authoritative design: `docs/superpowers/specs/2026-08-08-parallel-codex-worktree-orchestration-design.md`

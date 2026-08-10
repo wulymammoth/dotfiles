@@ -2,8 +2,8 @@
 
 Date: 2026-08-08
 
-Status: Local task-memory remediation under verification; activation and a
-qualifying adversarial canary remain pending
+Status: Task-memory remediation integrated and live through the existing Stow
+link; a fresh qualifying adversarial canary remains pending
 
 Decision owner: Repository owner
 
@@ -29,8 +29,9 @@ provenance, and use Engram only for curated memory. Parallel workers must not
 receive Engram's broad project-wide hook injection or automatic prompt and
 subagent capture.
 
-The no-fork design is intentionally staged. It must pass deterministic local
-tests and a separately authorized adversarial multi-worker canary before live
+The no-fork design is intentionally staged. Deterministic local tests and
+review precede integration into any live-linked source. A separately authorized
+adversarial multi-worker canary remains required before portfolio-wide
 promotion. A fork is a contingency only if the canary exposes a specific
 isolation gap that cannot be closed with upstream configuration or an upstream
 change.
@@ -271,8 +272,9 @@ configured Engram MCP server, Engram model instructions, Superpowers plugin,
 approval policy, and sandbox policy. It does not duplicate secrets or the base
 config.
 
-The profile is not activated globally. Worker launch must name it explicitly.
-Activation fails closed until a behavioral probe proves that:
+The profile is not selected globally. Worker launch must name it explicitly.
+The workflow remains unqualified for portfolio-wide use until a behavioral
+probe proves that:
 
 1. the Engram plugin's SessionStart, UserPromptSubmit, SubagentStop, and Stop
    hooks do not run;
@@ -659,12 +661,23 @@ expected schema value.
 1. Write and review this design and its test-first implementation plan.
 2. Implement only in the isolated dotfiles task worktree.
 3. Run deterministic tests without altering live `~/.codex` configuration.
-4. Request separate approval to Stow or otherwise activate the profile.
+4. Before promising a separate activation gate, inventory the installed target
+   with `readlink` or `realpath` and compare source and live hashes. Creating a
+   Stow link is a separate activation action. Once an installed target already
+   links to tracked source, however, integrating or editing that source is
+   effective activation; its approval envelope must combine integration and
+   activation or use a staging copy that is not live-linked.
 5. Repair ctx separately if provenance evaluation still requires it.
 6. Request separate approval for the adversarial provider-backed canary.
 7. Canary on bounded, low-risk tasks before using the workflow portfolio-wide.
-8. Preserve all worktrees and evidence until the owner separately approves
-   integration and cleanup.
+8. Preserve all worktrees and evidence through integration and until the owner
+   separately approves cleanup.
+
+For this remediation, the installed `worktree-session` helper already linked
+to the tracked dotfiles source. Integrating the reviewed implementation as
+`d423441` therefore changed the live helper without another Stow command. The
+owner accepted that effective activation on 2026-08-09. It does not constitute
+the fresh provider-backed canary, remote publication, or cleanup approval.
 
 Do not fork Engram merely because its optional Codex hooks are unsuitable for
 parallel workers. Reconsider a fork only when all of the following are true:
@@ -733,4 +746,6 @@ The design is implemented only when:
 9. deterministic tests pass and the authorized adversarial canary meets every
    promotion criterion;
 10. live activation, local commits, provider calls, integration, publication,
-    and cleanup occur only under their separate owner approvals.
+    and cleanup occur only under explicit owner approval; an existing Stow link
+    requires integration and effective activation to share an approval envelope
+    unless changes are staged outside the live-linked source.
