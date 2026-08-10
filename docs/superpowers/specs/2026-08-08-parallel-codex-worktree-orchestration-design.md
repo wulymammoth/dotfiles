@@ -2,7 +2,8 @@
 
 Date: 2026-08-08
 
-Status: Implemented locally; activation and adversarial canary pending
+Status: Local task-memory remediation under verification; activation and a
+qualifying adversarial canary remain pending
 
 Decision owner: Repository owner
 
@@ -33,6 +34,13 @@ tests and a separately authorized adversarial multi-worker canary before live
 promotion. A fork is a contingency only if the canary exposes a specific
 isolation gap that cannot be closed with upstream configuration or an upstream
 change.
+
+The first provider-backed profile canary proved that optional Engram hooks were
+suppressed, but also proved that setting `ENGRAM_PROJECT` only on the outer
+Codex process did not configure the Codex-managed Engram MCP child. The local
+remediation therefore keeps the worker environment check and adds an exact
+per-launch `mcp_servers.engram.env.ENGRAM_PROJECT` override. This is a Codex
+configuration correction, not a reason to fork Engram or Superpowers.
 
 ## Problem
 
@@ -78,9 +86,12 @@ This design was checked against the installed tools on 2026-08-08:
   narrow configuration boundary to test.
 - Engram 1.20.0 core supports `engram mcp --project <name>` and
   `ENGRAM_PROJECT=<name>` as process-level defaults for all read and write
-  tools. Read tools also accept an explicit existing project. This behavior
-  fixed an earlier reported project-override defect and still requires a local
-  regression probe before activation.
+  tools. Read tools also accept an explicit existing project. A live Codex
+  canary established an additional boundary: an environment variable on the
+  outer Codex process is not sufficient to configure a Codex-managed MCP
+  child. Codex 0.147.0 accepts per-launch
+  `mcp_servers.engram.env.ENGRAM_PROJECT` and `ENGRAM_DATA_DIR` overrides, and
+  provider-free `mcp list --json` probes expose their exact effective values.
 - The optional Engram Codex plugin is separable from the independently
   configured Engram MCP server and model instruction files. Disabling the
   plugin can therefore remove its automatic hooks without removing explicit
@@ -210,7 +221,8 @@ soundcoaster
 
 Worker defaults and rules:
 
-- `ENGRAM_PROJECT` selects the task project before Codex starts.
+- the helper sets `ENGRAM_PROJECT` for worker-side claim verification and also
+  sets `mcp_servers.engram.env.ENGRAM_PROJECT` in Codex's per-launch config;
 - `mem_current_project` must confirm that task project during bootstrap.
 - task-scoped `mem_context`, session summaries, decisions, bug fixes, and
   candidate discoveries remain in the task project;
@@ -431,6 +443,8 @@ proves no writer is active; it is not automated in the first release.
 - the current `CODEX_THREAD_ID` owns the claim;
 - metadata files and directories are not symlinks;
 - `ENGRAM_PROJECT` equals `memory.taskProject`;
+- the launched Codex configuration gives the Engram MCP child the same task
+  project;
 - `mem_current_project`, when run during bootstrap, returns the same task
   project.
 
@@ -443,8 +457,17 @@ The helper owns path quoting and launches a fresh worker as:
 
 ```sh
 ENGRAM_PROJECT="<task-project>" \
-  codex -p parallel-work -C "<absolute-worktree>" "<bootstrap prompt>"
+  codex -p parallel-work \
+    -c 'mcp_servers.engram.env.ENGRAM_PROJECT="<task-project>"' \
+    -C "<absolute-worktree>" "<bootstrap prompt>"
 ```
+
+For a disposable canary, the coordinator may pre-create a data directory under
+the task worktree and set `ENGRAM_DATA_DIR` when invoking the helper. The helper
+normalizes it, rejects relative, root-level, outside, and symlink-escape paths,
+and supplies the same path through
+`mcp_servers.engram.env.ENGRAM_DATA_DIR`. Normal task launches omit this
+override and isolate memory by task project in the configured Engram store.
 
 The bootstrap prompt includes the task ID and plan path and instructs the
 worker to invoke the orchestration skill, claim, and verify before any other
@@ -494,8 +517,8 @@ fresh fetch; it never claims remote currency without that fetch.
 
 ### Worker startup
 
-1. The helper starts Codex with `-p parallel-work`, `-C`, and the task-specific
-   `ENGRAM_PROJECT`.
+1. The helper starts Codex with `-p parallel-work`, `-C`, the task-specific
+   worker environment, and the matching Codex MCP-server environment override.
 2. The worker invokes the local orchestration skill.
 3. It atomically claims the worktree and runs `verify`.
 4. It confirms the Engram task project.
@@ -542,6 +565,8 @@ The workflow fails closed for:
 - missing, malformed, unsupported, or symlinked metadata;
 - wrong root, branch, owner, base ancestry, plan path, or plan digest;
 - missing `CODEX_THREAD_ID` or `ENGRAM_PROJECT`;
+- a requested disposable Engram data directory that is relative, missing, the
+  worktree root, or resolves outside the worktree;
 - a second claimant;
 - an incomplete owner claim;
 - an Engram default project mismatch;
@@ -585,8 +610,11 @@ worktrees under `/tmp`. They must cover:
     runtime state;
 17. a behavioral profile probe proving plugin hooks are absent while Engram
     MCP, global instructions, and Superpowers remain present.
+18. exact launch/resume arguments plus a provider-free `mcp list --json` probe
+    proving per-launch task-project and optional isolated-data-directory values
+    reach the Engram MCP server configuration.
 
-The last item may use Codex's offline prompt/config debug surface if it exposes
+Item 17 may use Codex's offline prompt/config debug surface if it exposes
 hook resolution. If no offline surface can prove it, static checks are not
 misreported as behavioral proof; that gate moves to the authorized canary.
 
@@ -617,6 +645,14 @@ Promotion requires zero wrong-root edits, zero dual ownership, zero
 cross-task default memory reads or writes, correct post-compaction identity,
 correct provenance attribution, accurate completion states, and no unauthorized
 integration or cleanup.
+
+Canary prompts and schemas must preserve measurement honesty. Expected project,
+owner, and reviewer counts are separate from unconstrained observed values;
+spawn attempts and successfully created reviewers are distinct fields. A
+default full-history reviewer fork omits an explicit `agent_type`; if a typed
+reviewer is required, the canary must use a non-inherited fork contract. Router
+rejection or missing review remains blocking and is never coerced into the
+expected schema value.
 
 ## Rollout and fork trigger
 

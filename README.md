@@ -98,6 +98,26 @@ CODEX_THREAD_ID="coordinator-thread" "$session_helper" prepare \
 "$session_helper" launch --worktree "$task_root"
 ```
 
+Launch and resume set the descriptor task project both in the worker process
+and in Codex's per-launch Engram MCP server environment. The latter boundary is
+required because an environment variable on the outer Codex process is not, by
+itself, inherited by Codex-managed MCP children. Workers still confirm the
+effective project with `mem_current_project` before writing.
+
+Disposable canaries may additionally isolate Engram's database in an existing
+directory beneath the task worktree:
+
+```sh
+mkdir -p "$task_root/.canary-data/live"
+ENGRAM_DATA_DIR="$task_root/.canary-data/live" \
+  "$session_helper" launch --worktree "$task_root"
+```
+
+The helper rejects relative paths, the worktree root itself, and paths or
+symlinks that resolve outside the task worktree. Normal task launches omit
+`ENGRAM_DATA_DIR` and use the configured Engram data store with a distinct
+task project.
+
 Stow activation and provider-backed canary execution remain separate approval
 gates; installing these tracked files does not prove live multi-worker behavior.
 

@@ -96,16 +96,28 @@ make_codex_stub() {
   cat >"$stub_bin/codex" <<'STUB'
 #!/usr/bin/env zsh
 print -r -- "${ENGRAM_PROJECT:-}" >"$CODEX_STUB_ENV"
+print -r -- "${ENGRAM_DATA_DIR:-}" >"$CODEX_STUB_DATA_DIR"
 printf '%s\n' "$@" >"$CODEX_STUB_ARGS"
 STUB
   chmod +x "$stub_bin/codex"
   stub_env="$fixture_root/codex.env"
+  stub_data_dir="$fixture_root/codex.data-dir"
   stub_args="$fixture_root/codex.args"
 }
 
 run_codex_boundary() {
-  env PATH="$stub_bin:$PATH" \
-    CODEX_STUB_ENV="$stub_env" CODEX_STUB_ARGS="$stub_args" \
+  env -u ENGRAM_DATA_DIR PATH="$stub_bin:$PATH" \
+    CODEX_STUB_ENV="$stub_env" CODEX_STUB_DATA_DIR="$stub_data_dir" \
+    CODEX_STUB_ARGS="$stub_args" \
+    "$session_bin" "$@"
+}
+
+run_codex_boundary_with_data_dir() {
+  local data_dir="$1"
+  shift
+  env PATH="$stub_bin:$PATH" ENGRAM_DATA_DIR="$data_dir" \
+    CODEX_STUB_ENV="$stub_env" CODEX_STUB_DATA_DIR="$stub_data_dir" \
+    CODEX_STUB_ARGS="$stub_args" \
     "$session_bin" "$@"
 }
 
@@ -527,16 +539,21 @@ test_launch_and_resume_use_exact_boundaries() {
   run_codex_boundary launch --worktree "$worktree"
   assert_equals "$(<"$stub_env")" "sample-task-task-1" \
     "launch Engram project"
+  assert_equals "$(<"$stub_data_dir")" "" "launch Engram data directory"
 
   local -a launch_args
   launch_args=("${(@f)$(<"$stub_args")}")
-  assert_equals "${#launch_args[@]}" "5" "launch argument count"
+  assert_equals "${#launch_args[@]}" "7" "launch argument count"
   assert_equals "${launch_args[1]}" "-p" "launch profile flag"
   assert_equals "${launch_args[2]}" "parallel-work" "launch profile"
-  assert_equals "${launch_args[3]}" "-C" "launch root flag"
-  assert_equals "${launch_args[4]}" "${worktree:A}" "launch physical root"
+  assert_equals "${launch_args[3]}" "-c" "launch config flag"
+  assert_equals "${launch_args[4]}" \
+    'mcp_servers.engram.env.ENGRAM_PROJECT="sample-task-task-1"' \
+    "launch task-project MCP config"
+  assert_equals "${launch_args[5]}" "-C" "launch root flag"
+  assert_equals "${launch_args[6]}" "${worktree:A}" "launch physical root"
 
-  local launch_prompt="${launch_args[5]}"
+  local launch_prompt="${launch_args[7]}"
   assert_contains "$launch_prompt" "TASK-1"
   assert_contains "$launch_prompt" "$plan_rel"
   assert_contains "$launch_prompt" "superpowers:orchestrating-parallel-worktrees"
@@ -548,22 +565,50 @@ test_launch_and_resume_use_exact_boundaries() {
   assert_contains "$launch_prompt" "BLOCKED"
   assert_contains "$launch_prompt" "compaction"
 
+  local isolated_data_dir="$worktree/isolated \"data\" \\ state"
+  mkdir -p -- "$isolated_data_dir"
+  run_codex_boundary_with_data_dir "$isolated_data_dir" \
+    launch --worktree "$worktree"
+  assert_equals "$(<"$stub_data_dir")" "${isolated_data_dir:A}" \
+    "isolated launch Engram data directory"
+  launch_args=("${(@f)$(<"$stub_args")}")
+  assert_equals "${#launch_args[@]}" "9" \
+    "isolated launch argument count"
+  assert_equals "${launch_args[3]}" "-c" \
+    "isolated launch project config flag"
+  assert_equals "${launch_args[4]}" \
+    'mcp_servers.engram.env.ENGRAM_PROJECT="sample-task-task-1"' \
+    "isolated launch task-project MCP config"
+  assert_equals "${launch_args[5]}" "-c" \
+    "isolated launch data config flag"
+  local expected_data_config="mcp_servers.engram.env.ENGRAM_DATA_DIR=\"${worktree:A}/isolated \\\"data\\\" \\\\ state\""
+  assert_equals "${launch_args[6]}" "$expected_data_config" \
+    "isolated launch data-directory MCP config"
+  assert_equals "${launch_args[7]}" "-C" "isolated launch root flag"
+  assert_equals "${launch_args[8]}" "${worktree:A}" \
+    "isolated launch physical root"
+
   run_worker worker-a "$session_bin" claim >/dev/null
   assert_fails "active owner" run_codex_boundary launch --worktree "$worktree"
 
   run_codex_boundary resume --worktree "$worktree"
   assert_equals "$(<"$stub_env")" "sample-task-task-1" \
     "resume Engram project"
+  assert_equals "$(<"$stub_data_dir")" "" "resume Engram data directory"
   local -a resume_args
   resume_args=("${(@f)$(<"$stub_args")}")
-  assert_equals "${#resume_args[@]}" "7" "resume argument count"
+  assert_equals "${#resume_args[@]}" "9" "resume argument count"
   assert_equals "${resume_args[1]}" "-p" "resume profile flag"
   assert_equals "${resume_args[2]}" "parallel-work" "resume profile"
-  assert_equals "${resume_args[3]}" "-C" "resume root flag"
-  assert_equals "${resume_args[4]}" "${worktree:A}" "resume physical root"
-  assert_equals "${resume_args[5]}" "resume" "resume subcommand"
-  assert_equals "${resume_args[6]}" "worker-a" "recorded resume owner"
-  local resume_prompt="${resume_args[7]}"
+  assert_equals "${resume_args[3]}" "-c" "resume config flag"
+  assert_equals "${resume_args[4]}" \
+    'mcp_servers.engram.env.ENGRAM_PROJECT="sample-task-task-1"' \
+    "resume task-project MCP config"
+  assert_equals "${resume_args[5]}" "-C" "resume root flag"
+  assert_equals "${resume_args[6]}" "${worktree:A}" "resume physical root"
+  assert_equals "${resume_args[7]}" "resume" "resume subcommand"
+  assert_equals "${resume_args[8]}" "worker-a" "recorded resume owner"
+  local resume_prompt="${resume_args[9]}"
   assert_contains "$resume_prompt" "TASK-1"
   assert_contains "$resume_prompt" "$plan_rel"
   assert_contains "$resume_prompt" "superpowers:orchestrating-parallel-worktrees"
@@ -575,6 +620,30 @@ test_launch_and_resume_use_exact_boundaries() {
   assert_contains "$resume_prompt" "BLOCKED"
   assert_contains "$resume_prompt" "compaction"
 
+  run_codex_boundary_with_data_dir "$isolated_data_dir" \
+    resume --worktree "$worktree"
+  assert_equals "$(<"$stub_data_dir")" "${isolated_data_dir:A}" \
+    "isolated resume Engram data directory"
+  resume_args=("${(@f)$(<"$stub_args")}")
+  assert_equals "${#resume_args[@]}" "11" \
+    "isolated resume argument count"
+  assert_equals "${resume_args[3]}" "-c" \
+    "isolated resume project config flag"
+  assert_equals "${resume_args[4]}" \
+    'mcp_servers.engram.env.ENGRAM_PROJECT="sample-task-task-1"' \
+    "isolated resume task-project MCP config"
+  assert_equals "${resume_args[5]}" "-c" \
+    "isolated resume data config flag"
+  assert_equals "${resume_args[6]}" "$expected_data_config" \
+    "isolated resume data-directory MCP config"
+  assert_equals "${resume_args[7]}" "-C" "isolated resume root flag"
+  assert_equals "${resume_args[8]}" "${worktree:A}" \
+    "isolated resume physical root"
+  assert_equals "${resume_args[9]}" "resume" \
+    "isolated resume subcommand"
+  assert_equals "${resume_args[10]}" "worker-a" \
+    "isolated resume recorded owner"
+
   if rg -n '(^|[^[:alnum:]_])eval([^[:alnum:]_]|$)' "$session_bin" >/dev/null; then
     fail "launch helper must not invoke eval"
   fi
@@ -582,6 +651,32 @@ test_launch_and_resume_use_exact_boundaries() {
     "$session_bin" >/dev/null; then
     fail "launch helper must not reconstruct codex as a scalar command string"
   fi
+}
+
+test_launch_rejects_unisolated_data_directory() {
+  make_fixture launch-data-boundary
+  prepare_fixture >/dev/null
+  make_codex_stub
+
+  assert_fails "Engram data directory must be absolute" \
+    run_codex_boundary_with_data_dir relative-data \
+      launch --worktree "$worktree"
+
+  local outside_data="$fixture_root/outside-data"
+  mkdir -p -- "$outside_data"
+  assert_fails "Engram data directory must resolve inside worktree" \
+    run_codex_boundary_with_data_dir "$outside_data" \
+      launch --worktree "$worktree"
+
+  local escaped_link="$worktree/escaped-data"
+  ln -s -- "$outside_data" "$escaped_link"
+  assert_fails "Engram data directory must resolve inside worktree" \
+    run_codex_boundary_with_data_dir "$escaped_link" \
+      launch --worktree "$worktree"
+
+  assert_fails "Engram data directory must resolve inside worktree" \
+    run_codex_boundary_with_data_dir "$worktree" \
+      launch --worktree "$worktree"
 }
 
 test_resume_requires_complete_owner() {
@@ -909,6 +1004,7 @@ test_verify_handoff_and_release
 test_reverification_detects_drift_but_owner_can_release
 test_descriptor_mutations_fail_closed
 test_launch_and_resume_use_exact_boundaries
+test_launch_rejects_unisolated_data_directory
 test_resume_requires_complete_owner
 test_report_state_consistency
 test_report_requires_evidence_and_blocker_fields

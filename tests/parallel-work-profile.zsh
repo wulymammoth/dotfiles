@@ -62,6 +62,18 @@ run_codex mcp list --json >"$mcp_json"
 [[ "$(/usr/bin/plutil -extract 0.transport.command raw -o - "$mcp_json")" == \
   "/usr/bin/true" ]] || fail "synthetic MCP command changed under the profile"
 
+override_json="$test_root/mcp-override.json"
+run_codex \
+  -c 'mcp_servers.engram.env.ENGRAM_PROJECT="synthetic-task-project"' \
+  -c 'mcp_servers.engram.env.ENGRAM_DATA_DIR="/private/tmp/synthetic task data"' \
+  mcp list --json >"$override_json"
+[[ "$(/usr/bin/plutil -extract 0.transport.env.ENGRAM_PROJECT raw -o - \
+  "$override_json")" == "synthetic-task-project" ]] \
+  || fail "per-launch Engram task project did not reach MCP server config"
+[[ "$(/usr/bin/plutil -extract 0.transport.env.ENGRAM_DATA_DIR raw -o - \
+  "$override_json")" == "/private/tmp/synthetic task data" ]] \
+  || fail "per-launch Engram data directory did not reach MCP server config"
+
 if run_codex debug prompt-input --help >/dev/null 2>&1; then
   prompt_json="$test_root/prompt-input.json"
   (cd "$workspace" && run_codex debug prompt-input "retention probe") \

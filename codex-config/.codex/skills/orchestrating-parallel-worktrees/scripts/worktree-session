@@ -421,6 +421,40 @@ worker_bootstrap_prompt() {
   print -r -- "$opening task $task_id in $descriptor_root using approved plan $task_plan_path. Invoke superpowers:orchestrating-parallel-worktrees. Before any implementation read or write beyond these named gates, run \"$helper_path\" claim; call Engram mem_current_project and require exactly $memory_task_project; then run \"$helper_path\" verify --memory-project $memory_task_project. After every compaction or resume, repeat claim, mem_current_project, and verify before further repository work. Stop BLOCKED on any mismatch."
 }
 
+toml_basic_string() {
+  local label="$1" value="$2"
+  reject_control_chars "$label" "$value"
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  print -r -- "\"$value\""
+}
+
+build_codex_engram_boundary() {
+  require_command env
+  typeset -ga codex_engram_environment=(
+    "ENGRAM_PROJECT=$memory_task_project"
+  )
+  typeset -ga codex_engram_config=(
+    -c "mcp_servers.engram.env.ENGRAM_PROJECT=$(toml_basic_string \
+      'Engram task project' "$memory_task_project")"
+  )
+
+  if [[ -n "${ENGRAM_DATA_DIR:-}" ]]; then
+    local data_dir
+    reject_control_chars "Engram data directory" "$ENGRAM_DATA_DIR"
+    [[ "$ENGRAM_DATA_DIR" == /* ]] \
+      || die "Engram data directory must be absolute"
+    data_dir="$(physical_dir "$ENGRAM_DATA_DIR")" || return 1
+    [[ "$data_dir" == "$descriptor_root"/* ]] \
+      || die "Engram data directory must resolve inside worktree: expected prefix $descriptor_root/, actual $data_dir"
+    codex_engram_environment+=("ENGRAM_DATA_DIR=$data_dir")
+    codex_engram_config+=(
+      -c "mcp_servers.engram.env.ENGRAM_DATA_DIR=$(toml_basic_string \
+        'Engram data directory' "$data_dir")"
+    )
+  fi
+}
+
 command_launch() {
   require_command codex
   local root bootstrap_prompt
@@ -430,8 +464,10 @@ command_launch() {
     || die "cannot launch while an active owner boundary exists"
 
   bootstrap_prompt="$(worker_bootstrap_prompt launch)"
-  ENGRAM_PROJECT="$memory_task_project" \
-    command codex -p parallel-work -C "$descriptor_root" "$bootstrap_prompt"
+  build_codex_engram_boundary
+  command env "${codex_engram_environment[@]}" \
+    codex -p parallel-work "${codex_engram_config[@]}" \
+      -C "$descriptor_root" "$bootstrap_prompt"
 }
 
 command_resume() {
@@ -442,8 +478,10 @@ command_resume() {
   read_owner_claim
 
   resume_prompt="$(worker_bootstrap_prompt resume "$owner_thread_id")"
-  ENGRAM_PROJECT="$memory_task_project" \
-    command codex -p parallel-work -C "$descriptor_root" \
+  build_codex_engram_boundary
+  command env "${codex_engram_environment[@]}" \
+    codex -p parallel-work "${codex_engram_config[@]}" \
+      -C "$descriptor_root" \
       resume "$owner_thread_id" "$resume_prompt"
 }
 
