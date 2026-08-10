@@ -6,6 +6,13 @@
 > not dispatch parallel implementers. Steps use checkbox (`- [ ]`) syntax for
 > tracking.
 
+> **Execution record — completed 2026-08-09 (`LOCAL_READY`).** This is now a
+> historical one-time activation plan; do not rerun it against current state.
+> Local and owned-fork `main` plus the live Codex cache were verified at
+> `47e868d`, one fresh read-only session loaded the v2 contract, and the
+> separately approved hosted promotion completed. Safety, stash, worktree, and
+> proof artifacts remain preserved. Continue from `notes/main--2026-08-09.md`.
+
 **Goal:** Activate the verified Design Lock v2 checkpoint from the maintained
 Superpowers fork in newly started Codex sessions without importing
 `upstream/dev`, changing the hosted fork, or losing the recoverable v1 state.
