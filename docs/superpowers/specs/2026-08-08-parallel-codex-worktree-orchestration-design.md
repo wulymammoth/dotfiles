@@ -43,6 +43,40 @@ remediation therefore keeps the worker environment check and adds an exact
 per-launch `mcp_servers.engram.env.ENGRAM_PROJECT` override. This is a Codex
 configuration correction, not a reason to fork Engram or Superpowers.
 
+### 2026-08-13 enforcement amendment
+
+The task-project mechanism remains accepted as temporary containment. The
+observed LEA-146, LEA-253, and LEA-265 contamination did not traverse a
+prepared worker boundary: those sessions started plainly from the primary
+checkout without descriptors. Engram's default Git-origin project detection
+therefore routed each session into the same `soundcoaster` project and its
+project-level recent context interleaved their activity.
+
+The remediation tightens adoption rather than rolling back isolation:
+
+1. Linked-checkout status triggers the orchestration boundary even when no
+   descriptor exists; an unprepared linked checkout fails closed.
+2. A session may implement only in its startup checkout. A primary
+   `COORDINATOR_ONLY` session has a narrow exception to create an approved plan
+   and descriptor in a new unclaimed linked worktree, then launches a fresh
+   writer instead of implementing across roots.
+3. A read-only `worktree-session guard` distinguishes `COORDINATOR_ONLY`,
+   `PREPARED_UNCLAIMED`, and `WRITER_BOUNDARY` states before any write.
+4. `memory.taskProject` must be unique across linked-worktree descriptors;
+   prepare and runtime preflight both reject duplicates.
+5. Project-level recovery memory may contain concurrent-session activity. It
+   supports recovery but never overrides the active conversation, current Git,
+   the descriptor, or the owner claim.
+
+[Engram issue #587](https://github.com/Gentleman-Programming/engram/issues/587)
+is the preferred future convergence architecture: one logical project, one
+data directory per worktree, a recorded fork point, and lossless three-way
+merge. As of this amendment it is an open design issue rather than a shipped
+and qualified boundary. This implementation therefore does not delete shared
+history, automatically call `mem_merge_projects`, use last-writer-wins, or
+locally imitate the proposed merge protocol. Reviewed durable discoveries are
+promoted deliberately until the upstream design can replace containment.
+
 ## Problem
 
 Linked worktrees isolate files, Git indexes, and branches. They do not isolate:
@@ -304,16 +338,21 @@ Coordinator responsibilities:
 - decompose only genuinely independent outcomes;
 - name dependencies and one integration owner;
 - obtain approval for plans and worktree creation;
+- run `guard` from the startup checkout and remain `COORDINATOR_ONLY` when it
+  is the primary checkout;
 - use the existing `superpowers:using-git-worktrees` boundary;
 - prepare metadata in an existing linked worktree;
 - provide the exact helper launch command;
+- use only the narrow approved-plan and descriptor bootstrap exception across
+  roots; never implement through `workdir`, `git -C`, or absolute paths;
 - stop writing after a worker claims the worktree;
 - inspect only read-only while the claim remains active;
 - preserve all integration and cleanup gates.
 
 Worker responsibilities:
 
-- claim and verify before any repository write;
+- run `guard`, claim, confirm the task memory project, and verify before any
+  repository write;
 - read the approved plan and authoritative repository context;
 - confirm the Engram task project;
 - use focused shared memory and ctx retrieval only when needed;
@@ -340,11 +379,26 @@ The helper is Zsh plus Git and standard macOS utilities. It does not require
 Supported lifecycle:
 
 ```text
-prepare -> launch -> claim -> verify -> report -> handoff | release
+guard -> prepare -> launch -> guard -> claim -> verify -> report -> handoff | release
 ```
 
 It intentionally has no create-worktree, merge, rebase, cherry-pick, push,
 remove-worktree, or delete-branch command.
+
+#### Startup guard and task-project uniqueness
+
+`guard` is read-only. In the repository's primary checkout it prints
+`COORDINATOR_ONLY`. In a linked checkout it requires a safe descriptor and its
+exact root, Git, plan, task-project, and—when claimed—owner identity. A valid
+unclaimed checkout reports `PREPARED_UNCLAIMED`; a matching claimed checkout
+reports `WRITER_BOUNDARY`. Missing preparation or any mismatch stops the
+session without creating metadata or an owner claim.
+
+`prepare` and every descriptor preflight inspect regular, non-symlink sibling
+descriptors from `git worktree list --porcelain -z`. Reusing a
+`memory.taskProject` fails with both physical roots. Running the same check at
+runtime prevents descriptor drift from silently converging two writers after
+preparation.
 
 #### Metadata layout
 
@@ -472,9 +526,10 @@ and supplies the same path through
 override and isolate memory by task project in the configured Engram store.
 
 The bootstrap prompt includes the task ID and plan path and instructs the
-worker to invoke the orchestration skill, claim, and verify before any other
-repository action. Starting Codex from a shell whose current directory merely
-points at the worktree is insufficient; `-C` is mandatory.
+worker to invoke the orchestration skill, run `guard`, claim, call
+`mem_current_project`, and verify before any other repository action. Starting
+Codex from a shell whose current directory merely points at the worktree is
+insufficient; `-C` is mandatory.
 
 Resume targets the recorded owner thread. A new top-level thread cannot resume
 an occupied worktree by claiming around the existing owner. If the original
@@ -509,23 +564,29 @@ fresh fetch; it never claims remote currency without that fetch.
 
 ### Preparation
 
-1. The orchestrator obtains approved independent plans and an integration
+1. The orchestrator runs `guard`; a primary checkout must report
+   `COORDINATOR_ONLY` and remains coordination-only.
+2. The orchestrator obtains approved independent plans and an integration
    order.
-2. It creates one linked worktree and branch per outcome using the existing
+3. It creates one linked worktree and branch per outcome using the existing
    worktree workflow.
-3. It runs `prepare`, which validates the linked worktree, stores the exact
-   base and plan digest, and creates the narrow self-ignore boundary.
-4. It reports the exact launch command and stops implementing in that worktree.
+4. It runs `prepare`, which validates the linked worktree, rejects a reused
+   task project, stores the exact base and plan digest, and creates the narrow
+   self-ignore boundary.
+5. It reports the exact launch command and stops implementing in that worktree.
 
 ### Worker startup
 
 1. The helper starts Codex with `-p parallel-work`, `-C`, the task-specific
    worker environment, and the matching Codex MCP-server environment override.
 2. The worker invokes the local orchestration skill.
-3. It atomically claims the worktree and runs `verify`.
-4. It confirms the Engram task project.
-5. It reads current repository authority and the approved plan.
-6. Only then may it write or dispatch implementation subagents.
+3. It runs read-only `guard`; an absent descriptor or identity mismatch stops
+   the run before mutation.
+4. It atomically claims the worktree.
+5. It confirms the Engram task project with `mem_current_project` and runs
+   `verify`.
+6. It reads current repository authority and the approved plan.
+7. Only then may it write or dispatch implementation subagents.
 
 ### Historical retrieval
 
@@ -540,10 +601,27 @@ fresh fetch; it never claims remote currency without that fetch.
 
 1. The normal Engram compaction instruction saves the compacted summary to the
    task project and reloads task-project context.
-2. Before any further repository mutation, the worker re-runs `claim`
-   idempotently and `verify`.
+2. Before any further repository mutation, the worker re-runs `guard`, `claim`
+   idempotently, `mem_current_project`, and `verify`.
 3. A root, branch, owner, base, plan, or Engram-project mismatch stops the run
    as `BLOCKED`.
+
+### Existing unsafe-session recovery
+
+1. Stop repository mutations in any session that started from the primary
+   checkout, an unprepared linked checkout, or without the parallel profile.
+2. Capture a handoff naming the physical worktree root, branch, HEAD, porcelain
+   status, current goal, verification evidence, and remaining work. Leave
+   uncommitted files in that worktree.
+3. Exit the old Codex thread and do not resume its session ID into the repaired
+   workflow. Startup instructions, profile, root, and MCP environment are fixed
+   at process creation.
+4. Prepare a descriptor for the existing linked worktree with a unique task
+   project, then use the helper to launch a fresh worker.
+5. Reconcile the handoff against live Git and require `guard`, `claim`,
+   `mem_current_project`, and `verify` before the next write.
+6. Retain already-interleaved canonical Engram entries as historical recovery
+   data. Do not delete them or blindly merge task projects.
 
 ### Completion and integration
 
@@ -564,9 +642,12 @@ fresh fetch; it never claims remote currency without that fetch.
 
 The workflow fails closed for:
 
+- a linked checkout without a safe prepared descriptor;
 - missing, malformed, unsupported, or symlinked metadata;
 - wrong root, branch, owner, base ancestry, plan path, or plan digest;
 - missing `CODEX_THREAD_ID` or `ENGRAM_PROJECT`;
+- a task project duplicated in another linked-worktree descriptor, including
+  duplicates introduced after preparation;
 - a requested disposable Engram data directory that is relative, missing, the
   worktree root, or resolves outside the worktree;
 - a second claimant;
@@ -611,10 +692,15 @@ worktrees under `/tmp`. They must cover:
 16. profile syntax and Stow behavior while preserving unrelated `~/.codex`
     runtime state;
 17. a behavioral profile probe proving plugin hooks are absent while Engram
-    MCP, global instructions, and Superpowers remain present.
+    MCP, global instructions, and Superpowers remain present;
 18. exact launch/resume arguments plus a provider-free `mcp list --json` probe
     proving per-launch task-project and optional isolated-data-directory values
-    reach the Engram MCP server configuration.
+    reach the Engram MCP server configuration;
+19. primary-checkout, unprepared-linked-checkout, prepared-unclaimed, and
+    owned-writer `guard` classifications;
+20. prepare-time rejection of duplicate task projects across linked worktrees;
+    and
+21. runtime rejection after descriptor drift creates a duplicate task project.
 
 Item 17 may use Codex's offline prompt/config debug surface if it exposes
 hook resolution. If no offline surface can prove it, static checks are not
@@ -736,16 +822,21 @@ The design is implemented only when:
 1. no Engram or Superpowers fork changed;
 2. every worker has one mechanically verified worktree, branch, owner thread,
    approved plan digest, and default Engram task project;
-3. a second top-level writer fails before repository mutation;
-4. plugin-driven broad context, prompt capture, and subagent capture are absent
+3. a session implements only in its startup checkout, and a primary
+   `COORDINATOR_ONLY` session uses only the narrow approved-plan and descriptor
+   bootstrap exception across roots;
+4. an unprepared linked checkout and a duplicate task project both fail before
+   repository mutation;
+5. a second top-level writer fails before repository mutation;
+6. plugin-driven broad context, prompt capture, and subagent capture are absent
    in the parallel profile while explicit Engram tools remain usable;
-5. ctx provenance is task-qualified and never treated as current authority;
-6. compaction and resume re-establish live identity before writes;
-7. committed, uncommitted, and blocked outcomes are reported accurately;
-8. the helper performs no integration, hosted mutation, shipping, or cleanup;
-9. deterministic tests pass and the authorized adversarial canary meets every
+7. ctx provenance is task-qualified and never treated as current authority;
+8. compaction and resume re-establish live identity before writes;
+9. committed, uncommitted, and blocked outcomes are reported accurately;
+10. the helper performs no integration, hosted mutation, shipping, or cleanup;
+11. deterministic tests pass and the authorized adversarial canary meets every
    promotion criterion;
-10. live activation, local commits, provider calls, integration, publication,
+12. live activation, local commits, provider calls, integration, publication,
     and cleanup occur only under explicit owner approval; an existing Stow link
     requires integration and effective activation to share an approval envelope
     unless changes are staged outside the live-linked source.

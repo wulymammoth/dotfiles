@@ -9,6 +9,8 @@ description: Use when coordinating two or more independent Codex writer sessions
 
 Live Git + descriptor + owner claim are control authority. ctx is provenance.
 Engram is curated memory. Neither memory system proves root, state, or ownership.
+During parallel work, the startup checkout is the only writable checkout. Do
+not implement in another checkout through `workdir`, `git -C`, or absolute paths.
 
 Resolve the helper without changing `PATH`:
 `session_helper="${CODEX_HOME:-$HOME/.codex}/skills/orchestrating-parallel-worktrees/scripts/worktree-session"`.
@@ -17,9 +19,10 @@ Resolve the helper without changing `PATH`:
 
 | Role/state | Required action |
 |---|---|
-| Coordinator before launch | Prepare descriptor; launch through helper |
-| Worker before write | Claim; `mem_current_project`; verify |
-| Compacted or resumed worker | Repeat claim and memory verification |
+| Coordinator before launch | Run `worktree-session guard`; keep `COORDINATOR_ONLY`; prepare and launch |
+| Unprepared linked worktree | Stop without writes; return preparation to the coordinator |
+| Worker before write | Guard; claim; `mem_current_project`; verify |
+| Compacted or resumed worker | Repeat guard, claim, and memory verification |
 | Active claim review | Read-only; fixes return to owner or explicit handoff |
 | Completion | Consistent report; keep separate gates |
 
@@ -27,20 +30,27 @@ Resolve the helper without changing `PATH`:
 
 1. Decompose only independent outcomes; name dependencies, integration owner,
    order, plans, and separate approval gates.
-2. Use `superpowers:using-git-worktrees`; run `$session_helper prepare` for each
-   existing linked worktree and launch only through that helper.
-3. Once claimed, stop writing there. Inspect a named commit or quiescent digest
+2. Run `worktree-session guard` from the primary checkout and keep its
+   `COORDINATOR_ONLY` boundary. Use `superpowers:using-git-worktrees`; the only
+   cross-root writes allowed before handoff are the approved plan and descriptor
+   created during the narrow plan and descriptor bootstrap.
+3. Run `$session_helper prepare` for each existing linked worktree and launch
+   only through that helper. A missing descriptor is a blocker, never a reason
+   to continue implementation in the coordinator session.
+4. Once claimed, stop writing there. Inspect a named commit or quiescent digest
    read-only; send fixes to the owner or hand off explicitly.
-4. Never auto-integrate, activate, publish, promote memory, or clean up.
+5. Never auto-integrate, activate, publish, promote memory, or clean up.
 
 ## Worker startup and recovery
 
 Before repository mutation: (1) invoke this skill, (2) run `$session_helper
-claim`, (3) call Engram `mem_current_project`, (4) run `$session_helper verify
---memory-project NAME` with that literal returned project, and (5) read live Git
-plus repository instructions and the approved plan.
+guard`, (3) run `$session_helper claim`, (4) call Engram
+`mem_current_project`, (5) run `$session_helper verify --memory-project NAME`
+with that literal returned project, and (6) read live Git plus repository
+instructions and the approved plan. Guard must run for every linked checkout,
+even when `.superpowers/parallel/session.conf` is absent; absence fails closed.
 
-After compaction or resume, repeat steps 2-4. Any mismatch produces `BLOCKED`
+After compaction or resume, repeat steps 2-5. Any mismatch produces `BLOCKED`
 without edits. Summaries, labels, branch names, elapsed time, and PIDs never
 override the claim.
 

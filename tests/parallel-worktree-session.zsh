@@ -295,6 +295,48 @@ test_prepare_requires_coordinator_and_explicit_replace() {
     --target-branch main --integration-owner integrator >/dev/null
 }
 
+test_prepare_rejects_duplicate_task_project() {
+  make_fixture duplicate-task-project
+  prepare_fixture >/dev/null
+
+  local other_worktree="$fixture_root/other worktree"
+  git -C "$repo" worktree add -q -b feat/other-task "$other_worktree" main
+
+  assert_fails "task project is already assigned" \
+    env CODEX_THREAD_ID=coordinator-thread "$session_bin" prepare \
+      --worktree "$other_worktree" --task-id TASK-2 --task-slug task-two \
+      --plan "$plan_rel" --base-ref main --base-sha "$base_sha" \
+      --shared-project sample --task-project sample-task-task-1 \
+      --target-branch main --integration-owner integrator
+  [[ ! -e "$other_worktree/.superpowers/parallel/session.conf" ]] \
+    || fail "duplicate task project must fail before writing a descriptor"
+}
+
+test_runtime_preflight_rejects_duplicate_task_project_drift() {
+  make_fixture duplicate-task-project-drift
+  prepare_fixture >/dev/null
+
+  local other_worktree="$fixture_root/other worktree"
+  git -C "$repo" worktree add -q -b feat/other-task-drift \
+    "$other_worktree" main
+  CODEX_THREAD_ID=coordinator-thread "$session_bin" prepare \
+    --worktree "$other_worktree" --task-id TASK-2 --task-slug task-two \
+    --plan "$plan_rel" --base-ref main --base-sha "$base_sha" \
+    --shared-project sample --task-project sample-task-task-2 \
+    --target-branch main --integration-owner integrator >/dev/null
+
+  git config --file \
+    "$other_worktree/.superpowers/parallel/session.conf" \
+    memory.taskProject sample-task-task-1
+
+  assert_fails "task project is already assigned" run_worker worker-a \
+    "$session_bin" guard
+  assert_fails "task project is already assigned" run_worker worker-a \
+    "$session_bin" claim
+  [[ ! -e "$worktree/.superpowers/parallel/owner" ]] \
+    || fail "duplicate task-project drift must fail before ownership"
+}
+
 test_preflight_requires_exact_metadata_shape() {
   make_fixture missing-ignore
   prepare_fixture >/dev/null
@@ -328,6 +370,38 @@ test_preflight_requires_exact_metadata_shape() {
   print -r -- "not a directory" >"$worktree/.superpowers/parallel/owner"
   assert_fails "owner must be a directory" run_worker worker-a \
     "$session_bin" claim
+}
+
+test_guard_classifies_session_boundary() {
+  make_fixture guard
+
+  local primary_output
+  primary_output="$(cd "$repo" && "$session_bin" guard)"
+  assert_contains "$primary_output" "COORDINATOR_ONLY"
+  assert_contains "$primary_output" "root=${repo:A}"
+  assert_contains "$primary_output" "branch=main"
+
+  assert_fails "linked worktree is unprepared" run_worker worker-a \
+    "$session_bin" guard
+
+  prepare_fixture >/dev/null
+  assert_fails "ENGRAM_PROJECT" run_worker_without_engram worker-a \
+    "$session_bin" guard
+
+  local prepared_output
+  prepared_output="$(run_worker worker-a "$session_bin" guard)"
+  assert_contains "$prepared_output" \
+    "PREPARED_UNCLAIMED task=TASK-1 root=${worktree:A}"
+  assert_contains "$prepared_output" "memory=sample-task-task-1"
+
+  run_worker worker-a "$session_bin" claim >/dev/null
+  local writer_output
+  writer_output="$(run_worker worker-a "$session_bin" guard)"
+  assert_contains "$writer_output" \
+    "WRITER_BOUNDARY task=TASK-1 owner=worker-a root=${worktree:A}"
+  assert_contains "$writer_output" "memory=sample-task-task-1"
+  assert_fails "current owner mismatch" run_worker worker-b \
+    "$session_bin" guard
 }
 
 test_claim_requires_identity_and_is_idempotent() {
@@ -558,6 +632,7 @@ test_launch_and_resume_use_exact_boundaries() {
   assert_contains "$launch_prompt" "$plan_rel"
   assert_contains "$launch_prompt" "superpowers:orchestrating-parallel-worktrees"
   assert_contains "$launch_prompt" "${session_bin:A}"
+  assert_contains "$launch_prompt" "guard"
   assert_contains "$launch_prompt" "claim"
   assert_contains "$launch_prompt" "mem_current_project"
   assert_contains "$launch_prompt" \
@@ -613,6 +688,7 @@ test_launch_and_resume_use_exact_boundaries() {
   assert_contains "$resume_prompt" "$plan_rel"
   assert_contains "$resume_prompt" "superpowers:orchestrating-parallel-worktrees"
   assert_contains "$resume_prompt" "${session_bin:A}"
+  assert_contains "$resume_prompt" "guard"
   assert_contains "$resume_prompt" "claim"
   assert_contains "$resume_prompt" "mem_current_project"
   assert_contains "$resume_prompt" \
@@ -996,7 +1072,10 @@ test_prepare_rejects_main_checkout_and_plan_escape
 test_prepare_rejects_unsafe_metadata
 test_prepare_rejects_identity_mismatches
 test_prepare_requires_coordinator_and_explicit_replace
+test_prepare_rejects_duplicate_task_project
+test_runtime_preflight_rejects_duplicate_task_project_drift
 test_preflight_requires_exact_metadata_shape
+test_guard_classifies_session_boundary
 test_claim_requires_identity_and_is_idempotent
 test_claim_race_has_one_winner
 test_incomplete_claim_fails_closed

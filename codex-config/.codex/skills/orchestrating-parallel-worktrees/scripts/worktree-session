@@ -24,6 +24,7 @@ Usage:
     --plan REPO_RELATIVE_PATH --base-ref REF --base-sha FULL_SHA \
     --shared-project NAME --task-project NAME --target-branch REF \
     --integration-owner LABEL [--replace]
+  worktree-session guard
   worktree-session launch --worktree ABS_ROOT
   worktree-session resume --worktree ABS_ROOT
   worktree-session claim
@@ -154,6 +155,39 @@ current_root() {
   physical_dir "$root"
 }
 
+command_guard() {
+  (( $# == 0 )) || die "guard does not accept options"
+  require_command git
+
+  local root git_dir common_dir branch metadata descriptor
+  root="$(current_root)" || return 1
+  git_dir="$(physical_dir "$(git -C "$root" rev-parse --path-format=absolute --git-dir)")"
+  common_dir="$(physical_dir "$(git -C "$root" rev-parse --path-format=absolute --git-common-dir)")"
+  branch="$(git_branch_identity "$root")" || return 1
+
+  if [[ "$git_dir" == "$common_dir" ]]; then
+    info "COORDINATOR_ONLY root=$root branch=$branch reason=primary-checkout"
+    return 0
+  fi
+
+  assert_metadata_paths_safe "$root"
+  metadata="$(metadata_path "$root")"
+  descriptor="$metadata/session.conf"
+  [[ -f "$descriptor" ]] \
+    || die "linked worktree is unprepared: $root; do not write; coordinator must prepare the descriptor and launch a fresh writer through this helper"
+
+  descriptor_preflight "$root" worker
+  require_thread_id
+
+  if [[ ! -e "$descriptor_metadata/owner" ]]; then
+    info "PREPARED_UNCLAIMED task=$task_id root=$descriptor_root branch=$git_branch memory=$memory_task_project next=claim"
+    return 0
+  fi
+
+  require_owner
+  info "WRITER_BOUNDARY task=$task_id owner=$owner_thread_id root=$descriptor_root branch=$git_branch memory=$memory_task_project"
+}
+
 load_descriptor() {
   local root="$1"
   typeset -g descriptor_root descriptor_metadata descriptor_file
@@ -233,6 +267,7 @@ descriptor_preflight() {
   [[ "$actual_plan_sha" == "$task_plan_sha" ]] \
     || die "plan digest mismatch: expected $task_plan_sha, actual $actual_plan_sha"
 
+  assert_task_project_unique "$descriptor_root" "$memory_task_project"
   [[ "$mode" != "worker" ]] || require_worker_project
 }
 
@@ -240,6 +275,34 @@ require_worker_project() {
   [[ -n "${ENGRAM_PROJECT:-}" ]] || die "ENGRAM_PROJECT is required"
   [[ "$ENGRAM_PROJECT" == "$memory_task_project" ]] \
     || die "Engram project mismatch: expected $memory_task_project, actual $ENGRAM_PROJECT"
+}
+
+assert_task_project_unique() {
+  local requested_root="$1" requested_project="$2"
+  local record other_root other_descriptor other_project
+
+  while IFS= read -r -d '' record; do
+    [[ "$record" == worktree\ * ]] || continue
+    other_root="${record#worktree }"
+    [[ "$other_root" == /* ]] \
+      || die "Git reported a non-absolute worktree path: $other_root"
+    [[ -d "$other_root" ]] || continue
+    other_root="$(physical_dir "$other_root")" || return 1
+    [[ "$other_root" != "$requested_root" ]] || continue
+
+    assert_metadata_paths_safe "$other_root"
+    other_descriptor="$(metadata_path "$other_root")/session.conf"
+    [[ -e "$other_descriptor" ]] || continue
+    [[ -f "$other_descriptor" && ! -L "$other_descriptor" ]] \
+      || die "sibling worktree descriptor is not a regular file: $other_descriptor"
+    other_project="$(git config --file "$other_descriptor" \
+      --get memory.taskProject 2>/dev/null)" \
+      || die "sibling worktree descriptor is missing memory.taskProject: $other_descriptor"
+    reject_control_chars "sibling memory.taskProject" "$other_project"
+
+    [[ "$other_project" != "$requested_project" ]] \
+      || die "task project is already assigned: $requested_project belongs to $other_root; requested root $requested_root"
+  done < <(git -C "$requested_root" worktree list --porcelain -z)
 }
 
 parse_prepare_options() {
@@ -354,6 +417,8 @@ command_prepare() {
     || die "plan must remain inside worktree: expected prefix $root, actual $plan_physical"
   plan_sha="$(sha256_file "$plan_physical")"
 
+  assert_task_project_unique "$root" "$task_project_arg"
+
   assert_metadata_paths_safe "$root"
   metadata="$(metadata_path "$root")"
   mkdir -p -- "$metadata"
@@ -418,7 +483,7 @@ worker_bootstrap_prompt() {
     opening="Start"
   fi
 
-  print -r -- "$opening task $task_id in $descriptor_root using approved plan $task_plan_path. Invoke superpowers:orchestrating-parallel-worktrees. Before any implementation read or write beyond these named gates, run \"$helper_path\" claim; call Engram mem_current_project and require exactly $memory_task_project; then run \"$helper_path\" verify --memory-project $memory_task_project. After every compaction or resume, repeat claim, mem_current_project, and verify before further repository work. Stop BLOCKED on any mismatch."
+  print -r -- "$opening task $task_id in $descriptor_root using approved plan $task_plan_path. Invoke superpowers:orchestrating-parallel-worktrees. Before any implementation read or write beyond these named gates, run \"$helper_path\" guard and then \"$helper_path\" claim; call Engram mem_current_project and require exactly $memory_task_project; then run \"$helper_path\" verify --memory-project $memory_task_project. After every compaction or resume, repeat guard, claim, mem_current_project, and verify before further repository work. Stop BLOCKED on any mismatch."
 }
 
 toml_basic_string() {
@@ -1165,6 +1230,9 @@ main() {
   case "$command_name" in
     prepare)
       command_prepare "$@"
+      ;;
+    guard)
+      command_guard "$@"
       ;;
     launch)
       command_launch "$@"

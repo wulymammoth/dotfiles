@@ -20,6 +20,12 @@ and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
   sessions may inspect read-only, but a review verdict must target a named
   commit or explicitly quiescent checkpoint. Independent writer sessions must
   use isolated checkouts or worktrees, each on its own task branch.
+- During a concurrent-worktree workflow, the startup checkout is the only checkout it may mutate. Record its physical root before work. It must not implement
+  in another checkout through `workdir`, `git -C`, or absolute paths.
+  A primary-checkout coordinator may create the approved plan and descriptor in
+  a new, unclaimed linked worktree as the narrow plan and descriptor bootstrap;
+  source, test, configuration, and implementation edits wait for the fresh
+  writer launched at that exact worktree root.
 - A mutable hosted artifact or environment also has one active writer. This
   includes a pull request, tracker issue, deployment, staging environment, and
   provider configuration; hand off ownership before another session mutates it.
@@ -31,12 +37,22 @@ and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
 - After compaction or resume, and at session start, reconcile the repository
   root, branch, HEAD, dirty state, current task, and any active review artifact
   against live state before acting on summaries. Engram and ctx support
-  recovery; they do not establish current ownership.
-- When `.superpowers/parallel/session.conf` exists, invoke
-  `orchestrating-parallel-worktrees`: claim the descriptor, call
-  `mem_current_project`, and pass its result to mechanical verification before
-  any write. Repeat claim and verification after compaction or resume. Git plus
-  the descriptor and owner claim are current authority; Engram and ctx are not.
+  recovery; they do not establish current ownership. Project-level recovery
+  memory can contain concurrent-session activity and must not override the
+  active conversation or verified checkout state.
+- When the current checkout is linked, or when a primary checkout starts
+  coordinating linked-worktree implementation, invoke
+  `orchestrating-parallel-worktrees` and run `worktree-session guard` before any
+  write. This trigger applies whether or not
+  `.superpowers/parallel/session.conf` exists: a missing descriptor is a
+  fail-closed result, not permission to continue. `COORDINATOR_ONLY` permits
+  coordination plus the narrow bootstrap above, never implementation in a
+  linked checkout.
+- A prepared linked-worktree writer must claim the descriptor, call
+  `mem_current_project`, and pass its literal result to mechanical verification
+  before writing. Repeat guard, claim, and verification after compaction or
+  resume. Git plus the descriptor and owner claim are current authority;
+  Engram and ctx are not.
 - Before declaring work ready, refresh the target base and prove the result is
   current and mergeable. Use the repository's chosen merge or rebase policy
   rather than imposing one globally. Repository-local instructions define the

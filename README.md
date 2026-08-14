@@ -84,6 +84,7 @@ arguments manually:
 session_helper="${CODEX_HOME:-$HOME/.codex}/skills/orchestrating-parallel-worktrees/scripts/worktree-session"
 task_root="/path/to/repository/.worktrees/task-slug"
 
+"$session_helper" guard
 CODEX_THREAD_ID="coordinator-thread" "$session_helper" prepare \
   --worktree "$task_root" \
   --task-id "TASK-123" \
@@ -98,11 +99,49 @@ CODEX_THREAD_ID="coordinator-thread" "$session_helper" prepare \
 "$session_helper" launch --worktree "$task_root"
 ```
 
+From a repository's primary checkout, `guard` reports `COORDINATOR_ONLY`.
+That state permits coordination and the narrow creation of an approved plan
+and descriptor in a new linked worktree; it does not permit implementation in
+another checkout through `workdir`, `git -C`, or absolute paths. A linked
+worktree without a safe descriptor fails closed. Start its implementation in a
+fresh helper-launched Codex session rather than converting the coordinator into
+its writer.
+
 Launch and resume set the descriptor task project both in the worker process
 and in Codex's per-launch Engram MCP server environment. The latter boundary is
 required because an environment variable on the outer Codex process is not, by
 itself, inherited by Codex-managed MCP children. Workers still confirm the
-effective project with `mem_current_project` before writing.
+effective project with `mem_current_project` before writing. The worker startup
+sequence is `guard`, `claim`, `mem_current_project`, and `verify`; repeat it
+after compaction or resume. The helper also rejects a task project already used
+by another linked-worktree descriptor in the same repository.
+
+### Recovering existing sessions that bypassed the helper
+
+If a concurrent session was started from the primary checkout, from an
+unprepared linked worktree, or without the `parallel-work` profile, do not keep
+using that thread as an implementation writer:
+
+1. Stop repository mutations and record the exact worktree root, branch, HEAD,
+   `git status`, current goal, verification state, and remaining work. Leave
+   uncommitted files in place.
+2. Exit the old Codex thread. Do not resume its session ID into the repaired
+   workflow: profiles, startup instructions, working root, and MCP environment
+   are process-start boundaries.
+3. From a coordinator, prepare a descriptor for that existing linked worktree
+   with a unique task project, then launch a fresh worker with
+   `worktree-session launch --worktree <root>`.
+4. In the fresh worker, require `guard`, `claim`, `mem_current_project`, and
+   `verify` to pass before the next write. Reconcile the handoff against live
+   Git rather than trusting recovery memory.
+
+Do not delete the shared canonical Engram history or blindly merge task
+projects. Treat already-interleaved entries as historical recovery material;
+promote only reviewed durable discoveries. Upstream
+[Engram issue #587](https://github.com/Gentleman-Programming/engram/issues/587)
+describes the preferred future model—one logical project with per-worktree
+stores, fork points, and lossless three-way merge—but that design must be
+implemented and qualified before replacing this containment boundary.
 
 Disposable canaries may additionally isolate Engram's database in an existing
 directory beneath the task worktree:

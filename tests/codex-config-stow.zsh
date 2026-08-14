@@ -40,11 +40,27 @@ for required_policy in \
   "After compaction" \
   ".superpowers/parallel/session.conf" \
   "orchestrating-parallel-worktrees" \
+  '`worktree-session guard`' \
+  '`COORDINATOR_ONLY`' \
+  "startup checkout is the only checkout it may mutate" \
+  "plan and descriptor bootstrap" \
+  '`workdir`, `git -C`, or absolute paths' \
   "claim" \
   "mem_current_project"
 do
   rg --fixed-strings --quiet "$required_policy" "$global_agents" \
     || fail "global AGENTS policy is missing: $required_policy"
+done
+
+for required_boundary in \
+  '`worktree-session guard`' \
+  '`COORDINATOR_ONLY`' \
+  "startup checkout" \
+  "plan and descriptor bootstrap" \
+  '`workdir`, `git -C`, or absolute paths'
+do
+  rg --fixed-strings --quiet "$required_boundary" "$skill_source" \
+    || fail "parallel worktree skill boundary is missing: $required_boundary"
 done
 
 for required_shell_guard in \
