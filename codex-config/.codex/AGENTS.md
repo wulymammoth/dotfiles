@@ -26,6 +26,14 @@ and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
   a new, unclaimed linked worktree as the narrow plan and descriptor bootstrap;
   source, test, configuration, and implementation edits wait for the fresh
   writer launched at that exact worktree root.
+- `Work on <TASK-ID or issue URL>` is sufficient to start this workflow from a
+  primary checkout: automatically act as coordinator, invoke
+  `orchestrating-parallel-worktrees`, and resolve the tracker record read-only
+  to derive the goal. Use repository-local worktree lifecycle commands when
+  present and fail closed; only otherwise fall back to `using-git-worktrees`.
+  Present the derived goal and plan for approval, prepare a unique task-scoped
+  descriptor, and return the helper launch command; implementation waits for
+  the fresh helper-launched writer in that worktree.
 - A mutable hosted artifact or environment also has one active writer. This
   includes a pull request, tracker issue, deployment, staging environment, and
   provider configuration; hand off ownership before another session mutates it.
