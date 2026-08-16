@@ -21,46 +21,44 @@ and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
   commit or explicitly quiescent checkpoint. Independent writer sessions must
   use isolated checkouts or worktrees, each on its own task branch.
 - During a concurrent-worktree workflow, the startup checkout is the only checkout it may mutate. Record its physical root before work. It must not implement
-  in another checkout through `workdir`, `git -C`, or absolute paths.
-  A primary-checkout coordinator may create the approved plan and descriptor in
-  a new, unclaimed linked worktree as the narrow plan and descriptor bootstrap;
-  source, test, configuration, and implementation edits wait for the fresh
-  writer launched at that exact worktree root.
-- `Work on <TASK-ID or issue URL>` is sufficient to start this workflow from a
-  primary checkout: automatically act as coordinator, invoke
-  `orchestrating-parallel-worktrees`, and resolve the tracker record read-only
-  to derive the goal. Use repository-local worktree lifecycle commands when
-  present and fail closed; only otherwise fall back to `using-git-worktrees`.
-  Present the derived goal and plan for approval, prepare a unique task-scoped
-  descriptor, and return the helper launch command; implementation waits for
-  the fresh helper-launched writer in that worktree.
+  in another checkout through `workdir`, `git -C`, or absolute paths. A session
+  started in a primary checkout may coordinate creation of another worktree,
+  but it must not implement there. When explicit multi-writer orchestration is
+  selected, its only cross-root mutation is the narrow approved-plan and
+  descriptor bootstrap; source, test, configuration, and implementation edits
+  wait for the prepared writer. The ordinary no-handoff path is to create the
+  worktree in the shell first, `cd` into it, and start Codex there.
+- Ordinary single-task work has one owner in its startup checkout and does not require a descriptor or claim.
+  `Work on <TASK-ID or issue URL>` means resolve
+  the task and propose the plan in the current owner session; it does not
+  silently create coordinator authority or permit cross-root writes. Use
+  repository-local worktree lifecycle commands when present and fall back to
+  `using-git-worktrees` only when needed.
 - A mutable hosted artifact or environment also has one active writer. This
   includes a pull request, tracker issue, deployment, staging environment, and
   provider configuration; hand off ownership before another session mutates it.
 - Treat a simulator, physical device, shared database, provider budget, or
   other shared runtime as exclusive unless the project proves isolation.
 - Parallel changes to overlapping or high-conflict files are allowed only with
-  a named integration owner and reconciliation order. Do not serialize all work
-  merely because eventual integration may produce conflicts.
+  an explicit integration owner and reconciliation order. Do not serialize all
+  work merely because eventual integration may produce conflicts.
 - After compaction or resume, and at session start, reconcile the repository
   root, branch, HEAD, dirty state, current task, and any active review artifact
-  against live state before acting on summaries. Engram and ctx support
-  recovery; they do not establish current ownership. Project-level recovery
-  memory can contain concurrent-session activity and must not override the
-  active conversation or verified checkout state.
-- When the current checkout is linked, or when a primary checkout starts
-  coordinating linked-worktree implementation, invoke
-  `orchestrating-parallel-worktrees` and run `worktree-session guard` before any
-  write. This trigger applies whether or not
-  `.superpowers/parallel/session.conf` exists: a missing descriptor is a
-  fail-closed result, not permission to continue. `COORDINATOR_ONLY` permits
-  coordination plus the narrow bootstrap above, never implementation in a
-  linked checkout.
-- A prepared linked-worktree writer must claim the descriptor, call
-  `mem_current_project`, and pass its literal result to mechanical verification
-  before writing. Repeat guard, claim, and verification after compaction or
-  resume. Git plus the descriptor and owner claim are current authority;
-  Engram and ctx are not.
+  against live state before acting on summaries. The active conversation,
+  transcript/resume state, and task-local notes support recovery but do not
+  override verified repository state.
+- Invoke `orchestrating-parallel-worktrees` only for two or more writer sessions
+  or an existing `.superpowers/parallel/session.conf`. In that explicit
+  multi-writer workflow, the coordinator may perform the narrow approved-plan
+  and descriptor bootstrap in a new unclaimed worktree, then each prepared
+  writer must run `worktree-session guard` and claim its descriptor before
+  writing. A missing or stale descriptor fails closed only after orchestration
+  has been selected; it is not required for an ordinary sole-owner worktree.
+  `COORDINATOR_ONLY` permits coordination, never implementation in another
+  checkout.
+- A prepared multi-writer session repeats guard, claim, and live-state
+  reconciliation after compaction or resume. Git plus the descriptor and owner
+  claim are current authority; memory and transcript labels are not.
 - Before declaring work ready, refresh the target base and prove the result is
   current and mergeable. Use the repository's chosen merge or rebase policy
   rather than imposing one globally. Repository-local instructions define the
@@ -144,23 +142,28 @@ and per-commit rules above remain in force.
 
 ## Decision and historical memory
 
-Before planning substantial work on an existing subsystem:
+The active conversation, Codex transcript/resume state, live Git, and committed
+task-local plans or notes are the default working context. Historical lookup is
+optional and must never establish current ownership, task scope, completion, or
+repository truth.
 
-1. Call Engram `mem_context`; use `mem_search` only when relevant decisions,
-   conventions, or constraints are not already available.
-2. Use ctx when original discussion, rejected approaches, regressions, exact
-   prior commands, or source-session provenance may matter. Follow the installed
-   `ctx-agent-history-search` skill: start with concrete identifiers and a small
-   result limit (normally 5), inspect a focused event window, and broaden only
-   when necessary. Use `--refresh off` only when the current index is sufficiently
-   fresh and stable read-only lookup is desired.
-3. Verify retrieved memory against the current repository.
+- Use ctx only when original discussion, rejected approaches, regressions, exact
+  prior commands, or source-session provenance materially matters. Follow the
+  installed `ctx-agent-history-search` skill: start with concrete identifiers
+  and a small result limit (normally 5), inspect a focused event window, and
+  broaden only when necessary.
+- Treat existing Engram history as legacy reference material. Do not load broad
+  shared recovery context automatically, construct per-task Engram projects, or
+  merge memory stores blindly. Verify any retrieved claim against current source.
+- Curated canonical Engram memory is optional and deliberate. Write it only from
+  a reconciled canonical checkout after integration, not as task-worktree
+  working memory.
 
 For a durable architecture or product decision, update the appropriate ADR or
-design document in Git and save a project-scoped Engram memory with a stable
-topic key and the authoritative path under `Where`. Reuse the topic key as the
-decision evolves. Ask before recording a superseding or conflicting relationship
-between architecture, policy, or decision memories.
+design document in Git. When canonical Engram capture is explicitly appropriate,
+use a stable topic key and record the authoritative path under `Where`; ask before
+recording a superseding or conflicting relationship between architecture,
+policy, or decision memories.
 
 ## Elixir/Phoenix
 

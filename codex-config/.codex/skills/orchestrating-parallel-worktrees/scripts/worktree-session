@@ -4,7 +4,9 @@ emulate -LR zsh
 setopt errexit nounset pipefail
 umask 077
 
-readonly schema_version=1
+readonly current_descriptor_schema_version=2
+readonly legacy_descriptor_schema_version=1
+readonly completion_schema_version=1
 readonly metadata_rel=".superpowers/parallel"
 readonly helper_path="${0:A}"
 
@@ -22,13 +24,12 @@ usage() {
 Usage:
   worktree-session prepare --worktree ABS_ROOT --task-id ID --task-slug SLUG \
     --plan REPO_RELATIVE_PATH --base-ref REF --base-sha FULL_SHA \
-    --shared-project NAME --task-project NAME --target-branch REF \
-    --integration-owner LABEL [--replace]
+    --target-branch REF --integration-owner LABEL [--replace]
   worktree-session guard
   worktree-session launch --worktree ABS_ROOT
   worktree-session resume --worktree ABS_ROOT
   worktree-session claim
-  worktree-session verify --memory-project NAME
+  worktree-session verify --memory-project NAME  # schema-v1 compatibility only
   worktree-session report --state STATE --freshness-source SOURCE [OPTIONS]
   worktree-session report --check
   worktree-session handoff --to THREAD_ID
@@ -176,16 +177,16 @@ command_guard() {
   [[ -f "$descriptor" ]] \
     || die "linked worktree is unprepared: $root; do not write; coordinator must prepare the descriptor and launch a fresh writer through this helper"
 
-  descriptor_preflight "$root" worker
+  descriptor_preflight "$root"
   require_thread_id
 
   if [[ ! -e "$descriptor_metadata/owner" ]]; then
-    info "PREPARED_UNCLAIMED task=$task_id root=$descriptor_root branch=$git_branch memory=$memory_task_project next=claim"
+    info "PREPARED_UNCLAIMED task=$task_id root=$descriptor_root branch=$git_branch next=claim"
     return 0
   fi
 
   require_owner
-  info "WRITER_BOUNDARY task=$task_id owner=$owner_thread_id root=$descriptor_root branch=$git_branch memory=$memory_task_project"
+  info "WRITER_BOUNDARY task=$task_id owner=$owner_thread_id root=$descriptor_root branch=$git_branch"
 }
 
 load_descriptor() {
@@ -216,8 +217,12 @@ load_descriptor() {
   git_branch="$(conf_require "$descriptor_file" git.branch)" || return 1
   git_base_ref="$(conf_require "$descriptor_file" git.baseRef)" || return 1
   git_base_sha="$(conf_require "$descriptor_file" git.baseSha)" || return 1
-  memory_shared_project="$(conf_require "$descriptor_file" memory.sharedProject)" || return 1
-  memory_task_project="$(conf_require "$descriptor_file" memory.taskProject)" || return 1
+  memory_shared_project=""
+  memory_task_project=""
+  if [[ "$session_schema_version" == "$legacy_descriptor_schema_version" ]]; then
+    memory_shared_project="$(conf_require "$descriptor_file" memory.sharedProject)" || return 1
+    memory_task_project="$(conf_require "$descriptor_file" memory.taskProject)" || return 1
+  fi
   integration_target_branch="$(conf_require "$descriptor_file" integration.targetBranch)" || return 1
   integration_owner="$(conf_require "$descriptor_file" integration.owner)" || return 1
 }
@@ -226,8 +231,12 @@ descriptor_identity_preflight() {
   local root="$1" actual_root actual_common
   load_descriptor "$root"
 
-  [[ "$session_schema_version" == "$schema_version" ]] \
-    || die "unsupported schema: expected $schema_version, actual $session_schema_version"
+  case "$session_schema_version" in
+    "$legacy_descriptor_schema_version"|"$current_descriptor_schema_version") ;;
+    *)
+      die "unsupported schema: expected $legacy_descriptor_schema_version or $current_descriptor_schema_version, actual $session_schema_version"
+      ;;
+  esac
   [[ "$session_role" == "implementation-controller" ]] \
     || die "unsupported session role: expected implementation-controller, actual $session_role"
 
@@ -241,7 +250,7 @@ descriptor_identity_preflight() {
 }
 
 descriptor_preflight() {
-  local root="$1" mode="${2:-non-owner}"
+  local root="$1"
   local actual_branch plan_file plan_physical actual_plan_sha
   descriptor_identity_preflight "$root"
 
@@ -267,42 +276,6 @@ descriptor_preflight() {
   [[ "$actual_plan_sha" == "$task_plan_sha" ]] \
     || die "plan digest mismatch: expected $task_plan_sha, actual $actual_plan_sha"
 
-  assert_task_project_unique "$descriptor_root" "$memory_task_project"
-  [[ "$mode" != "worker" ]] || require_worker_project
-}
-
-require_worker_project() {
-  [[ -n "${ENGRAM_PROJECT:-}" ]] || die "ENGRAM_PROJECT is required"
-  [[ "$ENGRAM_PROJECT" == "$memory_task_project" ]] \
-    || die "Engram project mismatch: expected $memory_task_project, actual $ENGRAM_PROJECT"
-}
-
-assert_task_project_unique() {
-  local requested_root="$1" requested_project="$2"
-  local record other_root other_descriptor other_project
-
-  while IFS= read -r -d '' record; do
-    [[ "$record" == worktree\ * ]] || continue
-    other_root="${record#worktree }"
-    [[ "$other_root" == /* ]] \
-      || die "Git reported a non-absolute worktree path: $other_root"
-    [[ -d "$other_root" ]] || continue
-    other_root="$(physical_dir "$other_root")" || return 1
-    [[ "$other_root" != "$requested_root" ]] || continue
-
-    assert_metadata_paths_safe "$other_root"
-    other_descriptor="$(metadata_path "$other_root")/session.conf"
-    [[ -e "$other_descriptor" ]] || continue
-    [[ -f "$other_descriptor" && ! -L "$other_descriptor" ]] \
-      || die "sibling worktree descriptor is not a regular file: $other_descriptor"
-    other_project="$(git config --file "$other_descriptor" \
-      --get memory.taskProject 2>/dev/null)" \
-      || die "sibling worktree descriptor is missing memory.taskProject: $other_descriptor"
-    reject_control_chars "sibling memory.taskProject" "$other_project"
-
-    [[ "$other_project" != "$requested_project" ]] \
-      || die "task project is already assigned: $requested_project belongs to $other_root; requested root $requested_root"
-  done < <(git -C "$requested_root" worktree list --porcelain -z)
 }
 
 parse_prepare_options() {
@@ -319,7 +292,10 @@ parse_prepare_options() {
         prepare_replace=true
         shift
         ;;
-      --worktree|--task-id|--task-slug|--plan|--base-ref|--base-sha|--shared-project|--task-project|--target-branch|--integration-owner)
+      --shared-project|--task-project)
+        die "removed prepare option: $option; schema v2 descriptors do not use Engram projects"
+        ;;
+      --worktree|--task-id|--task-slug|--plan|--base-ref|--base-sha|--target-branch|--integration-owner)
         (( $# >= 2 )) || die "missing value for option: $option"
         key="${option#--}"
         (( ${+prepare_seen[$key]} == 0 )) || die "duplicate option: $option"
@@ -354,24 +330,18 @@ command_prepare() {
   reject_control_chars "CODEX_THREAD_ID" "$CODEX_THREAD_ID"
 
   local worktree_arg task_id_arg task_slug_arg plan_arg base_ref_arg base_sha_arg
-  local shared_project_arg task_project_arg target_branch_arg integration_owner_arg
+  local target_branch_arg integration_owner_arg
   worktree_arg="$(prepare_value worktree worktree)"
   task_id_arg="$(prepare_value task-id "task ID")"
   task_slug_arg="$(prepare_value task-slug "task slug")"
   plan_arg="$(prepare_value plan "plan path")"
   base_ref_arg="$(prepare_value base-ref "base ref")"
   base_sha_arg="$(prepare_value base-sha "base SHA")"
-  shared_project_arg="$(prepare_value shared-project "shared project")"
-  task_project_arg="$(prepare_value task-project "task project")"
   target_branch_arg="$(prepare_value target-branch "target branch")"
   integration_owner_arg="$(prepare_value integration-owner "integration owner")"
 
   [[ "$worktree_arg" == /* ]] || die "worktree path must be absolute"
   require_simple_name "task slug" "$task_slug_arg"
-  require_simple_name "shared project" "$shared_project_arg"
-  require_simple_name "task project" "$task_project_arg"
-  [[ "$task_project_arg" != "$shared_project_arg" ]] \
-    || die "task project must differ from shared project"
   require_full_sha "$base_sha_arg"
 
   local root input_root common_dir git_dir branch current_ref target_ref
@@ -417,8 +387,6 @@ command_prepare() {
     || die "plan must remain inside worktree: expected prefix $root, actual $plan_physical"
   plan_sha="$(sha256_file "$plan_physical")"
 
-  assert_task_project_unique "$root" "$task_project_arg"
-
   assert_metadata_paths_safe "$root"
   metadata="$(metadata_path "$root")"
   mkdir -p -- "$metadata"
@@ -434,7 +402,8 @@ command_prepare() {
 
   temporary="$(mktemp "$metadata/.session.conf.tmp.XXXXXX")"
   {
-    git config --file "$temporary" session.schemaVersion "$schema_version"
+    git config --file "$temporary" session.schemaVersion \
+      "$current_descriptor_schema_version"
     git config --file "$temporary" session.role "implementation-controller"
     git config --file "$temporary" session.preparedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
     git config --file "$temporary" session.preparedByThread "$CODEX_THREAD_ID"
@@ -447,8 +416,6 @@ command_prepare() {
     git config --file "$temporary" git.branch "$branch"
     git config --file "$temporary" git.baseRef "$base_ref_arg"
     git config --file "$temporary" git.baseSha "$base_sha_arg"
-    git config --file "$temporary" memory.sharedProject "$shared_project_arg"
-    git config --file "$temporary" memory.taskProject "$task_project_arg"
     git config --file "$temporary" integration.targetBranch "$target_branch_arg"
     git config --file "$temporary" integration.owner "$integration_owner_arg"
     git config --file "$temporary" --list >/dev/null
@@ -483,41 +450,7 @@ worker_bootstrap_prompt() {
     opening="Start"
   fi
 
-  print -r -- "$opening task $task_id in $descriptor_root using approved plan $task_plan_path. Invoke superpowers:orchestrating-parallel-worktrees. Before any implementation read or write beyond these named gates, run \"$helper_path\" guard and then \"$helper_path\" claim; call Engram mem_current_project and require exactly $memory_task_project; then run \"$helper_path\" verify --memory-project $memory_task_project. After every compaction or resume, repeat guard, claim, mem_current_project, and verify before further repository work. Stop BLOCKED on any mismatch."
-}
-
-toml_basic_string() {
-  local label="$1" value="$2"
-  reject_control_chars "$label" "$value"
-  value="${value//\\/\\\\}"
-  value="${value//\"/\\\"}"
-  print -r -- "\"$value\""
-}
-
-build_codex_engram_boundary() {
-  require_command env
-  typeset -ga codex_engram_environment=(
-    "ENGRAM_PROJECT=$memory_task_project"
-  )
-  typeset -ga codex_engram_config=(
-    -c "mcp_servers.engram.env.ENGRAM_PROJECT=$(toml_basic_string \
-      'Engram task project' "$memory_task_project")"
-  )
-
-  if [[ -n "${ENGRAM_DATA_DIR:-}" ]]; then
-    local data_dir
-    reject_control_chars "Engram data directory" "$ENGRAM_DATA_DIR"
-    [[ "$ENGRAM_DATA_DIR" == /* ]] \
-      || die "Engram data directory must be absolute"
-    data_dir="$(physical_dir "$ENGRAM_DATA_DIR")" || return 1
-    [[ "$data_dir" == "$descriptor_root"/* ]] \
-      || die "Engram data directory must resolve inside worktree: expected prefix $descriptor_root/, actual $data_dir"
-    codex_engram_environment+=("ENGRAM_DATA_DIR=$data_dir")
-    codex_engram_config+=(
-      -c "mcp_servers.engram.env.ENGRAM_DATA_DIR=$(toml_basic_string \
-        'Engram data directory' "$data_dir")"
-    )
-  fi
+  print -r -- "$opening task $task_id in $descriptor_root using approved plan $task_plan_path. Invoke superpowers:orchestrating-parallel-worktrees. Before implementation, reconcile the physical startup root, branch, HEAD, dirty state, active task, and owned mutable artifacts; then run \"$helper_path\" guard and \"$helper_path\" claim. After every compaction or resume, repeat guard, claim, and live-state reconciliation before further repository work. Stop BLOCKED on any mismatch."
 }
 
 command_launch() {
@@ -529,10 +462,7 @@ command_launch() {
     || die "cannot launch while an active owner boundary exists"
 
   bootstrap_prompt="$(worker_bootstrap_prompt launch)"
-  build_codex_engram_boundary
-  command env "${codex_engram_environment[@]}" \
-    codex -p parallel-work "${codex_engram_config[@]}" \
-      -C "$descriptor_root" "$bootstrap_prompt"
+  command codex -p parallel-work -C "$descriptor_root" "$bootstrap_prompt"
 }
 
 command_resume() {
@@ -543,11 +473,8 @@ command_resume() {
   read_owner_claim
 
   resume_prompt="$(worker_bootstrap_prompt resume "$owner_thread_id")"
-  build_codex_engram_boundary
-  command env "${codex_engram_environment[@]}" \
-    codex -p parallel-work "${codex_engram_config[@]}" \
-      -C "$descriptor_root" \
-      resume "$owner_thread_id" "$resume_prompt"
+  command codex -p parallel-work -C "$descriptor_root" \
+    resume "$owner_thread_id" "$resume_prompt"
 }
 
 require_thread_id() {
@@ -582,7 +509,7 @@ command_claim() {
   require_thread_id
   local root
   root="$(current_root)" || return 1
-  descriptor_preflight "$root" worker
+  descriptor_preflight "$root"
 
   local owner_dir="$descriptor_metadata/owner"
   local claim_file="$owner_dir/claim.conf" temporary
@@ -626,11 +553,16 @@ command_verify() {
         ;;
     esac
   done
+  [[ "$memory_project_seen" == true ]] \
+    || die "verify requires exactly --memory-project NAME"
   reject_control_chars "memory project confirmation" "$memory_project"
 
   local root
   root="$(current_root)" || return 1
-  descriptor_preflight "$root" worker
+  descriptor_identity_preflight "$root"
+  [[ "$session_schema_version" == "$legacy_descriptor_schema_version" ]] \
+    || die "schema v2 does not use memory-project verification; run guard and claim instead"
+  descriptor_preflight "$root"
   require_owner
   [[ "$memory_project" == "$memory_task_project" ]] \
     || die "memory project confirmation mismatch: expected $memory_task_project, actual $memory_project"
@@ -989,9 +921,8 @@ command_report_write() {
   root="$(current_root)" || return 1
   if [[ "$report_state" == "BLOCKED" ]]; then
     descriptor_identity_preflight "$root"
-    require_worker_project
   else
-    descriptor_preflight "$root" worker
+    descriptor_preflight "$root"
   fi
   require_owner
 
@@ -1009,7 +940,8 @@ command_report_write() {
 
   temporary="$(mktemp "$descriptor_metadata/.completion.conf.tmp.XXXXXX")"
   {
-    git config --file "$temporary" completion.schemaVersion "$schema_version"
+    git config --file "$temporary" completion.schemaVersion \
+      "$completion_schema_version"
     git config --file "$temporary" completion.state "$report_state"
     git config --file "$temporary" completion.generatedAt "$generated_at"
     git config --file "$temporary" completion.taskId "$task_id"
@@ -1117,8 +1049,8 @@ load_completion() {
 }
 
 assert_completion_shape() {
-  [[ "$completion_schema" == "$schema_version" ]] \
-    || die "unsupported completion schema: expected $schema_version, actual $completion_schema"
+  [[ "$completion_schema" == "$completion_schema_version" ]] \
+    || die "unsupported completion schema: expected $completion_schema_version, actual $completion_schema"
 
   local verification_count evidence_count candidate_count risk_count next_action_count
   validate_config_values "$completion_file" verification.command verification

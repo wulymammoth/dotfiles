@@ -76,9 +76,26 @@ and skill files without replacing or folding the real runtime directory. The
 parallel profile remains inactive unless Codex is launched with
 `-p parallel-work`.
 
-Coordinators prepare and launch an existing linked worktree through the tracked
-helper rather than reconstructing `ENGRAM_PROJECT`, the profile, or `-C`
-arguments manually:
+For ordinary isolated task work, create the worktree before starting Codex, then
+make that worktree the session's startup checkout:
+
+```sh
+git worktree add /path/to/repository/.worktrees/task-slug -b task-branch main
+cd /path/to/repository/.worktrees/task-slug
+codex -p parallel-work
+```
+
+That sole owner does not need a session descriptor, claim, or memory-project
+check. The task profile preserves the tracked model and service defaults while
+disabling both the Engram plugin and Engram MCP server. Codex
+transcript/resume, live Git, and committed task-local plans or notes carry the
+working context.
+
+Use the orchestration helper only when two or more writer sessions will work in
+parallel, or when an existing `.superpowers/parallel/session.conf` already
+selects the protocol. The coordinator names file ownership, dependencies, the
+integration owner, and reconciliation order before preparing and launching each
+writer:
 
 ```sh
 session_helper="${CODEX_HOME:-$HOME/.codex}/skills/orchestrating-parallel-worktrees/scripts/worktree-session"
@@ -92,70 +109,30 @@ CODEX_THREAD_ID="coordinator-thread" "$session_helper" prepare \
   --plan "docs/plans/task-plan.md" \
   --base-ref "main" \
   --base-sha "0123456789abcdef0123456789abcdef01234567" \
-  --shared-project "repository" \
-  --task-project "repository-task-123" \
   --target-branch "main" \
   --integration-owner "integration-coordinator"
 "$session_helper" launch --worktree "$task_root"
 ```
 
 From a repository's primary checkout, `guard` reports `COORDINATOR_ONLY`.
-That state permits coordination and the narrow creation of an approved plan
-and descriptor in a new linked worktree; it does not permit implementation in
-another checkout through `workdir`, `git -C`, or absolute paths. A linked
-worktree without a safe descriptor fails closed. Start its implementation in a
-fresh helper-launched Codex session rather than converting the coordinator into
-its writer.
+That state permits only explicit coordination and the narrow creation of an
+approved plan and descriptor in a new, unclaimed linked worktree. It never
+permits implementation in another checkout through `workdir`, `git -C`, or
+absolute paths. Prepared workers run `guard` and `claim` before writing and
+repeat both plus live-state reconciliation after compaction or resume.
 
-Launch and resume set the descriptor task project both in the worker process
-and in Codex's per-launch Engram MCP server environment. The latter boundary is
-required because an environment variable on the outer Codex process is not, by
-itself, inherited by Codex-managed MCP children. Workers still confirm the
-effective project with `mem_current_project` before writing. The worker startup
-sequence is `guard`, `claim`, `mem_current_project`, and `verify`; repeat it
-after compaction or resume. The helper also rejects a task project already used
-by another linked-worktree descriptor in the same repository.
+New descriptors use schema v2 and contain no memory fields. Existing schema-v1
+descriptors remain readable through their current lifecycle so prepared work is
+not stranded, but launch and resume do not inject their legacy Engram values.
+The deprecated `verify --memory-project` command exists only for schema-v1
+compatibility; schema v2 rejects it with migration guidance.
 
-### Recovering existing sessions that bypassed the helper
-
-If a concurrent session was started from the primary checkout, from an
-unprepared linked worktree, or without the `parallel-work` profile, do not keep
-using that thread as an implementation writer:
-
-1. Stop repository mutations and record the exact worktree root, branch, HEAD,
-   `git status`, current goal, verification state, and remaining work. Leave
-   uncommitted files in place.
-2. Exit the old Codex thread. Do not resume its session ID into the repaired
-   workflow: profiles, startup instructions, working root, and MCP environment
-   are process-start boundaries.
-3. From a coordinator, prepare a descriptor for that existing linked worktree
-   with a unique task project, then launch a fresh worker with
-   `worktree-session launch --worktree <root>`.
-4. In the fresh worker, require `guard`, `claim`, `mem_current_project`, and
-   `verify` to pass before the next write. Reconcile the handoff against live
-   Git rather than trusting recovery memory.
-
-Do not delete the shared canonical Engram history or blindly merge task
-projects. Treat already-interleaved entries as historical recovery material;
-promote only reviewed durable discoveries. Upstream
-[Engram issue #587](https://github.com/Gentleman-Programming/engram/issues/587)
-describes the preferred future model—one logical project with per-worktree
-stores, fork points, and lossless three-way merge—but that design must be
-implemented and qualified before replacing this containment boundary.
-
-Disposable canaries may additionally isolate Engram's database in an existing
-directory beneath the task worktree:
-
-```sh
-mkdir -p "$task_root/.canary-data/live"
-ENGRAM_DATA_DIR="$task_root/.canary-data/live" \
-  "$session_helper" launch --worktree "$task_root"
-```
-
-The helper rejects relative paths, the worktree root itself, and paths or
-symlinks that resolve outside the task worktree. Normal task launches omit
-`ENGRAM_DATA_DIR` and use the configured Engram data store with a distinct
-task project.
+Task-project injection was not a complete session-isolation boundary: it
+isolated explicit or manual Engram MCP calls, but did not isolate automatic
+session registration, prompts, passive capture, or summaries. Preserve existing
+Engram history as searchable legacy material; do not delete or blindly merge it.
+Curated canonical memory, when desired, is written deliberately from a
+reconciled canonical checkout after integration rather than from task worktrees.
 
 Stow activation and provider-backed canary execution remain separate approval
 gates; installing these tracked files does not prove live multi-worker behavior.

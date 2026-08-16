@@ -3,3 +3,6 @@ model = "gpt-5.6-sol"
 model_reasoning_effort = "xhigh"
 [plugins."engram@engram"]
 enabled = false
+
+[mcp_servers.engram]
+enabled = false

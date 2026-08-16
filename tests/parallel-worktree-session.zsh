@@ -26,6 +26,13 @@ assert_equals() {
     || fail "$label: expected '$expected', got '$actual'"
 }
 
+assert_config_missing() {
+  local file="$1" key="$2" label="$3"
+  if git config --file "$file" --get "$key" >/dev/null 2>&1; then
+    fail "$label must be omitted"
+  fi
+}
+
 assert_fails() {
   local expected="$1"
   shift
@@ -67,10 +74,16 @@ prepare_fixture() {
     --plan "$plan_rel" \
     --base-ref main \
     --base-sha "$base_sha" \
-    --shared-project sample \
-    --task-project sample-task-task-1 \
     --target-branch main \
     --integration-owner "sample integrator"
+}
+
+prepare_legacy_fixture() {
+  prepare_fixture >/dev/null
+  local conf="$worktree/.superpowers/parallel/session.conf"
+  git config --file "$conf" session.schemaVersion 1
+  git config --file "$conf" memory.sharedProject sample
+  git config --file "$conf" memory.taskProject sample-task-task-1
 }
 
 prepare_with() {
@@ -81,13 +94,8 @@ run_worker() {
   local thread_id="$1"
   shift
   (cd "$worktree" && \
-    env CODEX_THREAD_ID="$thread_id" ENGRAM_PROJECT=sample-task-task-1 "$@")
-}
-
-run_worker_without_engram() {
-  local thread_id="$1"
-  shift
-  (cd "$worktree" && env -u ENGRAM_PROJECT CODEX_THREAD_ID="$thread_id" "$@")
+    env -u ENGRAM_PROJECT -u ENGRAM_DATA_DIR \
+      CODEX_THREAD_ID="$thread_id" "$@")
 }
 
 make_codex_stub() {
@@ -95,8 +103,8 @@ make_codex_stub() {
   mkdir -p "$stub_bin"
   cat >"$stub_bin/codex" <<'STUB'
 #!/usr/bin/env zsh
-print -r -- "${ENGRAM_PROJECT:-}" >"$CODEX_STUB_ENV"
-print -r -- "${ENGRAM_DATA_DIR:-}" >"$CODEX_STUB_DATA_DIR"
+print -r -- "${ENGRAM_PROJECT-unset}" >"$CODEX_STUB_ENV"
+print -r -- "${ENGRAM_DATA_DIR-unset}" >"$CODEX_STUB_DATA_DIR"
 printf '%s\n' "$@" >"$CODEX_STUB_ARGS"
 STUB
   chmod +x "$stub_bin/codex"
@@ -106,16 +114,7 @@ STUB
 }
 
 run_codex_boundary() {
-  env -u ENGRAM_DATA_DIR PATH="$stub_bin:$PATH" \
-    CODEX_STUB_ENV="$stub_env" CODEX_STUB_DATA_DIR="$stub_data_dir" \
-    CODEX_STUB_ARGS="$stub_args" \
-    "$session_bin" "$@"
-}
-
-run_codex_boundary_with_data_dir() {
-  local data_dir="$1"
-  shift
-  env PATH="$stub_bin:$PATH" ENGRAM_DATA_DIR="$data_dir" \
+  env -u ENGRAM_PROJECT -u ENGRAM_DATA_DIR PATH="$stub_bin:$PATH" \
     CODEX_STUB_ENV="$stub_env" CODEX_STUB_DATA_DIR="$stub_data_dir" \
     CODEX_STUB_ARGS="$stub_args" \
     "$session_bin" "$@"
@@ -145,6 +144,7 @@ run_ready_report() {
 
 run_report_check() {
   (cd "$worktree" && env -u CODEX_THREAD_ID -u ENGRAM_PROJECT \
+    -u ENGRAM_DATA_DIR \
     "$session_bin" report --check)
 }
 
@@ -162,7 +162,7 @@ test_prepare_writes_exact_descriptor() {
     "parallel metadata ignore content"
   assert_equals "$(wc -c <"$metadata/.gitignore" | tr -d ' ')" "2" \
     "parallel metadata ignore byte count"
-  assert_equals "$(git config --file "$conf" --get session.schemaversion)" "1" \
+  assert_equals "$(git config --file "$conf" --get session.schemaversion)" "2" \
     "schema version"
   assert_equals "$(git config --file "$conf" --get session.role)" \
     "implementation-controller" "session role"
@@ -187,10 +187,8 @@ test_prepare_writes_exact_descriptor() {
     "feat/descriptor" "task branch"
   assert_equals "$(git config --file "$conf" --get git.baseref)" "main" "base ref"
   assert_equals "$(git config --file "$conf" --get git.basesha)" "$base_sha" "base SHA"
-  assert_equals "$(git config --file "$conf" --get memory.sharedproject)" \
-    "sample" "shared project"
-  assert_equals "$(git config --file "$conf" --get memory.taskproject)" \
-    "sample-task-task-1" "task project"
+  assert_config_missing "$conf" memory.sharedproject "shared project"
+  assert_config_missing "$conf" memory.taskproject "task project"
   assert_equals "$(git config --file "$conf" --get integration.targetbranch)" \
     "main" "target branch"
   assert_equals "$(git config --file "$conf" --get integration.owner)" \
@@ -212,21 +210,18 @@ test_prepare_rejects_main_checkout_and_plan_escape() {
   assert_fails "linked worktree" prepare_with \
     --worktree "$repo" --task-id TASK-1 --task-slug task-one \
     --plan README.md --base-ref main --base-sha "$base_sha" \
-    --shared-project sample --task-project sample-task-task-1 \
     --target-branch integration --integration-owner integrator
 
   print -r -- "outside" >"$fixture_root/outside-plan.md"
   assert_fails "plan must remain inside" prepare_with \
     --worktree "$worktree" --task-id TASK-1 --task-slug task-one \
     --plan ../outside-plan.md --base-ref main --base-sha "$base_sha" \
-    --shared-project sample --task-project sample-task-task-1 \
     --target-branch main --integration-owner integrator
 
   ln -s "$fixture_root/outside-plan.md" "$worktree/escaped-plan.md"
   assert_fails "plan must remain inside" prepare_with \
     --worktree "$worktree" --task-id TASK-1 --task-slug task-one \
     --plan escaped-plan.md --base-ref main --base-sha "$base_sha" \
-    --shared-project sample --task-project sample-task-task-1 \
     --target-branch main --integration-owner integrator
 }
 
@@ -252,29 +247,19 @@ test_prepare_rejects_identity_mismatches() {
   assert_fails "task branch must differ" prepare_with \
     --worktree "$worktree" --task-id TASK-1 --task-slug task-one \
     --plan "$plan_rel" --base-ref main --base-sha "$base_sha" \
-    --shared-project sample --task-project sample-task-task-1 \
     --target-branch "feat/same-target" --integration-owner integrator
-
-  make_fixture same-project
-  assert_fails "task project must differ" prepare_with \
-    --worktree "$worktree" --task-id TASK-1 --task-slug task-one \
-    --plan "$plan_rel" --base-ref main --base-sha "$base_sha" \
-    --shared-project sample --task-project sample \
-    --target-branch main --integration-owner integrator
 
   make_fixture wrong-base
   local wrong_sha="$(printf '0%.0s' {1..40})"
   assert_fails "base SHA" prepare_with \
     --worktree "$worktree" --task-id TASK-1 --task-slug task-one \
     --plan "$plan_rel" --base-ref main --base-sha "$wrong_sha" \
-    --shared-project sample --task-project sample-task-task-1 \
     --target-branch main --integration-owner integrator
 
   make_fixture control
   assert_fails "control character" prepare_with \
     --worktree "$worktree" --task-id $'bad\nvalue' --task-slug task-one \
     --plan "$plan_rel" --base-ref main --base-sha "$base_sha" \
-    --shared-project sample --task-project sample-task-task-1 \
     --target-branch main --integration-owner integrator
 }
 
@@ -283,7 +268,6 @@ test_prepare_requires_coordinator_and_explicit_replace() {
   assert_fails "CODEX_THREAD_ID" env -u CODEX_THREAD_ID "$session_bin" prepare \
     --worktree "$worktree" --task-id TASK-1 --task-slug task-one \
     --plan "$plan_rel" --base-ref main --base-sha "$base_sha" \
-    --shared-project sample --task-project sample-task-task-1 \
     --target-branch main --integration-owner integrator
 
   prepare_fixture >/dev/null
@@ -291,50 +275,39 @@ test_prepare_requires_coordinator_and_explicit_replace() {
   CODEX_THREAD_ID=coordinator-thread "$session_bin" prepare --replace \
     --worktree "$worktree" --task-id TASK-1 --task-slug task-one \
     --plan "$plan_rel" --base-ref main --base-sha "$base_sha" \
-    --shared-project sample --task-project sample-task-task-1 \
     --target-branch main --integration-owner integrator >/dev/null
 }
 
-test_prepare_rejects_duplicate_task_project() {
-  make_fixture duplicate-task-project
+test_prepare_rejects_removed_memory_options() {
+  make_fixture removed-memory-options
+  assert_fails "removed prepare option: --shared-project" prepare_with \
+    --worktree "$worktree" --task-id TASK-1 --task-slug task-one \
+    --plan "$plan_rel" --base-ref main --base-sha "$base_sha" \
+    --shared-project sample --target-branch main \
+    --integration-owner integrator
+  assert_fails "removed prepare option: --task-project" prepare_with \
+    --worktree "$worktree" --task-id TASK-1 --task-slug task-one \
+    --plan "$plan_rel" --base-ref main --base-sha "$base_sha" \
+    --task-project sample-task-task-1 --target-branch main \
+    --integration-owner integrator
+}
+
+test_prepare_allows_multiple_descriptors_without_project_uniqueness() {
+  make_fixture multiple-descriptors
   prepare_fixture >/dev/null
 
   local other_worktree="$fixture_root/other worktree"
   git -C "$repo" worktree add -q -b feat/other-task "$other_worktree" main
-
-  assert_fails "task project is already assigned" \
-    env CODEX_THREAD_ID=coordinator-thread "$session_bin" prepare \
-      --worktree "$other_worktree" --task-id TASK-2 --task-slug task-two \
-      --plan "$plan_rel" --base-ref main --base-sha "$base_sha" \
-      --shared-project sample --task-project sample-task-task-1 \
-      --target-branch main --integration-owner integrator
-  [[ ! -e "$other_worktree/.superpowers/parallel/session.conf" ]] \
-    || fail "duplicate task project must fail before writing a descriptor"
-}
-
-test_runtime_preflight_rejects_duplicate_task_project_drift() {
-  make_fixture duplicate-task-project-drift
-  prepare_fixture >/dev/null
-
-  local other_worktree="$fixture_root/other worktree"
-  git -C "$repo" worktree add -q -b feat/other-task-drift \
-    "$other_worktree" main
   CODEX_THREAD_ID=coordinator-thread "$session_bin" prepare \
     --worktree "$other_worktree" --task-id TASK-2 --task-slug task-two \
     --plan "$plan_rel" --base-ref main --base-sha "$base_sha" \
-    --shared-project sample --task-project sample-task-task-2 \
     --target-branch main --integration-owner integrator >/dev/null
 
-  git config --file \
-    "$other_worktree/.superpowers/parallel/session.conf" \
-    memory.taskProject sample-task-task-1
-
-  assert_fails "task project is already assigned" run_worker worker-a \
-    "$session_bin" guard
-  assert_fails "task project is already assigned" run_worker worker-a \
-    "$session_bin" claim
-  [[ ! -e "$worktree/.superpowers/parallel/owner" ]] \
-    || fail "duplicate task-project drift must fail before ownership"
+  local other_conf="$other_worktree/.superpowers/parallel/session.conf"
+  assert_equals "$(git config --file "$other_conf" --get session.schemaversion)" \
+    "2" "second descriptor schema"
+  assert_config_missing "$other_conf" memory.taskproject \
+    "second descriptor task project"
 }
 
 test_preflight_requires_exact_metadata_shape() {
@@ -360,7 +333,6 @@ test_preflight_requires_exact_metadata_shape() {
     env CODEX_THREAD_ID=coordinator-thread "$session_bin" prepare --replace \
       --worktree "$worktree" --task-id TASK-1 --task-slug task-one \
       --plan "$plan_rel" --base-ref main --base-sha "$base_sha" \
-      --shared-project sample --task-project sample-task-task-1 \
       --target-branch main --integration-owner integrator
   [[ -z "$(ls -A "$worktree/.superpowers/parallel/session.conf")" ]] \
     || fail "failed descriptor replacement wrote inside a directory"
@@ -385,21 +357,20 @@ test_guard_classifies_session_boundary() {
     "$session_bin" guard
 
   prepare_fixture >/dev/null
-  assert_fails "ENGRAM_PROJECT" run_worker_without_engram worker-a \
-    "$session_bin" guard
-
   local prepared_output
   prepared_output="$(run_worker worker-a "$session_bin" guard)"
   assert_contains "$prepared_output" \
     "PREPARED_UNCLAIMED task=TASK-1 root=${worktree:A}"
-  assert_contains "$prepared_output" "memory=sample-task-task-1"
+  [[ "$prepared_output" != *"memory="* ]] \
+    || fail "schema-v2 guard output must not expose a memory project"
 
   run_worker worker-a "$session_bin" claim >/dev/null
   local writer_output
   writer_output="$(run_worker worker-a "$session_bin" guard)"
   assert_contains "$writer_output" \
     "WRITER_BOUNDARY task=TASK-1 owner=worker-a root=${worktree:A}"
-  assert_contains "$writer_output" "memory=sample-task-task-1"
+  [[ "$writer_output" != *"memory="* ]] \
+    || fail "schema-v2 writer boundary must not expose a memory project"
   assert_fails "current owner mismatch" run_worker worker-b \
     "$session_bin" guard
 }
@@ -409,9 +380,7 @@ test_claim_requires_identity_and_is_idempotent() {
   prepare_fixture >/dev/null
 
   assert_fails "CODEX_THREAD_ID" env -u CODEX_THREAD_ID \
-    ENGRAM_PROJECT=sample-task-task-1 "$session_bin" claim
-  assert_fails "ENGRAM_PROJECT" run_worker_without_engram worker-a \
-    "$session_bin" claim
+    -u ENGRAM_PROJECT -u ENGRAM_DATA_DIR "$session_bin" claim
   assert_fails "claim does not accept options" run_worker worker-a \
     "$session_bin" claim --worktree /definitely/wrong
   [[ ! -e "$worktree/.superpowers/parallel/owner" ]] \
@@ -465,9 +434,17 @@ test_incomplete_claim_fails_closed() {
     || fail "incomplete claim must be preserved"
 }
 
-test_verify_handoff_and_release() {
-  make_fixture ownership
+test_verify_is_legacy_only_and_handoff_release_still_work() {
+  make_fixture verify-v2
   prepare_fixture >/dev/null
+  run_worker worker-a "$session_bin" claim >/dev/null
+  assert_fails "schema v2 does not use memory-project verification" \
+    run_worker worker-a "$session_bin" verify \
+      --memory-project sample-task-task-1
+  run_worker worker-a "$session_bin" release >/dev/null
+
+  make_fixture ownership
+  prepare_legacy_fixture
   run_worker worker-a "$session_bin" claim >/dev/null
 
   local verify_output
@@ -501,13 +478,11 @@ test_reverification_detects_drift_but_owner_can_release() {
   print -r -- "changed" >>"$worktree/$plan_rel"
 
   assert_fails "plan digest" run_worker worker-a "$session_bin" claim
-  assert_fails "plan digest" run_worker worker-a "$session_bin" verify \
-    --memory-project sample-task-task-1
+  assert_fails "plan digest" run_worker worker-a "$session_bin" guard
   assert_fails "active owner" env CODEX_THREAD_ID=coordinator-thread \
     "$session_bin" prepare --replace --worktree "$worktree" \
     --task-id TASK-1 --task-slug task-one --plan "$plan_rel" \
-    --base-ref main --base-sha "$base_sha" --shared-project sample \
-    --task-project sample-task-task-1 --target-branch main \
+    --base-ref main --base-sha "$base_sha" --target-branch main \
     --integration-owner integrator
 
   run_worker worker-a "$session_bin" release >/dev/null
@@ -528,8 +503,15 @@ test_descriptor_mutations_fail_closed() {
   make_fixture schema
   prepare_fixture >/dev/null
   conf="$worktree/.superpowers/parallel/session.conf"
-  git config --file "$conf" session.schemaVersion 2
+  git config --file "$conf" session.schemaVersion 3
   assert_claim_fails_without_owner "unsupported schema"
+
+  make_fixture legacy-missing-memory
+  prepare_legacy_fixture
+  conf="$worktree/.superpowers/parallel/session.conf"
+  git config --file "$conf" --unset memory.taskProject
+  assert_claim_fails_without_owner \
+    "missing descriptor field: memory.taskProject"
 
   make_fixture missing-field
   prepare_fixture >/dev/null
@@ -611,114 +593,80 @@ test_launch_and_resume_use_exact_boundaries() {
   make_codex_stub
 
   run_codex_boundary launch --worktree "$worktree"
-  assert_equals "$(<"$stub_env")" "sample-task-task-1" \
-    "launch Engram project"
-  assert_equals "$(<"$stub_data_dir")" "" "launch Engram data directory"
+  assert_equals "$(<"$stub_env")" "unset" "launch Engram project"
+  assert_equals "$(<"$stub_data_dir")" "unset" \
+    "launch Engram data directory"
 
   local -a launch_args
   launch_args=("${(@f)$(<"$stub_args")}")
-  assert_equals "${#launch_args[@]}" "7" "launch argument count"
+  assert_equals "${#launch_args[@]}" "5" "launch argument count"
   assert_equals "${launch_args[1]}" "-p" "launch profile flag"
   assert_equals "${launch_args[2]}" "parallel-work" "launch profile"
-  assert_equals "${launch_args[3]}" "-c" "launch config flag"
-  assert_equals "${launch_args[4]}" \
-    'mcp_servers.engram.env.ENGRAM_PROJECT="sample-task-task-1"' \
-    "launch task-project MCP config"
-  assert_equals "${launch_args[5]}" "-C" "launch root flag"
-  assert_equals "${launch_args[6]}" "${worktree:A}" "launch physical root"
+  assert_equals "${launch_args[3]}" "-C" "launch root flag"
+  assert_equals "${launch_args[4]}" "${worktree:A}" "launch physical root"
 
-  local launch_prompt="${launch_args[7]}"
+  local launch_prompt="${launch_args[5]}"
   assert_contains "$launch_prompt" "TASK-1"
   assert_contains "$launch_prompt" "$plan_rel"
   assert_contains "$launch_prompt" "superpowers:orchestrating-parallel-worktrees"
   assert_contains "$launch_prompt" "${session_bin:A}"
   assert_contains "$launch_prompt" "guard"
   assert_contains "$launch_prompt" "claim"
-  assert_contains "$launch_prompt" "mem_current_project"
-  assert_contains "$launch_prompt" \
-    "verify --memory-project sample-task-task-1"
   assert_contains "$launch_prompt" "BLOCKED"
   assert_contains "$launch_prompt" "compaction"
-
-  local isolated_data_dir="$worktree/isolated \"data\" \\ state"
-  mkdir -p -- "$isolated_data_dir"
-  run_codex_boundary_with_data_dir "$isolated_data_dir" \
-    launch --worktree "$worktree"
-  assert_equals "$(<"$stub_data_dir")" "${isolated_data_dir:A}" \
-    "isolated launch Engram data directory"
-  launch_args=("${(@f)$(<"$stub_args")}")
-  assert_equals "${#launch_args[@]}" "9" \
-    "isolated launch argument count"
-  assert_equals "${launch_args[3]}" "-c" \
-    "isolated launch project config flag"
-  assert_equals "${launch_args[4]}" \
-    'mcp_servers.engram.env.ENGRAM_PROJECT="sample-task-task-1"' \
-    "isolated launch task-project MCP config"
-  assert_equals "${launch_args[5]}" "-c" \
-    "isolated launch data config flag"
-  local expected_data_config="mcp_servers.engram.env.ENGRAM_DATA_DIR=\"${worktree:A}/isolated \\\"data\\\" \\\\ state\""
-  assert_equals "${launch_args[6]}" "$expected_data_config" \
-    "isolated launch data-directory MCP config"
-  assert_equals "${launch_args[7]}" "-C" "isolated launch root flag"
-  assert_equals "${launch_args[8]}" "${worktree:A}" \
-    "isolated launch physical root"
+  [[ "$launch_prompt" != *"mem_current_project"* ]] \
+    || fail "schema-v2 launch prompt must not require mem_current_project"
+  [[ "$launch_prompt" != *"verify --memory-project"* ]] \
+    || fail "schema-v2 launch prompt must not require memory verification"
 
   run_worker worker-a "$session_bin" claim >/dev/null
   assert_fails "active owner" run_codex_boundary launch --worktree "$worktree"
 
   run_codex_boundary resume --worktree "$worktree"
-  assert_equals "$(<"$stub_env")" "sample-task-task-1" \
-    "resume Engram project"
-  assert_equals "$(<"$stub_data_dir")" "" "resume Engram data directory"
+  assert_equals "$(<"$stub_env")" "unset" "resume Engram project"
+  assert_equals "$(<"$stub_data_dir")" "unset" \
+    "resume Engram data directory"
   local -a resume_args
   resume_args=("${(@f)$(<"$stub_args")}")
-  assert_equals "${#resume_args[@]}" "9" "resume argument count"
+  assert_equals "${#resume_args[@]}" "7" "resume argument count"
   assert_equals "${resume_args[1]}" "-p" "resume profile flag"
   assert_equals "${resume_args[2]}" "parallel-work" "resume profile"
-  assert_equals "${resume_args[3]}" "-c" "resume config flag"
-  assert_equals "${resume_args[4]}" \
-    'mcp_servers.engram.env.ENGRAM_PROJECT="sample-task-task-1"' \
-    "resume task-project MCP config"
-  assert_equals "${resume_args[5]}" "-C" "resume root flag"
-  assert_equals "${resume_args[6]}" "${worktree:A}" "resume physical root"
-  assert_equals "${resume_args[7]}" "resume" "resume subcommand"
-  assert_equals "${resume_args[8]}" "worker-a" "recorded resume owner"
-  local resume_prompt="${resume_args[9]}"
+  assert_equals "${resume_args[3]}" "-C" "resume root flag"
+  assert_equals "${resume_args[4]}" "${worktree:A}" "resume physical root"
+  assert_equals "${resume_args[5]}" "resume" "resume subcommand"
+  assert_equals "${resume_args[6]}" "worker-a" "recorded resume owner"
+  local resume_prompt="${resume_args[7]}"
   assert_contains "$resume_prompt" "TASK-1"
   assert_contains "$resume_prompt" "$plan_rel"
   assert_contains "$resume_prompt" "superpowers:orchestrating-parallel-worktrees"
   assert_contains "$resume_prompt" "${session_bin:A}"
   assert_contains "$resume_prompt" "guard"
   assert_contains "$resume_prompt" "claim"
-  assert_contains "$resume_prompt" "mem_current_project"
-  assert_contains "$resume_prompt" \
-    "verify --memory-project sample-task-task-1"
   assert_contains "$resume_prompt" "BLOCKED"
   assert_contains "$resume_prompt" "compaction"
+  [[ "$resume_prompt" != *"mem_current_project"* ]] \
+    || fail "schema-v2 resume prompt must not require mem_current_project"
+  [[ "$resume_prompt" != *"verify --memory-project"* ]] \
+    || fail "schema-v2 resume prompt must not require memory verification"
 
-  run_codex_boundary_with_data_dir "$isolated_data_dir" \
-    resume --worktree "$worktree"
-  assert_equals "$(<"$stub_data_dir")" "${isolated_data_dir:A}" \
-    "isolated resume Engram data directory"
+  make_fixture legacy-launch
+  prepare_legacy_fixture
+  make_codex_stub
+  run_codex_boundary launch --worktree "$worktree"
+  assert_equals "$(<"$stub_env")" "unset" \
+    "legacy launch must not inject Engram project"
+  launch_args=("${(@f)$(<"$stub_args")}")
+  assert_equals "${#launch_args[@]}" "5" "legacy launch argument count"
+  [[ "${launch_args[5]}" != *"mem_current_project"* ]] \
+    || fail "legacy launch prompt must not require mem_current_project"
+  run_worker worker-a "$session_bin" claim >/dev/null
+  run_codex_boundary resume --worktree "$worktree"
+  assert_equals "$(<"$stub_env")" "unset" \
+    "legacy resume must not inject Engram project"
   resume_args=("${(@f)$(<"$stub_args")}")
-  assert_equals "${#resume_args[@]}" "11" \
-    "isolated resume argument count"
-  assert_equals "${resume_args[3]}" "-c" \
-    "isolated resume project config flag"
-  assert_equals "${resume_args[4]}" \
-    'mcp_servers.engram.env.ENGRAM_PROJECT="sample-task-task-1"' \
-    "isolated resume task-project MCP config"
-  assert_equals "${resume_args[5]}" "-c" \
-    "isolated resume data config flag"
-  assert_equals "${resume_args[6]}" "$expected_data_config" \
-    "isolated resume data-directory MCP config"
-  assert_equals "${resume_args[7]}" "-C" "isolated resume root flag"
-  assert_equals "${resume_args[8]}" "${worktree:A}" \
-    "isolated resume physical root"
-  assert_equals "${resume_args[9]}" "resume" \
-    "isolated resume subcommand"
-  assert_equals "${resume_args[10]}" "worker-a" \
-    "isolated resume recorded owner"
+  assert_equals "${#resume_args[@]}" "7" "legacy resume argument count"
+  [[ "${resume_args[7]}" != *"verify --memory-project"* ]] \
+    || fail "legacy resume prompt must not require memory verification"
 
   if rg -n '(^|[^[:alnum:]_])eval([^[:alnum:]_]|$)' "$session_bin" >/dev/null; then
     fail "launch helper must not invoke eval"
@@ -727,32 +675,6 @@ test_launch_and_resume_use_exact_boundaries() {
     "$session_bin" >/dev/null; then
     fail "launch helper must not reconstruct codex as a scalar command string"
   fi
-}
-
-test_launch_rejects_unisolated_data_directory() {
-  make_fixture launch-data-boundary
-  prepare_fixture >/dev/null
-  make_codex_stub
-
-  assert_fails "Engram data directory must be absolute" \
-    run_codex_boundary_with_data_dir relative-data \
-      launch --worktree "$worktree"
-
-  local outside_data="$fixture_root/outside-data"
-  mkdir -p -- "$outside_data"
-  assert_fails "Engram data directory must resolve inside worktree" \
-    run_codex_boundary_with_data_dir "$outside_data" \
-      launch --worktree "$worktree"
-
-  local escaped_link="$worktree/escaped-data"
-  ln -s -- "$outside_data" "$escaped_link"
-  assert_fails "Engram data directory must resolve inside worktree" \
-    run_codex_boundary_with_data_dir "$escaped_link" \
-      launch --worktree "$worktree"
-
-  assert_fails "Engram data directory must resolve inside worktree" \
-    run_codex_boundary_with_data_dir "$worktree" \
-      launch --worktree "$worktree"
 }
 
 test_resume_requires_complete_owner() {
@@ -794,6 +716,22 @@ test_report_state_consistency() {
   print -r -- "still dirty" >>"$worktree/README.md"
   assert_fails "zero local commits" \
     run_ready_report LOCAL_READY_UNCOMMITTED
+}
+
+test_legacy_descriptor_report_compatibility() {
+  make_fixture legacy-report
+  prepare_legacy_fixture
+  run_worker worker-a "$session_bin" claim >/dev/null
+  make_task_commit "legacy report"
+  run_ready_report LOCAL_READY_COMMITTED >/dev/null
+  run_report_check >/dev/null
+
+  local completion="$worktree/.superpowers/parallel/completion.conf"
+  assert_equals \
+    "$(git config --file "$completion" --get completion.schemaversion)" \
+    "1" "legacy descriptor completion schema"
+  assert_equals "$(git config --file "$completion" --get completion.taskid)" \
+    "TASK-1" "legacy descriptor completion task"
 }
 
 test_report_requires_evidence_and_blocker_fields() {
@@ -1072,20 +1010,20 @@ test_prepare_rejects_main_checkout_and_plan_escape
 test_prepare_rejects_unsafe_metadata
 test_prepare_rejects_identity_mismatches
 test_prepare_requires_coordinator_and_explicit_replace
-test_prepare_rejects_duplicate_task_project
-test_runtime_preflight_rejects_duplicate_task_project_drift
+test_prepare_rejects_removed_memory_options
+test_prepare_allows_multiple_descriptors_without_project_uniqueness
 test_preflight_requires_exact_metadata_shape
 test_guard_classifies_session_boundary
 test_claim_requires_identity_and_is_idempotent
 test_claim_race_has_one_winner
 test_incomplete_claim_fails_closed
-test_verify_handoff_and_release
+test_verify_is_legacy_only_and_handoff_release_still_work
 test_reverification_detects_drift_but_owner_can_release
 test_descriptor_mutations_fail_closed
 test_launch_and_resume_use_exact_boundaries
-test_launch_rejects_unisolated_data_directory
 test_resume_requires_complete_owner
 test_report_state_consistency
+test_legacy_descriptor_report_compatibility
 test_report_requires_evidence_and_blocker_fields
 test_report_records_exact_evidence_and_freshness
 test_report_fetched_and_unavailable_freshness

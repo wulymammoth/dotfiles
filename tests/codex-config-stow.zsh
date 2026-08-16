@@ -22,8 +22,8 @@ print -r -- "sentinel runtime state" >"$test_root/.codex/state.json"
 
 profile_source="$repo_root/codex-config/.codex/parallel-work.config.toml"
 [[ -f "$profile_source" ]] || fail "parallel-work profile is missing"
-[[ "$(<"$profile_source")" == $'[plugins."engram@engram"]\nenabled = false' ]] \
-  || fail "parallel-work profile must contain only the Engram plugin override"
+[[ "$(<"$profile_source")" == $'service_tier = "default"\nmodel = "gpt-5.6-sol"\nmodel_reasoning_effort = "xhigh"\n[plugins."engram@engram"]\nenabled = false\n\n[mcp_servers.engram]\nenabled = false' ]] \
+  || fail "parallel-work profile must preserve model defaults and disable the Engram plugin and MCP server"
 
 skill_source="$repo_root/codex-config/.codex/skills/orchestrating-parallel-worktrees/SKILL.md"
 helper_source="$repo_root/codex-config/.codex/skills/orchestrating-parallel-worktrees/scripts/worktree-session"
@@ -38,19 +38,23 @@ for required_policy in \
   "read-only" \
   "shared runtime" \
   "After compaction" \
+  "Ordinary single-task work" \
+  "does not require a descriptor or claim" \
+  "two or more writer sessions" \
+  'existing `.superpowers/parallel/session.conf`' \
   ".superpowers/parallel/session.conf" \
   "orchestrating-parallel-worktrees" \
-  '`worktree-session guard`' \
-  '`COORDINATOR_ONLY`' \
   "startup checkout is the only checkout it may mutate" \
-  "plan and descriptor bootstrap" \
   '`workdir`, `git -C`, or absolute paths' \
-  "claim" \
-  "mem_current_project"
+  "explicit integration owner"
 do
   rg --fixed-strings --quiet "$required_policy" "$global_agents" \
     || fail "global AGENTS policy is missing: $required_policy"
 done
+
+if rg --fixed-strings --quiet "mem_current_project" "$global_agents"; then
+  fail "ordinary global policy must not require mem_current_project"
+fi
 
 for required_boundary in \
   '`worktree-session guard`' \

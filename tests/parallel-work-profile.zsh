@@ -33,8 +33,8 @@ run_codex() {
 
 command -v codex >/dev/null 2>&1 || fail "codex is not installed"
 [[ -f "$profile_source" ]] || fail "tracked parallel-work profile is missing"
-[[ "$(<"$profile_source")" == $'[plugins."engram@engram"]\nenabled = false' ]] \
-  || fail "parallel-work overlay must contain only the Engram plugin override"
+[[ "$(<"$profile_source")" == $'service_tier = "default"\nmodel = "gpt-5.6-sol"\nmodel_reasoning_effort = "xhigh"\n[plugins."engram@engram"]\nenabled = false\n\n[mcp_servers.engram]\nenabled = false' ]] \
+  || fail "parallel-work overlay must preserve model defaults and disable the Engram plugin and MCP server"
 
 cat >"$codex_home/config.toml" <<'TOML'
 [mcp_servers.engram]
@@ -57,22 +57,10 @@ mcp_json="$test_root/mcp.json"
 run_codex mcp list --json >"$mcp_json"
 [[ "$(/usr/bin/plutil -extract 0.name raw -o - "$mcp_json")" == "engram" ]] \
   || fail "synthetic base Engram MCP entry was not retained"
-[[ "$(/usr/bin/plutil -extract 0.enabled raw -o - "$mcp_json")" == "true" ]] \
-  || fail "synthetic base Engram MCP entry is not enabled"
+[[ "$(/usr/bin/plutil -extract 0.enabled raw -o - "$mcp_json")" == "false" ]] \
+  || fail "parallel-work profile did not disable the inherited Engram MCP entry"
 [[ "$(/usr/bin/plutil -extract 0.transport.command raw -o - "$mcp_json")" == \
   "/usr/bin/true" ]] || fail "synthetic MCP command changed under the profile"
-
-override_json="$test_root/mcp-override.json"
-run_codex \
-  -c 'mcp_servers.engram.env.ENGRAM_PROJECT="synthetic-task-project"' \
-  -c 'mcp_servers.engram.env.ENGRAM_DATA_DIR="/private/tmp/synthetic task data"' \
-  mcp list --json >"$override_json"
-[[ "$(/usr/bin/plutil -extract 0.transport.env.ENGRAM_PROJECT raw -o - \
-  "$override_json")" == "synthetic-task-project" ]] \
-  || fail "per-launch Engram task project did not reach MCP server config"
-[[ "$(/usr/bin/plutil -extract 0.transport.env.ENGRAM_DATA_DIR raw -o - \
-  "$override_json")" == "/private/tmp/synthetic task data" ]] \
-  || fail "per-launch Engram data directory did not reach MCP server config"
 
 if run_codex debug prompt-input --help >/dev/null 2>&1; then
   prompt_json="$test_root/prompt-input.json"
@@ -82,5 +70,5 @@ if run_codex debug prompt-input --help >/dev/null 2>&1; then
     || fail "synthetic base instruction file was not retained"
 fi
 
-print -- "PASS: parallel-work profile syntax and base MCP retention"
+print -- "PASS: parallel-work profile disables Engram while retaining base config"
 print -- "PENDING_CANARY: no safe offline Codex surface proved hook suppression plus policy and Superpowers loading"
