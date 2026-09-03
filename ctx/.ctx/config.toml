@@ -1,8 +1,0 @@
-[daemon]
-enabled = true
-
-[search]
-semantic = true
-
-[upgrade]
-auto = "off"

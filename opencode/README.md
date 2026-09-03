@@ -21,10 +21,12 @@ opencode/.config/opencode/
 From your dotfiles directory:
 
 ```bash
-stow opencode
+stow --no-folding opencode
 ```
 
-This symlinks the config to `~/.config/opencode/`.
+This links tracked files into `~/.config/opencode/` without folding whole
+directories into repository symlinks. The real local `skills/` directory can
+therefore safely coexist with installer-managed skills such as ctx.
 
 ## Configuration Strategy
 

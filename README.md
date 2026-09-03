@@ -32,9 +32,9 @@ If you want tighter control than the default allow-list in [`Makefile`](./Makefi
 ```sh
 cd ~/dotfiles
 stow -nv zsh git tmux nvim ghostty starship ssh ripgrep gdircolors
-stow --no-folding -nv ctx codex-config
+stow --no-folding -nv codex-config
 stow -v zsh git tmux nvim ghostty starship ssh ripgrep gdircolors
-stow --no-folding -v ctx codex-config
+stow --no-folding -v codex-config
 ```
 
 Use `make stow-list` to inspect the current default package set.
@@ -57,17 +57,16 @@ Use `make stow-list` to inspect the current default package set.
 | `gdircolors/` | `~/.dir_colors` | Shared directory color theme for shell tools |
 | `asdf/` | `~/.asdfrc`, `~/.tool-versions` | Runtime version management |
 | `bat/` | `~/.config/bat/` | `bat` theme/config |
-| `ctx/` | `~/.ctx/config.toml` | Durable ctx preferences; private index/runtime state remains local |
 | `codex-config/` | `~/.codex/AGENTS.md`, `~/.codex/policies/`, `~/.codex/parallel-work.config.toml`, `~/.codex/skills/orchestrating-parallel-worktrees/` | Global and progressive Codex policy plus the opt-in parallel-work profile and local orchestration skill; private runtime state remains local |
 | `homebrew/` | Brew bundle files | Package bootstrap via Brewfile |
 
-The `ctx` package is state-adjacent: `~/.ctx` must remain a real local directory
-because it contains private, mutable search indexes and runtime files. The
-Makefile therefore stows `ctx` separately with `--no-folding`, linking only
-`config.toml`. The installer-managed `~/.local/bin/ctx` binary is not part of
-the package. Bundled ctx agent skills also remain installer-managed; the
-OpenCode copy is ignored by Git because its global skills directory links into
-this repository.
+The installer manages the `~/.local/bin/ctx` binary and bundled agent skills.
+Ctx v1 requires `~/.ctx/config.toml` to remain an owner-private regular file,
+so neither its config nor its private mutable indexes are managed through Stow.
+Tracked shell policy keeps automatic upgrades opt-in and semantic search off;
+automatic lexical indexing remains ctx's default. Activate the optional
+`opencode` package with `stow --no-folding opencode` so its skills root remains
+a real local directory where ctx can safely manage its own bundled skill.
 
 The `codex-config` package follows the same state-adjacent pattern. `~/.codex`
 must remain a real local directory because it contains private, mutable runtime

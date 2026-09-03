@@ -157,9 +157,11 @@ repository truth.
 
 - Use ctx only when original discussion, rejected approaches, regressions, exact
   prior commands, or source-session provenance materially matters. Follow the
-  installed `ctx-agent-history-search` skill: start with concrete identifiers
-  and a small result limit (normally 5), inspect a focused event window, and
-  broaden only when necessary.
+  installed `ctx` skill: start with concrete identifiers and a small result
+  limit (normally 5), inspect a focused event window, and broaden only when
+  necessary. Use `--primary-only` for user-intent and decision provenance;
+  retain the default primary-plus-subagent scope for implementation, test, and
+  failure evidence.
 - Treat existing Engram history as legacy reference material. Do not load broad
   shared recovery context automatically, construct per-task Engram projects, or
   merge memory stores blindly. Verify any retrieved claim against current source.

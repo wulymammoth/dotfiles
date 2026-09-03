@@ -123,7 +123,7 @@ policy_link="$test_root/.codex/policies/bounded-autonomy.md"
   || fail "existing Codex runtime state changed"
 
 apply_recipe="$(make -s -n -C "$repo_root" stow-apply)"
-[[ "$apply_recipe" == *'stow --no-folding -v ctx codex-config'* ]] \
+[[ "$apply_recipe" == *'stow --no-folding -v codex-config'* ]] \
   || fail "codex-config must use the state-adjacent no-folding Stow command"
 [[ "$(make -s -C "$repo_root" stow-list)" == *$'\ncodex-config'* ]] \
   || fail "codex-config must appear in the default Stow package list"
