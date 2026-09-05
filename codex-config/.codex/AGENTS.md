@@ -68,6 +68,9 @@ and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
 
 - Prefer `fd` over `find` and `rg` over `grep`; use fallbacks when unavailable.
 - Use Context7 when current external library or framework documentation matters.
+- For Maestro-based native UI tests or explicit Expo/React Native harness
+  adoption, use `maestro-mobile-testing`. Retain the repository's chosen test
+  stack; global tool availability does not authorize runtime or cloud actions.
 - Use the available planning/task tool for substantial multi-step work and keep
   its status current.
 - Write shell snippets for their declared interpreter. In zsh, the special

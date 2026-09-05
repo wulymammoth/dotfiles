@@ -140,6 +140,13 @@ gates; installing these tracked files does not prove live multi-worker behavior.
 
 These packages are kept in the repo for selective use and are not part of the default `make stow-*` allow-list:
 
+`maestro/` provides the pinned mobile UI test CLI in `~/.local/bin`. Use
+`make maestro-install`, `make maestro-preview`, `make maestro-activate`, then
+`make maestro-doctor`. Its release pin, checksum, setup/check commands, and Codex
+guidance are version-controlled; binaries, credentials, and runtime state are
+not. See [shared Maestro setup](docs/maestro.md). App-specific flows and simulator
+ownership remain project-owned; this setup does not create regression coverage.
+
 `alacritty/`, `cursor/`, `iterm2/`, `neofetch/`, `opencode/`, `wezterm/`, `wtf/`
 
 ## Tooling

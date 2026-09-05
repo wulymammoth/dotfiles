@@ -1,0 +1,231 @@
+#!/usr/bin/env python3
+"""Pinned Maestro installation and prerequisite checks; Python 3.9+, stdlib only."""
+import argparse
+import hashlib
+import json
+import os
+import platform
+import re
+import shutil
+import stat
+import subprocess
+import sys
+import tempfile
+import zipfile
+from pathlib import Path, PurePosixPath
+
+PIN_FILE = Path(__file__).resolve().parent.parent / "share/maestro-toolchain/pin.json"
+RELEASES = "https://github.com/mobile-dev-inc/Maestro/releases/download"
+
+
+class ToolchainError(Exception):
+    pass
+
+
+def load_pin(filename=PIN_FILE):
+    pin = json.loads(filename.read_text())
+    if (not isinstance(pin, dict)
+            or set(pin) != {"version", "sha256"}
+            or not isinstance(pin["version"], str)
+            or not re.fullmatch(r"\d+\.\d+\.\d+", pin["version"])
+            or not isinstance(pin["sha256"], str)
+            or not re.fullmatch(r"[0-9a-f]{64}", pin["sha256"])):
+        raise ToolchainError("Invalid Maestro version/SHA256 manifest")
+    return pin
+
+
+def runtime_env(environ):
+    env = dict(environ)
+    env.update({
+        "MAESTRO_CLI_NO_ANALYTICS": "true",
+        "MAESTRO_CLI_ANALYSIS_NOTIFICATION_DISABLED": "true",
+        "MAESTRO_DISABLE_UPDATE_CHECK": "true",
+        # 2.10.0 still starts update requests and sends error reports despite
+        # the opt-outs above. This launcher is for local tests, not Maestro Cloud.
+        "MAESTRO_API_URL": "http://127.0.0.1:9",
+    })
+    if env.get("MAESTRO_JAVA_HOME"):
+        env["JAVA_HOME"] = env["MAESTRO_JAVA_HOME"]
+    return env
+
+
+def install_dir(pin, home):
+    base = home / ".local/share/maestro-cli"
+    target = base / pin["version"]
+    if any(directory.is_symlink() for directory in
+           (home / ".local", home / ".local/share", base, target)):
+        raise ToolchainError("Refusing symlink Maestro installation directory")
+    return target
+
+
+def check_layout(directory, version):
+    binary = directory / "maestro/bin/maestro"
+    jar = directory / "maestro/lib" / ("maestro-cli-" + version + ".jar")
+    if not binary.is_file() or not os.access(binary, os.X_OK) or not jar.is_file():
+        raise ToolchainError("Missing expected executable/JAR release layout")
+    return binary
+
+
+def installed_binary(pin, home):
+    target = install_dir(pin, home)
+    if not target.exists():
+        raise ToolchainError("Maestro is not installed; run maestro-toolchain install (or make maestro-install)")
+    try:
+        if json.loads((target / "receipt.json").read_text()) == pin:
+            return check_layout(target, pin["version"])
+    except (OSError, ValueError, ToolchainError):
+        pass
+    raise ToolchainError("Refusing conflicting or incomplete Maestro install: " + str(target))
+
+
+def unpack(archive, directory):
+    with zipfile.ZipFile(archive) as z:
+        entries = z.infolist()
+        seen = set()
+        # Validate the whole archive before writing. The reviewed release has
+        # only ordinary files/directories under maestro/ (no symlinks).
+        for entry in entries:
+            relative = PurePosixPath(entry.filename)
+            mode = entry.external_attr >> 16
+            kind = stat.S_IFMT(mode)
+            if (relative.is_absolute() or ".." in relative.parts
+                    or not relative.parts or relative.parts[0] != "maestro"
+                    or "\\" in entry.filename or relative in seen
+                    or kind not in (0, stat.S_IFREG, stat.S_IFDIR)):
+                raise ToolchainError("Refusing unsafe archive entry: " + entry.filename)
+            seen.add(relative)
+        for entry in entries:
+            target = directory / entry.filename
+            if entry.is_dir():
+                target.mkdir(parents=True, exist_ok=True)
+            else:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                with z.open(entry) as source, target.open("xb") as output:
+                    shutil.copyfileobj(source, output)
+                target.chmod(0o755 if (entry.external_attr >> 16) & 0o111 else 0o644)
+
+
+def install(pin, home, archive=None):
+    target = install_dir(pin, home)
+    if target.exists():
+        return installed_binary(pin, home)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix=".install-", dir=target.parent) as temporary:
+        staging = Path(temporary)
+        if archive is None:
+            archive = staging / "maestro.zip"
+            url = RELEASES + "/cli-" + pin["version"] + "/maestro.zip"
+            subprocess.run([
+                "curl", "--fail", "--location", "--proto", "=https",
+                "--proto-redir", "=https", "--connect-timeout", "15",
+                "--max-time", "600", "--output", str(archive), url,
+            ], check=True, timeout=615)
+        digest = hashlib.sha256()
+        with archive.open("rb") as source:
+            for chunk in iter(lambda: source.read(1024 * 1024), b""):
+                digest.update(chunk)
+        if digest.hexdigest() != pin["sha256"]:
+            raise ToolchainError("Maestro archive checksum mismatch; nothing installed")
+        payload = staging / "payload"
+        payload.mkdir()
+        unpack(archive, payload)
+        check_layout(payload, pin["version"])
+        (payload / "receipt.json").write_text(json.dumps(pin, indent=2) + "\n")
+        # Publication is atomic; do not overwrite an installation created by
+        # another process. A valid installation is nonempty, so rename fails.
+        if target.exists() or target.is_symlink():
+            raise ToolchainError("Concurrent Maestro installation; rerun after it completes")
+        payload.rename(target)
+    return installed_binary(pin, home)
+
+
+def capture(argv, env):
+    try:
+        result = subprocess.run(argv, env=env, text=True, capture_output=True, timeout=30, check=False)
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise ToolchainError(str(error)) from error
+    output = (result.stdout + "\n" + result.stderr).strip()
+    if result.returncode:
+        raise ToolchainError("Command failed: " + " ".join(argv) + "\n" + output[:2000])
+    return output
+
+
+def doctor(pin, home, ios=False):
+    env = runtime_env(os.environ)
+    errors = []
+
+    def check(label, action):
+        try:
+            print("PASS " + label + ": " + action())
+        except (ToolchainError, OSError, ValueError, KeyError) as error:
+            errors.append(label)
+            print("FAIL " + label + ": " + str(error))
+
+    def java_check():
+        java = str(Path(env["JAVA_HOME"]) / "bin/java") if env.get("JAVA_HOME") else "java"
+        output = capture([java, "-version"], env)
+        match = re.search(r'(?:openjdk|java)\s+(?:version\s+)?"?(\d+)(?:\.(\d+))?', output)
+        major = int(match[2] or 0) if match and match[1] == "1" else int(match[1]) if match else 0
+        if major < 17:
+            raise ToolchainError("Java 17+ required; select JAVA_HOME or MAESTRO_JAVA_HOME")
+        return output.splitlines()[0]
+
+    def maestro_check():
+        binary = installed_binary(pin, home)
+        output = capture([str(binary), "--version"], env)
+        versions = re.findall(r"(?m)^\s*(\d+\.\d+\.\d+)\s*$", output)
+        if versions != [pin["version"]]:
+            raise ToolchainError("Expected Maestro " + pin["version"] + "; got " + output[:500])
+        diagnostics = [line for line in output.splitlines() if line.strip() and line.strip() != pin["version"]]
+        if diagnostics:
+            print("WARN Maestro startup:\n" + "\n".join(diagnostics))
+        return pin["version"] + " at " + str(binary)
+
+    def ios_check():
+        if platform.system() != "Darwin":
+            raise ToolchainError("iOS inventory requires macOS with Xcode")
+        xcode = capture(["xcodebuild", "-version"], env)
+        data = json.loads(capture(["xcrun", "simctl", "list", "devices", "available", "--json"], env))
+        devices = [(runtime, device) for runtime, items in data["devices"].items()
+                   if ".iOS-" in runtime for device in items if device.get("isAvailable")]
+        if not devices:
+            raise ToolchainError("No available iOS simulator; install a runtime/create a device separately")
+        return xcode.splitlines()[0] + "\n" + "\n".join(
+            "  " + device["udid"] + " " + device["name"] + " (" + device["state"] + ") " + runtime
+            for runtime, device in devices)
+
+    check("Java", java_check)
+    check("Maestro", maestro_check)
+    if ios:
+        check("iOS inventory (read-only)", ios_check)
+    print("Privacy: analytics off; Maestro service API -> loopback (not a network sandbox)")
+    print("Prerequisite check only; app/driver tests NOT RUN; no device selected or booted")
+    return 1 if errors else 0
+
+
+def main():
+    try:
+        pin = load_pin()
+        home = Path.home()
+        # Parse only our subcommand; forward every upstream flag unchanged.
+        if sys.argv[1:2] == ["run"]:
+            binary = installed_binary(pin, home)
+            os.execve(str(binary), [str(binary)] + sys.argv[2:], runtime_env(os.environ))
+        parser = argparse.ArgumentParser(description=__doc__)
+        commands = parser.add_subparsers(dest="command", required=True)
+        installer = commands.add_parser("install", help="install the checked-in release; never replace conflicts")
+        installer.add_argument("--archive", type=Path, help="verify an already downloaded official ZIP")
+        checker = commands.add_parser("doctor", help="check prerequisites, not app functionality")
+        checker.add_argument("--ios", action="store_true", help="also list Xcode/iOS simulator inventory; never boot")
+        args = parser.parse_args()
+        if args.command == "install":
+            print("Installed/verified: " + str(install(pin, home, args.archive)))
+            return 0
+        return doctor(pin, home, args.ios)
+    except (ToolchainError, OSError, ValueError, zipfile.BadZipFile, subprocess.SubprocessError) as error:
+        print("ERROR: " + str(error), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

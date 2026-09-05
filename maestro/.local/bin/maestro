@@ -1,0 +1,3 @@
+#!/bin/sh
+# Keep humans and agents on the same pinned, local-testing launcher.
+exec "$(dirname "$0")/maestro-toolchain" run "$@"
