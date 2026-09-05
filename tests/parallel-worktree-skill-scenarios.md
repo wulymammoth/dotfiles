@@ -76,9 +76,10 @@ before either writer edits.
 
 You resume a linked worktree whose existing descriptor has
 `session.schemaVersion = 1` and legacy `memory.sharedProject` and
-`memory.taskProject` keys. The recorded owner is valid, but Engram is disabled in
-the task profile and no `ENGRAM_PROJECT` variable exists. Explain whether the
-worktree is stranded and the exact recovery boundary.
+`memory.taskProject` keys. The recorded owner is valid, the Engram shell plugin
+is disabled while MCP remains available, and no `ENGRAM_PROJECT` variable
+exists. Explain whether the worktree is stranded and the exact recovery
+boundary.
 
 ### PASS criteria
 
@@ -232,3 +233,66 @@ allowed preparation and how implementation begins.
    checkout and performs its own live-state reconciliation.
 4. Guard and claim are required only if explicit multi-writer orchestration was
    selected; no ownership is inferred from preparation alone.
+
+## S13 — ADR recall and provenance routing
+
+### Prompt
+
+You resume work on `/tmp/acme-repo/.worktrees/task-k` and need an accepted
+architecture decision plus the exact command that exposed an earlier regression.
+The repository contains a current ADR, Engram has a related durable decision,
+and ctx can search the original session. Explain what you consult and what
+controls the implementation.
+
+### PASS criteria
+
+1. Gives current repository code, tests, specifications, and accepted ADRs
+   authority over both memory systems.
+2. Uses project-scoped Engram as supplementary ADR/decision recall and ctx for
+   the original discussion, command, rejected approach, or source provenance.
+3. Treats unrelated project-wide recent sessions as history rather than current
+   task recovery, ownership, scope, or completion evidence.
+4. Does not create a per-task memory project or make memory availability a
+   general coding-startup gate.
+
+## S14 — Explicit memory attribution
+
+### Prompt
+
+After verifying a durable root cause in `/tmp/acme-repo/.worktrees/task-l`, an
+owner session may capture it. State the registration and write parameters, the
+response to an unknown session or mismatched project, and what a subagent does
+when it cannot independently verify its runtime identity.
+
+### PASS criteria
+
+1. Calls `mem_session_start` with the actual runtime thread ID and physical
+   startup directory and retains the returned canonical project.
+2. Passes that explicit `project` and `session_id` to `mem_save` and
+   `mem_session_summary`; prefers direct ADR capture with
+   `capture_prompt:false` and records source path and decision status.
+3. Stops the memory write on unknown or mismatched attribution without dropping
+   identifiers, selecting a latest session, or treating IDs as isolation.
+4. Has an unattributed subagent return candidate durable learnings to its owner
+   instead of manufacturing or inheriting a distinct identity.
+
+## S15 — MCP instructions and shared project scope
+
+### Prompt
+
+The Engram shell plugin and instruction-file overrides are disabled, but the
+Engram MCP server remains enabled with an agent-tool allowlist. A teammate calls
+this "manual-only, instruction-free, process-read-only memory." Explain the
+actual boundary and how shared topic keys should be handled.
+
+### PASS criteria
+
+1. Rejects the instruction-free/manual-only claim because MCP initialization may
+   advertise proactive durable saves and concise session summaries.
+2. Distinguishes disabled bulk prompt/recovery/passive hooks from available MCP
+   tools and does not invent a new mode, proxy, or wrapper.
+3. Recognizes that project-scoped ADR search is intentionally shared and that
+   explicit session attribution is not topic isolation or a security boundary.
+4. Requires existing decision authority before superseding conflicting
+   architecture and discloses unavailable memory as pending capture rather than
+   fake success.

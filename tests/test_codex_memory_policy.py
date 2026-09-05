@@ -1,4 +1,6 @@
+import contextlib
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -33,30 +35,43 @@ class AppServerClient:
         self.next_id = 1
         self.process = None
         self.selector = None
+        self.read_buffer = b""
 
     def __enter__(self):
-        self.process = subprocess.Popen(
-            ["codex", "app-server", "--listen", "stdio://"],
-            cwd=self.cwd,
-            env=self.env,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-            text=True,
-            bufsize=1,
-        )
-        self.selector = selectors.DefaultSelector()
-        self.selector.register(self.process.stdout, selectors.EVENT_READ)
-        self.request(
-            "initialize",
-            {"clientInfo": {"name": "codex-memory-policy-test", "version": "1"}},
-        )
-        self.notify("initialized")
-        return self
+        try:
+            self.process = subprocess.Popen(
+                ["codex", "app-server", "--listen", "stdio://"],
+                cwd=self.cwd,
+                env=self.env,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+                bufsize=0,
+            )
+            self.selector = selectors.DefaultSelector()
+            self.selector.register(self.process.stdout, selectors.EVENT_READ)
+            self.request(
+                "initialize",
+                {
+                    "clientInfo": {
+                        "name": "codex-memory-policy-test",
+                        "version": "1",
+                    }
+                },
+            )
+            self.notify("initialized")
+            return self
+        except BaseException:
+            self._close()
+            raise
 
     def __exit__(self, exc_type, exc, traceback):
+        self._close()
+
+    def _close(self):
         if self.selector is not None:
             self.selector.close()
+            self.selector = None
         if self.process is None:
             return
         if self.process.stdin is not None:
@@ -75,9 +90,12 @@ class AppServerClient:
                 self.process.wait(timeout=3)
         if self.process.stdout is not None:
             self.process.stdout.close()
+        self.process = None
 
     def _send(self, payload):
-        self.process.stdin.write(json.dumps(payload, separators=(",", ":")) + "\n")
+        self.process.stdin.write(
+            (json.dumps(payload, separators=(",", ":")) + "\n").encode("utf-8")
+        )
         self.process.stdin.flush()
 
     def notify(self, method, params=None):
@@ -99,19 +117,29 @@ class AppServerClient:
         )
         deadline = time.monotonic() + 10
         while time.monotonic() < deadline:
-            remaining = deadline - time.monotonic()
-            if not self.selector.select(remaining):
-                break
-            line = self.process.stdout.readline()
-            if not line:
-                break
-            message = json.loads(line)
+            line = self._read_protocol_line(deadline)
+            message = json.loads(line.decode("utf-8"))
             if message.get("id") != request_id:
                 continue
             if "error" in message:
                 raise AssertionError("native app-server request failed")
             return message["result"]
         raise AssertionError("native app-server did not return a response")
+
+    def _read_protocol_line(self, deadline):
+        while True:
+            newline_index = self.read_buffer.find(b"\n")
+            if newline_index >= 0:
+                line = self.read_buffer[:newline_index]
+                self.read_buffer = self.read_buffer[newline_index + 1 :]
+                return line
+            remaining = deadline - time.monotonic()
+            if remaining <= 0 or not self.selector.select(remaining):
+                raise AssertionError("native app-server did not return a response")
+            chunk = os.read(self.process.stdout.fileno(), 65536)
+            if not chunk:
+                raise AssertionError("native app-server closed unexpectedly")
+            self.read_buffer += chunk
 
     def read_config(self):
         return self.request("config/read", {"includeLayers": True})
@@ -187,9 +215,10 @@ class CodexMemoryPolicyTests(unittest.TestCase):
     ):
         model_target = model_target or self.model_instructions
         compact_target = compact_target or self.compact_instructions
-        mcp_enabled_text = (
-            "enabled = true\n" if mcp_enabled else 'args = ["--fixture"]\n'
-        )
+        if mcp_enabled is None:
+            mcp_enabled_text = 'args = ["--fixture"]\n'
+        else:
+            mcp_enabled_text = "enabled = " + str(mcp_enabled).lower() + "\n"
         self.config_path.write_text(
             "# fixture comment that native deletion may remove\n"
             f'model_instructions_file = "{model_target}"\n'
@@ -301,7 +330,7 @@ class CodexMemoryPolicyTests(unittest.TestCase):
                     "set_false", report["plugins.engram@engram.enabled"]
                 )
                 self.assertEqual(
-                    "set_false", report["mcp_servers.engram.enabled"]
+                    "already_true", report["mcp_servers.engram.enabled"]
                 )
                 self.assertEqual(before_bytes, self.config_path.read_bytes())
                 combined = process.stdout + process.stderr
@@ -312,7 +341,7 @@ class CodexMemoryPolicyTests(unittest.TestCase):
         self.assert_no_runtime_side_effects()
 
     def test_mcp_implicit_enabled_default_uses_exact_user_server_provenance(self):
-        self.write_contaminated_config(mcp_enabled=False)
+        self.write_contaminated_config(mcp_enabled=None)
         before_bytes = self.config_path.read_bytes()
         native = self.read_config()
         layer = self.user_layer(native)
@@ -331,7 +360,7 @@ class CodexMemoryPolicyTests(unittest.TestCase):
         process = self.run_helper("--dry-run")
         self.assertEqual(1, process.returncode, process.stderr)
         report = self.parse_report(process)
-        self.assertEqual("set_false", report["mcp_servers.engram.enabled"])
+        self.assertEqual("already_true", report["mcp_servers.engram.enabled"])
         self.assertEqual(before_bytes, self.config_path.read_bytes())
 
         apply_process = self.run_helper(
@@ -340,8 +369,8 @@ class CodexMemoryPolicyTests(unittest.TestCase):
         self.assertEqual(0, apply_process.returncode, apply_process.stderr)
         applied = self.read_config()
         applied_layer = self.user_layer(applied)
-        self.assertFalse(applied["config"]["mcp_servers"]["engram"]["enabled"])
-        self.assertFalse(
+        self.assertTrue(applied["config"]["mcp_servers"]["engram"]["enabled"])
+        self.assertTrue(
             applied_layer["config"]["mcp_servers"]["engram"]["enabled"]
         )
         enabled_origin = applied["origins"]["mcp_servers.engram.enabled"]
@@ -350,11 +379,31 @@ class CodexMemoryPolicyTests(unittest.TestCase):
         self.assertEqual(applied_layer["version"], enabled_origin["version"])
         self.assert_no_runtime_side_effects()
 
+    def test_explicit_mcp_false_requires_native_enablement(self):
+        self.write_contaminated_config(mcp_enabled=False)
+        before_bytes = self.config_path.read_bytes()
+
+        process = self.run_helper("--dry-run")
+        self.assertEqual(1, process.returncode, process.stderr)
+        report = self.parse_report(process)
+        self.assertEqual("set_true", report["mcp_servers.engram.enabled"])
+        self.assertEqual(before_bytes, self.config_path.read_bytes())
+
+        apply_process = self.run_helper(
+            "--apply", "--expected-version", report["config_version"]
+        )
+        self.assertEqual(0, apply_process.returncode, apply_process.stderr)
+        applied = self.read_config()
+        self.assertTrue(applied["config"]["mcp_servers"]["engram"]["enabled"])
+        self.assert_no_runtime_side_effects()
+
     def test_mcp_implicit_enabled_default_rejects_missing_or_mixed_provenance(self):
         before_bytes = self.config_path.read_bytes()
         expected_errors = {
             "implicit-mcp-missing-origin": "ambiguous user origin",
             "implicit-mcp-mixed-origin": "non-user origin",
+            "implicit-mcp-partial-list-origin": "ambiguous user origin",
+            "implicit-mcp-partial-nested-origin": "ambiguous user origin",
         }
         for mode, expected_error in expected_errors.items():
             with self.subTest(mode=mode):
@@ -363,6 +412,88 @@ class CodexMemoryPolicyTests(unittest.TestCase):
                 self.assertEqual(2, process.returncode)
                 self.assertIn(expected_error, process.stderr.lower())
                 self.assertEqual(before_bytes, self.config_path.read_bytes())
+        self.assert_no_runtime_side_effects()
+
+    def test_absent_plugin_is_consistently_treated_as_hooks_disabled(self):
+        clean_without_plugin = (
+            'model = "gpt-5.6-sol"\n'
+            'service_tier = "default"\n'
+            '\n[mcp_servers.engram]\n'
+            f'command = "{self.mcp_command}"\n'
+            'enabled = true\n'
+            '\n[sandbox_workspace_write]\n'
+            'writable_roots = ["/tmp/unrelated-sentinel-root"]\n'
+        )
+        self.config_path.write_text(clean_without_plugin)
+        before_bytes = self.config_path.read_bytes()
+
+        report_process = self.run_helper("--dry-run")
+        self.assertEqual(0, report_process.returncode, report_process.stderr)
+        report = self.parse_report(report_process)
+        self.assertEqual("absent", report["plugins.engram@engram.enabled"])
+        self.assertEqual("already_true", report["mcp_servers.engram.enabled"])
+
+        no_op_apply = self.run_helper(
+            "--apply", "--expected-version", report["config_version"]
+        )
+        self.assertEqual(0, no_op_apply.returncode, no_op_apply.stderr)
+        self.assertEqual(before_bytes, self.config_path.read_bytes())
+        self.assertEqual(
+            "absent",
+            self.parse_report(no_op_apply)["plugins.engram@engram.enabled"],
+        )
+
+        self.config_path.write_text(
+            f'model_instructions_file = "{self.model_instructions}"\n'
+            + clean_without_plugin
+        )
+        reconcile_report = self.parse_report(self.run_helper("--dry-run"))
+        reconcile_apply = self.run_helper(
+            "--apply",
+            "--expected-version",
+            reconcile_report["config_version"],
+        )
+        self.assertEqual(0, reconcile_apply.returncode, reconcile_apply.stderr)
+        native = self.read_config()
+        self.assertIsNone(native["config"]["model_instructions_file"])
+        self.assertFalse(native["config"]["plugins"]["engram@engram"]["enabled"])
+        self.assertTrue(native["config"]["mcp_servers"]["engram"]["enabled"])
+        self.assert_no_runtime_side_effects()
+
+    def test_missing_mcp_server_fails_closed_without_creating_enabled_only_entry(self):
+        self.config_path.write_text(
+            'model = "gpt-5.6-sol"\n'
+            'service_tier = "default"\n'
+            '\n[plugins."engram@engram"]\n'
+            'enabled = false\n'
+            '\n[sandbox_workspace_write]\n'
+            'writable_roots = ["/tmp/unrelated-sentinel-root"]\n'
+        )
+        before_bytes = self.config_path.read_bytes()
+
+        process = self.run_helper("--dry-run")
+        self.assertEqual(2, process.returncode)
+        self.assertIn("incomplete", process.stderr.lower())
+        self.assertEqual(before_bytes, self.config_path.read_bytes())
+        self.assert_no_runtime_side_effects()
+
+    def test_invalid_raw_user_layer_fails_before_native_batch_write(self):
+        fake_env, _ = self.fake_codex_environment("invalid-raw-layer")
+        method_log = Path(fake_env["FAKE_CODEX_METHODS"])
+        before_bytes = self.config_path.read_bytes()
+
+        process = self.run_helper(
+            "--apply",
+            "--expected-version",
+            "sha256:fixture-version",
+            env=fake_env,
+        )
+        self.assertEqual(2, process.returncode)
+        self.assertIn("ambiguous user configuration layer", process.stderr.lower())
+        methods = method_log.read_text().splitlines()
+        self.assertEqual(["initialize", "config/read"], methods)
+        self.assertNotIn("config/batchWrite", methods)
+        self.assertEqual(before_bytes, self.config_path.read_bytes())
         self.assert_no_runtime_side_effects()
 
     def test_missing_known_instruction_files_break_both_profile_inheritance_paths(self):
@@ -414,7 +545,7 @@ class CodexMemoryPolicyTests(unittest.TestCase):
         self.assertIsNone(native["config"]["model_instructions_file"])
         self.assertIsNone(native["config"]["experimental_compact_prompt_file"])
         self.assertFalse(native["config"]["plugins"]["engram@engram"]["enabled"])
-        self.assertFalse(native["config"]["mcp_servers"]["engram"]["enabled"])
+        self.assertTrue(native["config"]["mcp_servers"]["engram"]["enabled"])
         self.assertEqual("gpt-5.6-sol", native["config"]["model"])
         self.assertEqual("default", native["config"]["service_tier"])
         self.assertEqual(
@@ -440,7 +571,7 @@ class CodexMemoryPolicyTests(unittest.TestCase):
                 self.assertEqual(0, mcp_process.returncode, mcp_process.stderr)
                 entries = json.loads(mcp_process.stdout)
                 engram = next(entry for entry in entries if entry["name"] == "engram")
-                self.assertFalse(engram["enabled"])
+                self.assertTrue(engram["enabled"])
 
                 prompt_process = subprocess.run(
                     [
@@ -477,7 +608,7 @@ class CodexMemoryPolicyTests(unittest.TestCase):
             "already_false", clean_report["plugins.engram@engram.enabled"]
         )
         self.assertEqual(
-            "already_false", clean_report["mcp_servers.engram.enabled"]
+            "already_true", clean_report["mcp_servers.engram.enabled"]
         )
         self.assertEqual(before_reapply, self.config_path.read_bytes())
         self.assert_no_runtime_side_effects()
@@ -496,6 +627,130 @@ class CodexMemoryPolicyTests(unittest.TestCase):
         self.assertIn("requires --apply", version_without_apply.stderr)
         self.assertEqual(before_bytes, self.config_path.read_bytes())
         self.assert_no_runtime_side_effects()
+
+    def test_production_home_opt_in_is_explicit_and_keeps_all_native_guards(self):
+        spec = importlib.util.spec_from_file_location("codex_memory_policy", SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        for arguments in (
+            ["--allow-production-home"],
+            ["--dry-run", "--allow-production-home"],
+            ["--apply", "--allow-production-home"],
+        ):
+            with self.subTest(arguments=arguments):
+                with self.assertRaises(SystemExit), contextlib.redirect_stderr(
+                    io.StringIO()
+                ):
+                    module._parse_args(arguments)
+
+        account_home = self.root / "fixture-account"
+        production_home = account_home / ".codex"
+        production_home.mkdir(parents=True)
+        production_config = production_home / "config.toml"
+        production_config.write_text("model = 'fixture'\n")
+        with self.assertRaises(module.PolicyError):
+            module._preflight_config_path(
+                True,
+                False,
+                config_candidate=production_config,
+                account_home=account_home,
+            )
+        self.assertEqual(
+            production_config.resolve(),
+            module._preflight_config_path(
+                True,
+                True,
+                config_candidate=production_config,
+                account_home=account_home,
+            ),
+        )
+
+        report = self.parse_report(self.run_helper("--dry-run"))
+        stale = self.run_helper(
+            "--apply",
+            "--allow-production-home",
+            "--expected-version",
+            "sha256:not-current",
+        )
+        self.assertEqual(2, stale.returncode)
+        self.assertIn("version", stale.stderr.lower())
+
+        apply_process = self.run_helper(
+            "--apply",
+            "--allow-production-home",
+            "--expected-version",
+            report["config_version"],
+        )
+        self.assertEqual(0, apply_process.returncode, apply_process.stderr)
+        native = self.read_config()
+        self.assertEqual(
+            ["/tmp/unrelated-sentinel-root"],
+            native["config"]["sandbox_workspace_write"]["writable_roots"],
+        )
+        self.assertTrue(native["config"]["mcp_servers"]["engram"]["enabled"])
+        self.assert_no_runtime_side_effects()
+
+    def test_apply_verifies_with_a_fresh_app_server_process(self):
+        report = self.parse_report(self.run_helper("--dry-run"))
+        real_codex = shutil.which("codex")
+        shim_dir = self.root / "logging-codex-shim"
+        shim_dir.mkdir()
+        invocation_log = shim_dir / "invocations.log"
+        shim = shim_dir / "codex"
+        shim.write_text(
+            "#!/bin/sh\n"
+            'printf "%s\\n" "$*" >>"$CODEX_INVOCATION_LOG"\n'
+            'exec "$REAL_CODEX" "$@"\n'
+        )
+        shim.chmod(shim.stat().st_mode | stat.S_IXUSR)
+        logged_env = self.env.copy()
+        logged_env.update(
+            {
+                "PATH": str(shim_dir) + os.pathsep + logged_env["PATH"],
+                "REAL_CODEX": real_codex,
+                "CODEX_INVOCATION_LOG": str(invocation_log),
+            }
+        )
+
+        process = self.run_helper(
+            "--apply",
+            "--expected-version",
+            report["config_version"],
+            env=logged_env,
+        )
+        self.assertEqual(0, process.returncode, process.stderr)
+        self.assertEqual(
+            ["app-server --listen stdio://", "app-server --listen stdio://"],
+            invocation_log.read_text().splitlines(),
+        )
+        self.assert_no_runtime_side_effects()
+
+    def test_unscoped_user_config_comparison_detects_unrelated_changes(self):
+        spec = importlib.util.spec_from_file_location("codex_memory_policy", SCRIPT)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        before = {
+            "model_instructions_file": "/fixture/engram-instructions.md",
+            "plugins": {"engram@engram": {"enabled": True}},
+            "mcp_servers": {
+                "engram": {"command": "engram", "args": ["mcp"], "enabled": False}
+            },
+            "model": "gpt-5.6-sol",
+        }
+        after = json.loads(json.dumps(before))
+        after.pop("model_instructions_file")
+        after["plugins"]["engram@engram"]["enabled"] = False
+        after["mcp_servers"]["engram"]["enabled"] = True
+        self.assertEqual(
+            module._unscoped_user_config(before),
+            module._unscoped_user_config(after),
+        )
+        after["model"] = "gpt-5.6-terra"
+        self.assertNotEqual(
+            module._unscoped_user_config(before),
+            module._unscoped_user_config(after),
+        )
 
     def test_stale_expected_version_fails_without_mutation(self):
         initial = self.run_helper()
@@ -642,6 +897,7 @@ class CodexMemoryPolicyTests(unittest.TestCase):
         shim_dir = self.root / ("shim-" + mode.replace("-", "_"))
         shim_dir.mkdir(exist_ok=True)
         argv_path = shim_dir / "argv.json"
+        methods_path = shim_dir / "methods.log"
         shim = shim_dir / "codex"
         shim.write_text(
             """#!/usr/bin/python3
@@ -673,6 +929,8 @@ for line in sys.stdin:
     request_id = message.get("id")
     if request_id is None:
         continue
+    with Path(os.environ["FAKE_CODEX_METHODS"]).open("a") as method_log:
+        method_log.write(message.get("method", "") + "\\n")
     if message.get("method") == "initialize":
         result = {
             "userAgent": "fixture/0",
@@ -684,10 +942,16 @@ for line in sys.stdin:
         implicit_mcp = mode in (
             "implicit-mcp-missing-origin",
             "implicit-mcp-mixed-origin",
+            "implicit-mcp-partial-list-origin",
+            "implicit-mcp-partial-nested-origin",
         )
         effective_mcp = {"enabled": True}
         if implicit_mcp:
             effective_mcp.update({"command": "fixture-engram", "args": ["serve"]})
+        if mode == "implicit-mcp-partial-list-origin":
+            effective_mcp["args"] = ["serve", "--tools=agent"]
+        if mode == "implicit-mcp-partial-nested-origin":
+            effective_mcp["env"] = {"FIRST": "one", "SECOND": "two"}
         config = {
             "model_instructions_file": str(codex_home / "engram-instructions.md"),
             "experimental_compact_prompt_file": str(codex_home / "engram-compact-prompt.md"),
@@ -702,6 +966,8 @@ for line in sys.stdin:
         layer_config = json.loads(json.dumps(config))
         if implicit_mcp:
             del layer_config["mcp_servers"]["engram"]["enabled"]
+        if mode == "invalid-raw-layer":
+            layer_config = None
         layer = {"name": user_name, "version": version, "config": layer_config}
         layers = [layer]
         if mode == "ambiguous-user-layers":
@@ -726,6 +992,19 @@ for line in sys.stdin:
                 "name": dict(user_name),
                 "version": version,
             }
+            if mode in (
+                "implicit-mcp-partial-list-origin",
+                "implicit-mcp-partial-nested-origin",
+            ):
+                origins["mcp_servers.engram.args.0"] = {
+                    "name": dict(user_name),
+                    "version": version,
+                }
+            if mode == "implicit-mcp-partial-nested-origin":
+                origins["mcp_servers.engram.env.FIRST"] = {
+                    "name": dict(user_name),
+                    "version": version,
+                }
             if mode == "implicit-mcp-mixed-origin":
                 origins["mcp_servers.engram.args.0"] = {
                     "name": {"type": "system", "file": "/etc/codex/config.toml"},
@@ -748,6 +1027,7 @@ for line in sys.stdin:
         fake_env = self.env.copy()
         fake_env["FAKE_CODEX_MODE"] = mode
         fake_env["FAKE_CODEX_ARGV"] = str(argv_path)
+        fake_env["FAKE_CODEX_METHODS"] = str(methods_path)
         fake_env["PATH"] = str(shim_dir) + os.pathsep + fake_env["PATH"]
         return fake_env, argv_path
 

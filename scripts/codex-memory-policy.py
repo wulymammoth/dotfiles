@@ -2,6 +2,7 @@
 """Report or reconcile Codex's four Engram injection settings safely."""
 
 import argparse
+import copy
 import json
 import os
 from pathlib import Path
@@ -48,7 +49,7 @@ EDITS = (
     },
     {
         "keyPath": MCP_ENABLED_KEY,
-        "value": False,
+        "value": True,
         "mergeStrategy": "upsert",
     },
 )
@@ -78,8 +79,12 @@ def _configured_codex_home():
     return _resolved(Path.home() / ".codex")
 
 
-def _preflight_config_path(apply):
-    config_candidate = _configured_codex_home() / "config.toml"
+def _preflight_config_path(
+    apply, allow_production_home=False, config_candidate=None, account_home=None
+):
+    if config_candidate is None:
+        config_candidate = _configured_codex_home() / "config.toml"
+    config_candidate = Path(config_candidate)
     if config_candidate.is_symlink():
         raise PolicyError("configuration path must not be a symlink")
     try:
@@ -88,8 +93,14 @@ def _preflight_config_path(apply):
         config_path = config_candidate.resolve(strict=True)
     except OSError:
         raise PolicyError("configuration file is missing or unsafe")
-    if apply and _is_production_config_path(config_path):
-        raise PolicyError("production-home --apply is forbidden")
+    if (
+        apply
+        and _is_production_config_path(config_path, account_home=account_home)
+        and not allow_production_home
+    ):
+        raise PolicyError(
+            "production-home --apply requires --allow-production-home"
+        )
     return config_path
 
 
@@ -303,18 +314,35 @@ def _validate_implicit_mcp_enabled_default(
     if not server_origin_keys:
         raise PolicyError("scoped setting has an ambiguous user origin")
 
-    for raw_key in raw_server:
+    for raw_key, raw_value in raw_server.items():
         if not isinstance(raw_key, str) or not raw_key:
             raise PolicyError("scoped configuration is malformed")
-        raw_path = server_prefix + raw_key
-        if not any(
-            key == raw_path or key.startswith(raw_path + ".")
-            for key in server_origin_keys
-        ):
-            raise PolicyError("scoped setting has an ambiguous user origin")
+        for raw_path in _raw_leaf_paths(raw_value, server_prefix + raw_key):
+            if raw_path not in origins:
+                raise PolicyError("scoped setting has an ambiguous user origin")
 
     for key in server_origin_keys:
         _validate_origin(origins, key, config_path, version)
+
+
+def _raw_leaf_paths(value, prefix):
+    if isinstance(value, dict):
+        if not value:
+            return [prefix]
+        paths = []
+        for key, nested in value.items():
+            if not isinstance(key, str) or not key:
+                raise PolicyError("scoped configuration is malformed")
+            paths.extend(_raw_leaf_paths(nested, prefix + "." + key))
+        return paths
+    if isinstance(value, list):
+        if not value:
+            return [prefix]
+        paths = []
+        for index, nested in enumerate(value):
+            paths.extend(_raw_leaf_paths(nested, prefix + "." + str(index)))
+        return paths
+    return [prefix]
 
 
 def _known_instruction_action(value, expected_target):
@@ -327,14 +355,14 @@ def _known_instruction_action(value, expected_target):
     return "remove"
 
 
-def _enabled_action(value):
+def _enabled_action(value, desired):
     if value is None:
         return "absent"
-    if value is False:
-        return "already_false"
-    if value is True:
-        return "set_false"
-    raise PolicyError("scoped configuration is malformed")
+    if not isinstance(value, bool):
+        raise PolicyError("scoped configuration is malformed")
+    if value is desired:
+        return "already_true" if desired else "already_false"
+    return "set_true" if desired else "set_false"
 
 
 def _inspect_config(server, expected_config_path):
@@ -354,6 +382,7 @@ def _inspect_config(server, expected_config_path):
         or not Path(layer_file).is_absolute()
         or not isinstance(version, str)
         or not version
+        or not isinstance(user_layer_config, dict)
     ):
         raise PolicyError("ambiguous user configuration layer")
     config_path = _resolved(layer_file)
@@ -372,17 +401,19 @@ def _inspect_config(server, expected_config_path):
             server.codex_home / "engram-compact-prompt.md",
         ),
         PLUGIN_ENABLED_KEY: _enabled_action(
-            _nested_value(config, "plugins", "engram@engram", "enabled")
+            _nested_value(config, "plugins", "engram@engram", "enabled"), False
         ),
         MCP_ENABLED_KEY: _enabled_action(
-            _nested_value(config, "mcp_servers", "engram", "enabled")
+            _nested_value(config, "mcp_servers", "engram", "enabled"), True
         ),
     }
+    if actions[MCP_ENABLED_KEY] == "absent":
+        raise PolicyError("scoped Engram configuration is incomplete")
 
     for key, action in actions.items():
         if action != "absent":
             if key == MCP_ENABLED_KEY and key not in origins:
-                if action != "set_false":
+                if action != "already_true":
                     raise PolicyError("scoped setting has an ambiguous user origin")
                 _validate_implicit_mcp_enabled_default(
                     origins, user_layer_config, config_path, version
@@ -394,11 +425,44 @@ def _inspect_config(server, expected_config_path):
         "config_path": config_path,
         "version": version,
         "actions": actions,
+        "user_config": copy.deepcopy(user_layer_config),
     }
 
 
 def _needs_reconciliation(actions):
-    return any(action in ("remove", "set_false") for action in actions.values())
+    return any(
+        action in ("remove", "set_false", "set_true")
+        for action in actions.values()
+    )
+
+
+def _unscoped_user_config(config):
+    if not isinstance(config, dict):
+        raise PolicyError("ambiguous user configuration layer")
+    unscoped = copy.deepcopy(config)
+    unscoped.pop(MODEL_INSTRUCTIONS_KEY, None)
+    unscoped.pop(COMPACT_INSTRUCTIONS_KEY, None)
+
+    plugins = unscoped.get("plugins")
+    if isinstance(plugins, dict):
+        engram_plugin = plugins.get("engram@engram")
+        if isinstance(engram_plugin, dict):
+            engram_plugin.pop("enabled", None)
+            if not engram_plugin:
+                plugins.pop("engram@engram", None)
+        if not plugins:
+            unscoped.pop("plugins", None)
+
+    mcp_servers = unscoped.get("mcp_servers")
+    if isinstance(mcp_servers, dict):
+        engram_server = mcp_servers.get("engram")
+        if isinstance(engram_server, dict):
+            engram_server.pop("enabled", None)
+            if not engram_server:
+                mcp_servers.pop("engram", None)
+        if not mcp_servers:
+            unscoped.pop("mcp_servers", None)
+    return unscoped
 
 
 def _print_report(inspection):
@@ -411,8 +475,8 @@ def _print_report(inspection):
 def _apply(server, inspection):
     actions = inspection["actions"]
     if not _needs_reconciliation(actions):
-        return
-    if actions[PLUGIN_ENABLED_KEY] == "absent" or actions[MCP_ENABLED_KEY] == "absent":
+        return inspection["version"]
+    if actions[MCP_ENABLED_KEY] == "absent":
         raise PolicyError("scoped Engram configuration is incomplete")
     write_result = server.request(
         "config/batchWrite",
@@ -435,17 +499,7 @@ def _apply(server, inspection):
     ):
         raise PolicyError("native configuration write response is malformed")
 
-    verified = _inspect_config(server, inspection["config_path"])
-    if verified["version"] != written_version:
-        raise PolicyError("configuration changed during post-write verification")
-    expected_actions = {
-        MODEL_INSTRUCTIONS_KEY: "absent",
-        COMPACT_INSTRUCTIONS_KEY: "absent",
-        PLUGIN_ENABLED_KEY: "already_false",
-        MCP_ENABLED_KEY: "already_false",
-    }
-    if verified["actions"] != expected_actions:
-        raise PolicyError("post-write configuration verification failed")
+    return written_version
 
 
 def _parse_args(argv):
@@ -459,18 +513,27 @@ def _parse_args(argv):
         "--expected-version",
         help="exact user-config version previously returned by report/dry-run",
     )
+    parser.add_argument(
+        "--allow-production-home",
+        action="store_true",
+        help="permit an approved production-home apply; does not grant approval",
+    )
     arguments = parser.parse_args(argv)
     if arguments.apply and not arguments.expected_version:
         parser.error("--apply requires --expected-version")
     if arguments.expected_version and not arguments.apply:
         parser.error("--expected-version requires --apply")
+    if arguments.allow_production_home and not arguments.apply:
+        parser.error("--allow-production-home requires --apply")
     return arguments
 
 
 def main(argv=None):
     arguments = _parse_args(argv)
     try:
-        expected_config_path = _preflight_config_path(arguments.apply)
+        expected_config_path = _preflight_config_path(
+            arguments.apply, arguments.allow_production_home
+        )
         with AppServer(cwd=os.getcwd()) as server:
             inspection = _inspect_config(server, expected_config_path)
             if arguments.apply:
@@ -478,11 +541,38 @@ def main(argv=None):
                     raise PolicyError(
                         "expected version does not match inspected configuration version"
                     )
-                _apply(server, inspection)
-            _print_report(inspection)
-            if not arguments.apply and _needs_reconciliation(inspection["actions"]):
-                return EXIT_RECONCILIATION_NEEDED
-            return EXIT_CLEAN
+                before_unscoped = _unscoped_user_config(
+                    inspection["user_config"]
+                )
+                write_required = _needs_reconciliation(inspection["actions"])
+                written_version = _apply(server, inspection)
+        if arguments.apply:
+            with AppServer(cwd=os.getcwd()) as verification_server:
+                verified = _inspect_config(verification_server, expected_config_path)
+            if verified["version"] != written_version:
+                raise PolicyError(
+                    "configuration changed during post-write verification"
+                )
+            expected_actions = {
+                MODEL_INSTRUCTIONS_KEY: "absent",
+                COMPACT_INSTRUCTIONS_KEY: "absent",
+                PLUGIN_ENABLED_KEY: (
+                    "already_false"
+                    if write_required
+                    else inspection["actions"][PLUGIN_ENABLED_KEY]
+                ),
+                MCP_ENABLED_KEY: "already_true",
+            }
+            if verified["actions"] != expected_actions:
+                raise PolicyError("post-write configuration verification failed")
+            if _unscoped_user_config(verified["user_config"]) != before_unscoped:
+                raise PolicyError(
+                    "unrelated configuration changed during native reconciliation"
+                )
+        _print_report(inspection)
+        if not arguments.apply and _needs_reconciliation(inspection["actions"]):
+            return EXIT_RECONCILIATION_NEEDED
+        return EXIT_CLEAN
     except PolicyError as error:
         print("ERROR: " + str(error), file=sys.stderr)
         return EXIT_ERROR

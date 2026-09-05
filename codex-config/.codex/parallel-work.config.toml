@@ -5,4 +5,4 @@ model_reasoning_effort = "xhigh"
 enabled = false
 
 [mcp_servers.engram]
-enabled = false
+enabled = true

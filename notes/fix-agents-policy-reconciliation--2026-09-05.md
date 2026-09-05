@@ -60,3 +60,68 @@
 4. Commit/integration, effective activation, fresh-session verification, and
    cleanup each remain separate owner decisions. Suggested future commit:
    `fix(codex): reconcile memory injection and worktree preflight`.
+
+## Corrective checkpoint after approved plan refresh
+
+The preceding sections preserve the earlier reviewed milestone as historical
+evidence. The refreshed corrective plan supersedes its blanket Engram restriction
+without rolling back the startup-root, ownership, native-config, or security
+work.
+
+- The default and `parallel-work` contract now removes both instruction-file
+  overrides, keeps the Engram plugin and bulk hooks disabled, and keeps the
+  Engram MCP server enabled. Engram is ADR-centric supplementary decision memory;
+  ctx remains the source for original discussion, commands, rejected approaches,
+  regressions, and source-session provenance. Current repository authority still
+  controls implementation truth.
+- Memory writes use the actual runtime thread ID and physical startup directory
+  for `mem_session_start`, then retain the returned canonical project and pass it
+  with an explicit `session_id` to saves and summaries. This proves attribution,
+  not ownership, topic isolation, or a security boundary. Unknown or mismatched
+  attribution fails; an unverified subagent returns candidate learnings to its
+  owner.
+- The native helper now treats explicit or narrowly proven implicit MCP `true`
+  as clean and explicit `false` as `set_true`. An apply uses the existing native
+  versioned batch transaction and a second fresh app-server process to validate
+  scoped state plus unchanged unscoped raw user config. Default production-home
+  refusal remains; `--allow-production-home` is a tested opt-in requiring apply
+  and an inspected expected version, but is not approval by itself and was not
+  used on real home.
+- The parked test-client framing item above is resolved in this corrective scope:
+  its app-server client now uses strict byte-buffered framing and cleans up after
+  failed initialization.
+- A new installed-MCP fixture invokes only `engram mcp --tools=agent` with a
+  credential-free environment, autosync disabled, existing network restriction,
+  and a valid precreated SQLite database under an isolated temporary data root.
+  It proves the required agent tools and proactive instructions, shared-project
+  ADR search, explicit two-session saves/summaries, retrieval, persisted
+  attribution, and negative unknown/mismatched controls without touching real
+  memory. It never runs Engram version/help.
+- Runtime identity is pinned to installed executable SHA256
+  `cbcb115278c332313d35c1500d261eadfc9ff74d400b021f06b3362b1df2d80a`.
+  Read-only source reference
+  `1dafc0f63051b2214100f7bd801357e4aab61c26` differs from the installed build,
+  so the installed fixture—not source inspection—provides behavior evidence.
+- Initial complete-manifest and supplemental review found two Important native
+  helper gaps: a missing MCP server could report clean, and raw user-layer
+  validation occurred after `config/batchWrite`. Focused RED/GREEN regressions
+  now reject a missing server rather than create an enabled-only entry and prove
+  a missing/non-object raw layer makes zero native write calls. The full
+  unscoped snapshot is computed before mutation.
+- A subsequent final-manifest review found two more Important edge cases and one
+  stale scenario sentence. Raw implicit-MCP provenance now requires an exact
+  origin for every scalar, list element, and nested leaf. An absent plugin stanza
+  is consistently treated as hook-disabled on a no-op and is established as
+  explicit `false` when another scoped correction writes. RED/GREEN coverage
+  includes partial list/nested origins and both absent-plugin paths; the schema-v1
+  scenario now says the plugin is disabled while MCP remains available.
+- Current local verification passes 23 native-helper tests, the installed MCP
+  contract test, `parallel-work-profile.zsh`, `codex-config-stow.zsh`,
+  `parallel-worktree-session.zsh`, and `git diff --check`. The profile test still
+  reports `PENDING_CANARY`: no provider-backed model/hook canary, real-home
+  activation, or fresh live Codex session is authorized in this checkpoint.
+- No production config or memory, home Stow target, provider/runtime, other
+  checkout, hosted artifact, stage, commit, or remote was mutated. Independent
+  complete-manifest review, a fresh `origin/main` ancestry check, and a truthful
+  `LOCAL_READY_UNCOMMITTED` report remain before handoff; the writer claim stays
+  held.

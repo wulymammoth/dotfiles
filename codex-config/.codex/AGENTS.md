@@ -153,9 +153,10 @@ and per-commit rules above remain in force.
 ## Decision and historical memory
 
 The active conversation, Codex transcript/resume state, live Git, and committed
-task-local plans or notes are the default working context. Historical lookup is
-optional and must never establish current ownership, task scope, completion, or
-repository truth.
+task-local plans or notes are the default working context. Current repository
+code, tests, specifications, design documents, and accepted ADRs are
+authoritative. Historical lookup is optional and must never establish current
+ownership, task scope, completion, or repository truth.
 
 - Use ctx only when original discussion, rejected approaches, regressions, exact
   prior commands, or source-session provenance materially matters. Follow the
@@ -164,18 +165,39 @@ repository truth.
   necessary. Use `--primary-only` for user-intent and decision provenance;
   retain the default primary-plus-subagent scope for implementation, test, and
   failure evidence.
-- Treat existing Engram history as legacy reference material. Do not load broad
-  shared recovery context automatically, construct per-task Engram projects, or
-  merge memory stores blindly. Verify any retrieved claim against current source.
-- Curated canonical Engram memory is optional and deliberate. Write it only from
-  a reconciled canonical checkout after integration, not as task-worktree
-  working memory.
+- Use Engram as supplementary ADR/decision memory, including verified durable
+  lessons. Scope recall to the reconciled canonical project and the current work;
+  project-wide recent sessions are history, not task recovery or ownership.
+  Existing history remains available, but do not load broad recovery context,
+  construct per-task Engram projects, or merge stores blindly. Verify retrieved
+  claims against current source.
+- Disabling the Engram shell plugin and its bulk prompt/recovery/passive hooks
+  does not make an enabled MCP server manual-only or instruction-free. MCP
+  initialization may still advertise proactive saves, concise session summaries,
+  and project-scoped context. Do not invent a new memory mode, proxy, or wrapper.
+- At the first memory write, call `mem_session_start` with the actual runtime
+  thread ID and physical startup directory, retain its returned canonical
+  project, and pass that explicit project and `session_id` to `mem_save` and
+  `mem_session_summary`. This attribution is not an ownership, descriptor,
+  isolation, security, readiness, or general coding-startup boundary. Never
+  manufacture an ID or treat an inherited parent ID as a distinct subagent ID.
+- Prefer direct `mem_save(capture_prompt:false)` for established architecture,
+  policy, decision, root-cause, or verified-lesson records. Include the
+  authoritative source path and decision status. Summaries should distinguish
+  verified outcomes from pending work. Topic-key upserts are shared across the
+  project; explicit sessions do not isolate them.
+- An unknown or mismatched session/project stops that memory write. Do not retry
+  by dropping identifiers or selecting the latest session. A subagent without
+  independently verified identity returns candidate durable learnings to its
+  owner. Memory unavailability is disclosed as pending capture and does not fake
+  success or block unrelated coding unless a higher-priority requirement says to
+  stop.
 
 For a durable architecture or product decision, update the appropriate ADR or
-design document in Git. When canonical Engram capture is explicitly appropriate,
-use a stable topic key and record the authoritative path under `Where`; ask before
-recording a superseding or conflicting relationship between architecture,
-policy, or decision memories.
+design document in Git. When Engram capture is appropriate, use a stable topic
+key and record the authoritative path under `Where`; require existing explicit
+decision authority before recording a superseding or conflicting relationship
+between architecture, policy, or decision memories.
 
 ## Elixir/Phoenix
 

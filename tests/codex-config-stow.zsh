@@ -22,8 +22,8 @@ print -r -- "sentinel runtime state" >"$test_root/.codex/state.json"
 
 profile_source="$repo_root/codex-config/.codex/parallel-work.config.toml"
 [[ -f "$profile_source" ]] || fail "parallel-work profile is missing"
-[[ "$(<"$profile_source")" == $'service_tier = "default"\nmodel = "gpt-5.6-sol"\nmodel_reasoning_effort = "xhigh"\n[plugins."engram@engram"]\nenabled = false\n\n[mcp_servers.engram]\nenabled = false' ]] \
-  || fail "parallel-work profile must preserve model defaults and disable the Engram plugin and MCP server"
+[[ "$(<"$profile_source")" == $'service_tier = "default"\nmodel = "gpt-5.6-sol"\nmodel_reasoning_effort = "xhigh"\n[plugins."engram@engram"]\nenabled = false\n\n[mcp_servers.engram]\nenabled = true' ]] \
+  || fail "parallel-work profile must preserve model defaults, disable the Engram plugin, and retain Engram MCP"
 
 skill_source="$repo_root/codex-config/.codex/skills/orchestrating-parallel-worktrees/SKILL.md"
 helper_source="$repo_root/codex-config/.codex/skills/orchestrating-parallel-worktrees/scripts/worktree-session"
@@ -103,7 +103,10 @@ for scenario in \
   "S9 — Prepared worktree reuse" \
   "S10 — Resumed prepared worktree" \
   "S11 — Wrong-root refusal" \
-  "S12 — Primary coordinator handoff"
+  "S12 — Primary coordinator handoff" \
+  "S13 — ADR recall and provenance routing" \
+  "S14 — Explicit memory attribution" \
+  "S15 — MCP instructions and shared project scope"
 do
   rg --fixed-strings --quiet "$scenario" "$scenario_doc" \
     || fail "parallel-worktree scenarios are missing: $scenario"
@@ -122,10 +125,45 @@ for required_memory_boundary in \
   "mcp_servers.engram.enabled" \
   "does not activate" \
   "fresh session" \
-  "MCP-only"
+  "ADR-centric" \
+  "ctx" \
+  "mem_session_start" \
+  "session_id" \
+  "capture_prompt:false" \
+  "proactive"
 do
   rg --fixed-strings --quiet "$required_memory_boundary" "$memory_policy_doc" \
     || fail "memory-policy documentation is missing: $required_memory_boundary"
+done
+
+
+for required_memory_policy in \
+  "supplementary ADR" \
+  "Current repository code" \
+  "actual runtime thread ID" \
+  "physical startup directory" \
+  "explicit project" \
+  "not an ownership" \
+  "unknown or mismatched" \
+  "candidate durable learnings"
+do
+  if ! rg --fixed-strings --quiet "$required_memory_policy" \
+    "$global_agents" "$memory_policy_doc"; then
+    fail "tracked policy is missing the memory contract: $required_memory_policy"
+  fi
+done
+
+for forbidden_memory_policy in \
+  "disabling both the Engram plugin and Engram MCP" \
+  "both the plugin and MCP entry disabled" \
+  "written deliberately from a reconciled canonical checkout" \
+  "only after integration"
+do
+  if rg --fixed-strings --quiet "$forbidden_memory_policy" \
+    "$repo_root/README.md" "$repo_root/.Codex-context.md" \
+    "$global_agents" "$memory_policy_doc" "$skill_source"; then
+    fail "tracked policy retains a blanket Engram restriction: $forbidden_memory_policy"
+  fi
 done
 
 for required_shell_guard in \

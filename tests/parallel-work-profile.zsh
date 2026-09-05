@@ -43,8 +43,8 @@ run_codex() {
   run_isolated "$codex_bin" -p parallel-work "$@"
 }
 [[ -f "$profile_source" ]] || fail "tracked parallel-work profile is missing"
-[[ "$(<"$profile_source")" == $'service_tier = "default"\nmodel = "gpt-5.6-sol"\nmodel_reasoning_effort = "xhigh"\n[plugins."engram@engram"]\nenabled = false\n\n[mcp_servers.engram]\nenabled = false' ]] \
-  || fail "parallel-work overlay must preserve model defaults and disable the Engram plugin and MCP server"
+[[ "$(<"$profile_source")" == $'service_tier = "default"\nmodel = "gpt-5.6-sol"\nmodel_reasoning_effort = "xhigh"\n[plugins."engram@engram"]\nenabled = false\n\n[mcp_servers.engram]\nenabled = true' ]] \
+  || fail "parallel-work overlay must preserve model defaults, disable the Engram plugin, and retain Engram MCP"
 
 cat >"$codex_home/config.toml" <<'TOML'
 model_instructions_file = "__MODEL_INSTRUCTIONS__"
@@ -56,6 +56,9 @@ enabled = true
 [mcp_servers.engram]
 command = "/usr/bin/true"
 enabled = true
+
+[sandbox_workspace_write]
+writable_roots = ["/tmp/profile-unrelated-sentinel"]
 TOML
 
 model_instructions="$codex_home/engram-instructions.md"
@@ -95,7 +98,7 @@ for expected_operation in \
   "model_instructions_file=remove" \
   "experimental_compact_prompt_file=remove" \
   "plugins.engram@engram.enabled=set_false" \
-  "mcp_servers.engram.enabled=set_false"
+  "mcp_servers.engram.enabled=already_true"
 do
   print -r -- "$policy_output" | rg --fixed-strings --quiet "$expected_operation" \
     || fail "memory-policy dry-run is missing: $expected_operation"
@@ -103,12 +106,30 @@ done
 [[ "$(<"$codex_home/config.toml")" == "$base_config_before" ]] \
   || fail "memory-policy dry-run changed the fixture config"
 
+config_version="$(print -r -- "$policy_output" | sed -n 's/^config_version=//p')"
+[[ -n "$config_version" ]] || fail "memory-policy dry-run omitted config version"
+run_isolated /usr/bin/python3 -B \
+  "$repo_root/scripts/codex-memory-policy.py" \
+  --apply --expected-version "$config_version" >/dev/null \
+  || fail "synthetic native reconciliation failed"
+reconciled_config="$(<"$codex_home/config.toml")"
+[[ "$reconciled_config" != *"model_instructions_file"* ]] \
+  || fail "model instruction override survived synthetic reconciliation"
+[[ "$reconciled_config" != *"experimental_compact_prompt_file"* ]] \
+  || fail "compact instruction override survived synthetic reconciliation"
+[[ "$reconciled_config" == *$'[plugins."engram@engram"]\nenabled = false'* ]] \
+  || fail "synthetic reconciliation did not disable the Engram plugin"
+[[ "$reconciled_config" == *$'[mcp_servers.engram]\ncommand = "/usr/bin/true"\nenabled = true'* ]] \
+  || fail "synthetic reconciliation did not retain the Engram MCP command and enable it"
+[[ "$reconciled_config" == *'writable_roots = ["/tmp/profile-unrelated-sentinel"]'* ]] \
+  || fail "synthetic reconciliation changed unrelated config"
+
 mcp_json="$test_root/mcp.json"
 run_codex mcp list --json >"$mcp_json"
 [[ "$(/usr/bin/plutil -extract 0.name raw -o - "$mcp_json")" == "engram" ]] \
   || fail "synthetic base Engram MCP entry was not retained"
-[[ "$(/usr/bin/plutil -extract 0.enabled raw -o - "$mcp_json")" == "false" ]] \
-  || fail "parallel-work profile did not disable the inherited Engram MCP entry"
+[[ "$(/usr/bin/plutil -extract 0.enabled raw -o - "$mcp_json")" == "true" ]] \
+  || fail "parallel-work profile did not retain the enabled Engram MCP entry"
 [[ "$(/usr/bin/plutil -extract 0.transport.command raw -o - "$mcp_json")" == \
   "/usr/bin/true" ]] || fail "synthetic MCP command changed under the profile"
 
@@ -120,8 +141,8 @@ if run_codex debug prompt-input --help >/dev/null 2>&1; then
     || fail "synthetic base instruction file was not retained"
 fi
 
-[[ "$(<"$codex_home/config.toml")" == "$base_config_before" ]] \
-  || fail "parallel-work profile checks changed the fixture config"
+[[ "$(<"$codex_home/config.toml")" == "$reconciled_config" ]] \
+  || fail "parallel-work profile checks changed the reconciled fixture config"
 
-print -- "PASS: parallel-work profile disables Engram while retaining base config"
+print -- "PASS: parallel-work profile disables Engram hooks while retaining MCP availability"
 print -- "PENDING_CANARY: no safe offline Codex surface proved hook suppression plus policy and Superpowers loading"
