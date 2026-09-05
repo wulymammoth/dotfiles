@@ -24,22 +24,49 @@ fail() {
   exit 1
 }
 
-run_codex() {
-  HOME="$home" CODEX_HOME="$codex_home" \
+command -v codex >/dev/null 2>&1 || fail "codex is not installed"
+codex_bin="$(command -v codex)"
+
+run_isolated() {
+  env -i \
+    HOME="$home" CODEX_HOME="$codex_home" \
     XDG_CONFIG_HOME="$xdg_config" XDG_CACHE_HOME="$xdg_cache" \
     XDG_DATA_HOME="$xdg_data" XDG_STATE_HOME="$xdg_state" \
-    codex -p parallel-work "$@"
+    TMPDIR="${TMPDIR:-/tmp}" PATH="$PATH" LANG="${LANG:-C.UTF-8}" \
+    COMMAND_MODE="${COMMAND_MODE:-unix2003}" USER="${USER:-fixture-user}" \
+    LOGNAME="${LOGNAME:-fixture-user}" \
+    __CF_USER_TEXT_ENCODING="${__CF_USER_TEXT_ENCODING:-0x0:0x0:0x0}" \
+    "$@"
 }
 
-command -v codex >/dev/null 2>&1 || fail "codex is not installed"
+run_codex() {
+  run_isolated "$codex_bin" -p parallel-work "$@"
+}
 [[ -f "$profile_source" ]] || fail "tracked parallel-work profile is missing"
 [[ "$(<"$profile_source")" == $'service_tier = "default"\nmodel = "gpt-5.6-sol"\nmodel_reasoning_effort = "xhigh"\n[plugins."engram@engram"]\nenabled = false\n\n[mcp_servers.engram]\nenabled = false' ]] \
   || fail "parallel-work overlay must preserve model defaults and disable the Engram plugin and MCP server"
 
 cat >"$codex_home/config.toml" <<'TOML'
+model_instructions_file = "__MODEL_INSTRUCTIONS__"
+experimental_compact_prompt_file = "__COMPACT_INSTRUCTIONS__"
+
+[plugins."engram@engram"]
+enabled = true
+
 [mcp_servers.engram]
 command = "/usr/bin/true"
+enabled = true
 TOML
+
+model_instructions="$codex_home/engram-instructions.md"
+compact_instructions="$codex_home/engram-compact-prompt.md"
+print -r -- "fixture model instructions" >"$model_instructions"
+print -r -- "fixture compact instructions" >"$compact_instructions"
+sed -i '' \
+  -e "s|__MODEL_INSTRUCTIONS__|$model_instructions|" \
+  -e "s|__COMPACT_INSTRUCTIONS__|$compact_instructions|" \
+  "$codex_home/config.toml"
+base_config_before="$(<"$codex_home/config.toml")"
 
 readonly instruction_marker="SYNTHETIC_PARALLEL_BASE_INSTRUCTION_7D91E2"
 print -r -- "$instruction_marker" >"$workspace/AGENTS.md"
@@ -52,6 +79,29 @@ ln -s "$profile_source" "$overlay_path"
 version_output="$(run_codex --version)"
 [[ "$version_output" == codex-cli\ * ]] \
   || fail "parallel-work profile did not parse: $version_output"
+
+policy_output=""
+if policy_output="$(run_isolated /usr/bin/python3 -B \
+  "$repo_root/scripts/codex-memory-policy.py" --dry-run)"; then
+  fail "contaminated base configuration should require reconciliation"
+else
+  policy_rc=$?
+fi
+[[ "$policy_rc" == 1 ]] \
+  || fail "memory-policy dry-run returned unexpected status: $policy_rc"
+[[ "$(print -r -- "$policy_output" | wc -l | tr -d ' ')" == 6 ]] \
+  || fail "memory-policy dry-run must report only the config identity and four operations"
+for expected_operation in \
+  "model_instructions_file=remove" \
+  "experimental_compact_prompt_file=remove" \
+  "plugins.engram@engram.enabled=set_false" \
+  "mcp_servers.engram.enabled=set_false"
+do
+  print -r -- "$policy_output" | rg --fixed-strings --quiet "$expected_operation" \
+    || fail "memory-policy dry-run is missing: $expected_operation"
+done
+[[ "$(<"$codex_home/config.toml")" == "$base_config_before" ]] \
+  || fail "memory-policy dry-run changed the fixture config"
 
 mcp_json="$test_root/mcp.json"
 run_codex mcp list --json >"$mcp_json"
@@ -69,6 +119,9 @@ if run_codex debug prompt-input --help >/dev/null 2>&1; then
   rg --fixed-strings --quiet "$instruction_marker" "$prompt_json" \
     || fail "synthetic base instruction file was not retained"
 fi
+
+[[ "$(<"$codex_home/config.toml")" == "$base_config_before" ]] \
+  || fail "parallel-work profile checks changed the fixture config"
 
 print -- "PASS: parallel-work profile disables Engram while retaining base config"
 print -- "PENDING_CANARY: no safe offline Codex surface proved hook suppression plus policy and Superpowers loading"

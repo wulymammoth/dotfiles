@@ -55,7 +55,9 @@ and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
   writing. A missing or stale descriptor fails closed only after orchestration
   has been selected; it is not required for an ordinary sole-owner worktree.
   `COORDINATOR_ONLY` permits coordination, never implementation in another
-  checkout.
+  checkout. If the skill catalog entry is unavailable, read
+  `${CODEX_HOME:-$HOME/.codex}/skills/orchestrating-parallel-worktrees/SKILL.md`
+  directly before continuing.
 - A prepared multi-writer session repeats guard, claim, and live-state
   reconciliation after compaction or resume. Git plus the descriptor and owner
   claim are current authority; memory and transcript labels are not.

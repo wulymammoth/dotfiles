@@ -52,6 +52,11 @@ do
     || fail "global AGENTS policy is missing: $required_policy"
 done
 
+rg --fixed-strings --quiet \
+  '${CODEX_HOME:-$HOME/.codex}/skills/orchestrating-parallel-worktrees/SKILL.md' \
+  "$global_agents" \
+  || fail "global AGENTS policy is missing the direct orchestration-skill fallback"
+
 if rg --fixed-strings --quiet "mem_current_project" "$global_agents"; then
   fail "ordinary global policy must not require mem_current_project"
 fi
@@ -65,6 +70,62 @@ for required_boundary in \
 do
   rg --fixed-strings --quiet "$required_boundary" "$skill_source" \
     || fail "parallel worktree skill boundary is missing: $required_boundary"
+done
+
+
+bounded_policy="$repo_root/codex-config/.codex/policies/bounded-autonomy.md"
+for required_preflight in \
+  "prepared startup worktree" \
+  "physical startup root" \
+  "base ancestry" \
+  "fresh writer" \
+  "wrong root" \
+  "After compaction or resume"
+do
+  rg --fixed-strings --quiet "$required_preflight" "$bounded_policy" \
+    || fail "bounded-autonomy policy is missing preflight rule: $required_preflight"
+done
+
+harness_doc="$repo_root/docs/codex-harness-autonomy.md"
+for required_preflight in \
+  "prepared startup worktree" \
+  "physical startup root" \
+  "base ancestry" \
+  "fresh writer" \
+  "wrong root"
+do
+  rg --fixed-strings --quiet "$required_preflight" "$harness_doc" \
+    || fail "harness design is missing preflight rule: $required_preflight"
+done
+
+scenario_doc="$repo_root/tests/parallel-worktree-skill-scenarios.md"
+for scenario in \
+  "S9 — Prepared worktree reuse" \
+  "S10 — Resumed prepared worktree" \
+  "S11 — Wrong-root refusal" \
+  "S12 — Primary coordinator handoff"
+do
+  rg --fixed-strings --quiet "$scenario" "$scenario_doc" \
+    || fail "parallel-worktree scenarios are missing: $scenario"
+done
+
+memory_policy_script="$repo_root/scripts/codex-memory-policy.py"
+memory_policy_doc="$repo_root/docs/codex-memory-policy.md"
+[[ -f "$memory_policy_script" ]] \
+  || fail "native Codex memory-policy reconciler is missing"
+[[ -f "$memory_policy_doc" ]] \
+  || fail "Codex memory-policy documentation is missing"
+for required_memory_boundary in \
+  "model_instructions_file" \
+  "experimental_compact_prompt_file" \
+  'plugins."engram@engram".enabled' \
+  "mcp_servers.engram.enabled" \
+  "does not activate" \
+  "fresh session" \
+  "MCP-only"
+do
+  rg --fixed-strings --quiet "$required_memory_boundary" "$memory_policy_doc" \
+    || fail "memory-policy documentation is missing: $required_memory_boundary"
 done
 
 for required_shell_guard in \

@@ -79,13 +79,25 @@ There is deliberately no autonomous `SHIPPED` state.
 
 1. Reconcile current code, Git/worktree state, active plan, and repository
    contracts. Current repository evidence outranks notes and memory.
-2. Create and verify exactly one harness-owned isolated worktree from the named
-   base revision. If isolation fails, stop; never fall back to a current or dirty
+2. Validate and reuse the approved isolated prepared startup worktree when it
+   already exists. Its physical startup root, repository, task branch,
+   base ancestry and base revision, allowed dirty state, and current ownership must
+   match the envelope. A resumed run uses the same checks; it does not infer
+   ownership from a transcript, process, memory, or directory name.
+3. If worktree creation is still needed, a coordinator prepares exactly one
+   executor worktree before a fresh writer starts there. The coordinator never
+   follows preparation with cross-root implementation, and the writer never
+   creates a nested executor worktree or falls back to a current or dirty primary
    checkout.
-3. Do not create nested executor worktrees. Do not reset, remove, prune, or
-   delete unrelated worktrees or branches.
-4. Confirm every required command and evidence category before editing.
-5. Confirm that the selected execution authority is compatible with the commit
+4. A wrong root, branch, base, dirty-state, or owner mismatch returns `BLOCKED`.
+   Do not reset, remove, prune, or delete unrelated worktrees or branches to make
+   preflight pass.
+5. After compaction or resume, repeat the live-state reconciliation before any
+   further repository work. Run orchestration guard and claim again only when an
+   explicit multi-writer descriptor has selected that protocol; ordinary sole
+   ownership does not acquire those requirements.
+6. Confirm every required command and evidence category before editing.
+7. Confirm that the selected execution authority is compatible with the commit
    setting. `superpowers_sdd` requires `local_checkpoint_commits: allowed`;
    otherwise select `inline_policy_executor` or stop `BLOCKED`.
 
