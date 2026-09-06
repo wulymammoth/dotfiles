@@ -1,70 +1,78 @@
 ## Startup and authority
 
-At the start of a session, determine the current repository and branch. Inspect
-these files when present:
+For repository work, determine the current repository and branch. Inspect these
+files when present, reading only relevant sections of large files:
 
 - `README.md`
 - `<current branch name>.md`
 - `Codex.local.md`
 - `.Codex-context.md`
 
-If a file is large, inspect its headings and only the sections relevant to the
-current task. Current repository code, tests, specifications, design documents,
-and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
+Current repository code, tests, specifications, design documents, and accepted
+ADRs are authoritative over notes, ctx transcripts, and memories.
 
 ## Concurrent sessions
 
-- A writable checkout and branch have one active writer session at a time. Its
-  named executor may dispatch project-approved workers with explicit,
-  non-overlapping ownership and remains responsible for integration. Other
-  sessions may inspect read-only, but a review verdict must target a named
-  commit or explicitly quiescent checkpoint. Independent writer sessions must
-  use isolated checkouts or worktrees, each on its own task branch.
-- During a concurrent-worktree workflow, the startup checkout is the only checkout it may mutate. Record its physical root before work. It must not implement
-  in another checkout through `workdir`, `git -C`, or absolute paths. A session
-  started in a primary checkout may coordinate creation of another worktree,
-  but it must not implement there. When explicit multi-writer orchestration is
-  selected, its only cross-root mutation is the narrow approved-plan and
-  descriptor bootstrap; source, test, configuration, and implementation edits
-  wait for the prepared writer. The ordinary no-handoff path is to create the
-  worktree in the shell first, `cd` into it, and start Codex there.
+- Each writable checkout and branch has one active writer. Its named executor
+  may dispatch project-approved workers with explicit ownership and remains
+  responsible for integration. Independent writers need isolated checkouts and
+  task branches. Other sessions may inspect read-only; review a named commit or
+  explicitly quiescent checkpoint. Overlapping parallel changes require an
+  explicit integration owner and reconciliation order.
+- During worktree workflows, the startup checkout is the only checkout it may mutate.
+  Record its physical root before work; never implement in another checkout
+  through `workdir`, `git -C`, or absolute paths. A primary-checkout coordinator
+  may create the approved plan and descriptor in a new unclaimed worktree only
+  under explicit multi-writer orchestration; implementation waits for its writer.
+  For ordinary isolated work, create the worktree in the shell, `cd` into it,
+  then start Codex there.
 - Ordinary single-task work has one owner in its startup checkout and does not require a descriptor or claim.
-  `Work on <TASK-ID or issue URL>` means resolve
-  the task and propose the plan in the current owner session; it does not
-  silently create coordinator authority or permit cross-root writes. Use
-  repository-local worktree lifecycle commands when present and fall back to
-  `using-git-worktrees` only when needed.
-- A mutable hosted artifact or environment also has one active writer. This
-  includes a pull request, tracker issue, deployment, staging environment, and
-  provider configuration; hand off ownership before another session mutates it.
-- Treat a simulator, physical device, shared database, provider budget, or
-  other shared runtime as exclusive unless the project proves isolation.
-- Parallel changes to overlapping or high-conflict files are allowed only with
-  an explicit integration owner and reconciliation order. Do not serialize all
-  work merely because eventual integration may produce conflicts.
-- After compaction or resume, and at session start, reconcile the repository
-  root, branch, HEAD, dirty state, current task, and any active review artifact
-  against live state before acting on summaries. The active conversation,
-  transcript/resume state, and task-local notes support recovery but do not
-  override verified repository state.
+  `Work on <TASK-ID or issue URL>` means resolve the task and propose its plan;
+  it does not select orchestration or authorize cross-root implementation.
+- Use repository-local worktree lifecycle commands when present. Fall back to
+  `using-git-worktrees` only when the repository has no lifecycle tooling. A
+  failed guard, ownership check, or required worktree creation stops dependent
+  writes; never bypass it with generic tooling or work in place instead.
+- Hosted artifacts and environments also have one active writer; hand off before
+  another session mutates them. Treat devices, simulators, shared databases,
+  provider budgets, and other shared runtime as exclusive unless isolation is proven.
+- After compaction or resume, and at session start, reconcile the physical root,
+  branch, HEAD, dirty state, current task, and owned review artifacts against live
+  state before acting on summaries. Prepared multi-writer sessions also repeat
+  guard and claim; their Git state, descriptors, and claims establish ownership.
 - Invoke `orchestrating-parallel-worktrees` only for two or more writer sessions
   or an existing `.superpowers/parallel/session.conf`. In that explicit
-  multi-writer workflow, the coordinator may perform the narrow approved-plan
-  and descriptor bootstrap in a new unclaimed worktree, then each prepared
-  writer must run `worktree-session guard` and claim its descriptor before
-  writing. A missing or stale descriptor fails closed only after orchestration
-  has been selected; it is not required for an ordinary sole-owner worktree.
-  `COORDINATOR_ONLY` permits coordination, never implementation in another
-  checkout. If the skill catalog entry is unavailable, read
+  multi-writer workflow, each prepared writer must run `worktree-session guard`
+  and claim its descriptor before writing. Missing or stale descriptors fail
+  closed only after orchestration is selected. `COORDINATOR_ONLY` permits
+  coordination, never cross-root implementation. If the skill is unavailable, read
   `${CODEX_HOME:-$HOME/.codex}/skills/orchestrating-parallel-worktrees/SKILL.md`
   directly before continuing.
-- A prepared multi-writer session repeats guard, claim, and live-state
-  reconciliation after compaction or resume. Git plus the descriptor and owner
-  claim are current authority; memory and transcript labels are not.
-- Before declaring work ready, refresh the target base and prove the result is
-  current and mergeable. Use the repository's chosen merge or rebase policy
-  rather than imposing one globally. Repository-local instructions define the
-  concrete ownership tuple, isolation commands, and runtime boundaries.
+- Before declaring implementation ready, refresh the target base and prove the
+  result is current and mergeable using the repository's merge or rebase policy.
+  Repository instructions define concrete isolation commands and runtime limits.
+
+## Approvals and delivery
+
+- Recommend a concrete delivery plan using known repository and session context.
+  One explicit approval can cover implementation, multiple verified checkpoint
+  commits, pushing the named task branch, and creating or updating its pull
+  request. State sensible defaults for the remote, PR base, and draft/ready intent.
+  A direct user request can supply this approval without another planning gate.
+- Keep that approval across steps, turns, and resume within the approved scope.
+  Choose appropriate checkpoint boundaries and commit messages, run relevant
+  checks, and report progress without asking again for each commit, push, or PR.
+  This overrides workflow-skill defaults that split already-authorized actions
+  into separate confirmation prompts.
+- Ask again only when authorization is missing or a material change affects
+  scope, destination, risk, or the agreed outcome. For actions still awaiting
+  approval, prepare a concrete, verified result first, then ask one consolidated
+  question for the remaining delivery steps. Coding or review alone does not
+  authorize publication.
+- Merge, deployment, release, destructive operations, and paid/provider/device
+  actions require explicit authorization beyond the commit/push/PR bundle.
+  A bounded autonomous run keeps its local-only envelope; separately authorized
+  delivery can follow `LOCAL_READY` without repeating an existing approval.
 
 ## Tools and context
 
@@ -110,14 +118,15 @@ and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
   a concrete failure.
 - This policy supersedes workflow-skill defaults that require `gh` when local
   `git` and GitHub MCP can complete the operation.
-- Tool selection does not grant mutation authority. Preserve explicit approval
-  gates for pushes, pull-request or issue changes, reviews, merges, and releases.
+- Tool selection does not grant mutation authority. Apply the delivery approval
+  above; unrelated issue changes and posted reviews require explicit authorization.
 
 ## Linear operations
 
 - Prefer direct Linear MCP (`mcp__linear__*`); use the bundled connector only
   after a concrete capability gap or failure. This supersedes skill defaults.
-- Preserve explicit approval gates for Linear mutations.
+- Include Linear mutations explicitly in an approved plan; tool availability or
+  commit/push/PR approval alone does not authorize them.
 
 ## Development workflow
 
@@ -137,9 +146,8 @@ and accepted ADRs are authoritative over notes, ctx transcripts, and memories.
    verification suite before claiming success.
 7. Update context or design documents only when durable project knowledge or an
    accepted decision changed.
-8. For completed repository work, propose a commit message and ask for explicit
-   approval before committing. Commit only complete, verified milestones; no
-   commit is required when no tracked repository files changed.
+8. Under an approved delivery plan, commit complete, verified checkpoints as
+   useful. No commit is needed when no tracked repository files changed.
 
 ## Bounded autonomous work
 
@@ -148,53 +156,44 @@ execution, first read `~/.codex/policies/bounded-autonomy.md`. That approval may
 cover only the envelope recorded in the plan: one harness-owned isolated
 worktree, named local commands, and local checkpoint commits only when expressly
 allowed. Isolation, verification, review, and required evidence fail closed.
-The run ends at `LOCAL_READY` or `BLOCKED`; all hosted, production, provider,
-paid, destructive, authentication, provisioning, device/store, and shipping
-actions retain their separate approval gates. Otherwise, the normal per-action
-and per-commit rules above remain in force.
+The run ends at `LOCAL_READY` or `BLOCKED`; hosted, production, provider, paid,
+destructive, authentication, provisioning, device/store, and shipping actions
+remain outside that execution envelope. The delivery approval policy above
+governs any separately authorized follow-on work.
 
 ## Decision and historical memory
 
-The active conversation, Codex transcript/resume state, live Git, and committed
-task-local plans or notes are the default working context. Current repository
-code, tests, specifications, design documents, and accepted ADRs are
-authoritative. Historical lookup is optional and must never establish current
-ownership, task scope, completion, or repository truth.
+Use the active conversation, transcript/resume state, live Git, and task-local
+plans or notes as working context. Historical lookup is optional and never
+establishes current ownership, task scope, completion, or repository truth.
 
-- Use ctx only when original discussion, rejected approaches, regressions, exact
-  prior commands, or source-session provenance materially matters. Follow the
-  installed `ctx` skill: start with concrete identifiers and a small result
-  limit (normally 5), inspect a focused event window, and broaden only when
-  necessary. Use `--primary-only` for user-intent and decision provenance;
-  retain the default primary-plus-subagent scope for implementation, test, and
-  failure evidence.
-- Use Engram as supplementary ADR/decision memory, including verified durable
-  lessons. Scope recall to the reconciled canonical project and the current work;
-  project-wide recent sessions are history, not task recovery or ownership.
-  Existing history remains available, but do not load broad recovery context,
-  construct per-task Engram projects, or merge stores blindly. Verify retrieved
-  claims against current source.
-- Disabling the Engram shell plugin and its bulk prompt/recovery/passive hooks
-  does not make an enabled MCP server manual-only or instruction-free. MCP
-  initialization may still advertise proactive saves, concise session summaries,
-  and project-scoped context. Do not invent a new memory mode, proxy, or wrapper.
+- Use ctx for original discussion, rejected approaches, regressions, exact prior
+  commands, or source-session provenance when material. Follow its installed
+  skill: concrete identifiers, small limits (normally 5), focused event windows,
+  then broaden as needed. Use `--primary-only` for user-intent and decision
+  provenance; retain primary-plus-subagent scope for implementation/test evidence.
+- Use Engram as supplementary ADR/decision memory and verified durable lessons.
+  Scope recall to the reconciled canonical project and current work; verify
+  claims against source. Preserve history without broad recovery dumps, per-task
+  Engram projects, or blind store merges.
+- An enabled Engram MCP can advertise proactive saves, summaries, and project
+  context even with shell-plugin hooks disabled. Do not describe it as manual-only
+  or instruction-free, or invent a new memory mode, proxy, or wrapper.
 - At the first memory write, call `mem_session_start` with the actual runtime
   thread ID and physical startup directory, retain its returned canonical
-  project, and pass that explicit project and `session_id` to `mem_save` and
-  `mem_session_summary`. This attribution is not an ownership, descriptor,
-  isolation, security, readiness, or general coding-startup boundary. Never
-  manufacture an ID or treat an inherited parent ID as a distinct subagent ID.
+  project, and pass that explicit project and `session_id` to every `mem_save`
+  and `mem_session_summary`. Attribution is not an ownership, isolation, security,
+  readiness, or coding-startup boundary. Never manufacture an ID or treat a
+  parent's ID as a distinct subagent identity.
 - Prefer direct `mem_save(capture_prompt:false)` for established architecture,
-  policy, decision, root-cause, or verified-lesson records. Include the
-  authoritative source path and decision status. Summaries should distinguish
-  verified outcomes from pending work. Topic-key upserts are shared across the
-  project; explicit sessions do not isolate them.
+  policy, decision, root-cause, or verified-lesson records. Include the source path
+  and decision status; distinguish verified outcomes from pending work. Topic-key
+  upserts are project-shared, regardless of session identity.
 - An unknown or mismatched session/project stops that memory write. Do not retry
-  by dropping identifiers or selecting the latest session. A subagent without
-  independently verified identity returns candidate durable learnings to its
-  owner. Memory unavailability is disclosed as pending capture and does not fake
-  success or block unrelated coding unless a higher-priority requirement says to
-  stop.
+  by dropping identifiers or selecting the latest session. Subagents without
+  verified identity return candidate durable learnings to their owner. Disclose
+  pending capture; memory unavailability does not block unrelated coding unless
+  a higher-priority requirement says to stop.
 
 For a durable architecture or product decision, update the appropriate ADR or
 design document in Git. When Engram capture is appropriate, use a stable topic

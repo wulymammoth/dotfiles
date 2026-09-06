@@ -208,7 +208,10 @@ attempts separately from repair rounds.
 Neither terminal state authorizes push, pull-request or issue/tracker mutation,
 review submission, merge, deployment or release, production/provider/paid
 calls, destructive data changes, authentication or secret changes, provisioning,
-or real-device/store actions. Each class remains separately approved.
+or real-device/store actions. Each action needs explicit authorization. A
+commit/push/PR delivery bundle may be approved together under the global policy
+and run after `LOCAL_READY`, outside this bounded run; do not repeat approval
+already given for that scope. Other action classes retain their own authorization.
 
 ## Pilot Promotion Gate
 
