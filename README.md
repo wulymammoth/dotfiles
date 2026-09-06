@@ -84,11 +84,12 @@ cd /path/to/repository/.worktrees/task-slug
 codex -p parallel-work
 ```
 
-That sole owner does not need a session descriptor, claim, or memory-project
-check. The task profile preserves the tracked model and service defaults while
-disabling both the Engram plugin and Engram MCP server. Codex
-transcript/resume, live Git, and committed task-local plans or notes carry the
-working context.
+That sole owner does not need a session descriptor, claim, or per-task memory
+project. The task profile preserves the tracked model and service defaults,
+disables the Engram shell plugin and its bulk hooks, and keeps the Engram MCP
+server available for ADR-centric decision memory. Codex transcript/resume, live
+Git, and committed task-local plans or notes carry the working context and
+remain authoritative for the current task.
 
 Use the orchestration helper only when two or more writer sessions will work in
 parallel, or when an existing `.superpowers/parallel/session.conf` already
@@ -126,12 +127,15 @@ not stranded, but launch and resume do not inject their legacy Engram values.
 The deprecated `verify --memory-project` command exists only for schema-v1
 compatibility; schema v2 rejects it with migration guidance.
 
-Task-project injection was not a complete session-isolation boundary: it
-isolated explicit or manual Engram MCP calls, but did not isolate automatic
-session registration, prompts, passive capture, or summaries. Preserve existing
-Engram history as searchable legacy material; do not delete or blindly merge it.
-Curated canonical memory, when desired, is written deliberately from a
-reconciled canonical checkout after integration rather than from task worktrees.
+Task-project injection was not a complete session-isolation boundary: explicit
+session and project parameters provide attribution, not ownership, topic
+isolation, or a security boundary. Engram remains supplementary ADR/decision
+memory, while ctx supplies original discussions, commands, rejected approaches,
+and source-session provenance. MCP initialization may advertise proactive saves
+and summaries even with shell-plugin hooks disabled; use the explicit
+session/project protocol in [the memory policy](docs/codex-memory-policy.md)
+rather than describing MCP as manual-only or instruction-free. Preserve existing
+history, and do not delete or blindly merge it.
 
 Stow activation and provider-backed canary execution remain separate approval
 gates; installing these tracked files does not prove live multi-worker behavior.

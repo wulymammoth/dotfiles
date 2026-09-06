@@ -204,10 +204,24 @@ Any state -----------------------------------------------> BLOCKED
 
 - Reconcile the current base revision, working trees, active plan, and declared
   project commands.
-- Create exactly one harness-owned isolated worktree. Failure to create or
-  validate it stops the run; never fall back to the user's current checkout.
-- Do not create nested executor worktrees and never enumerate, reset, remove, or
-  delete unrelated worktrees or branches.
+- Validate and reuse the approved isolated prepared startup worktree when it
+  already exists. Its physical startup root, repository, task branch,
+  base ancestry and base revision, allowed dirty state, and current owner must match
+  the envelope. This is the normal path for both a fresh prepared writer and a
+  resumed writer.
+- If worktree creation is still needed, a coordinator prepares exactly one
+  executor worktree before a fresh writer starts there. Preparation never gives
+  the coordinator cross-root implementation authority, and the writer never
+  creates a nested executor worktree or falls back to a current or dirty primary
+  checkout.
+- A wrong root, branch, base, dirty-state, or ownership result is a fail-closed
+  `BLOCKED`, not permission to repair the descriptor or infer ownership. Never
+  enumerate, reset, remove, or delete unrelated worktrees or branches to make the
+  check pass.
+- After compaction or resume, repeat live-state reconciliation before any more
+  repository work. Guard and claim are repeated only when an explicit
+  multi-writer descriptor selected orchestration; an ordinary sole owner does
+  not gain that ceremony.
 
 ### `EXECUTE`
 

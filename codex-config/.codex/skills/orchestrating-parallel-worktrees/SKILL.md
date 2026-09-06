@@ -43,7 +43,10 @@ Resolve the helper without changing `PATH`:
    malformed descriptor is a blocker rather than permission to write.
 4. Once claimed, stop writing there. Inspect a named commit or explicitly
    quiescent digest read-only; send fixes to the owner or hand off explicitly.
-5. Never auto-integrate, activate, publish, write canonical memory, or clean up.
+5. Never auto-integrate, activate, publish, or clean up. Memory work follows the
+   global attribution and decision-authority policy; it never establishes
+   ownership or readiness, and reviewers without verified capture identity
+   return candidate durable learnings to the owner.
 
 ## Writer startup and recovery
 

@@ -22,8 +22,8 @@ print -r -- "sentinel runtime state" >"$test_root/.codex/state.json"
 
 profile_source="$repo_root/codex-config/.codex/parallel-work.config.toml"
 [[ -f "$profile_source" ]] || fail "parallel-work profile is missing"
-[[ "$(<"$profile_source")" == $'service_tier = "default"\nmodel = "gpt-5.6-sol"\nmodel_reasoning_effort = "xhigh"\n[plugins."engram@engram"]\nenabled = false\n\n[mcp_servers.engram]\nenabled = false' ]] \
-  || fail "parallel-work profile must preserve model defaults and disable the Engram plugin and MCP server"
+[[ "$(<"$profile_source")" == $'service_tier = "default"\nmodel = "gpt-5.6-sol"\nmodel_reasoning_effort = "xhigh"\n[plugins."engram@engram"]\nenabled = false\n\n[mcp_servers.engram]\nenabled = true' ]] \
+  || fail "parallel-work profile must preserve model defaults, disable the Engram plugin, and retain Engram MCP"
 
 skill_source="$repo_root/codex-config/.codex/skills/orchestrating-parallel-worktrees/SKILL.md"
 helper_source="$repo_root/codex-config/.codex/skills/orchestrating-parallel-worktrees/scripts/worktree-session"
@@ -52,6 +52,11 @@ do
     || fail "global AGENTS policy is missing: $required_policy"
 done
 
+rg --fixed-strings --quiet \
+  '${CODEX_HOME:-$HOME/.codex}/skills/orchestrating-parallel-worktrees/SKILL.md' \
+  "$global_agents" \
+  || fail "global AGENTS policy is missing the direct orchestration-skill fallback"
+
 if rg --fixed-strings --quiet "mem_current_project" "$global_agents"; then
   fail "ordinary global policy must not require mem_current_project"
 fi
@@ -65,6 +70,100 @@ for required_boundary in \
 do
   rg --fixed-strings --quiet "$required_boundary" "$skill_source" \
     || fail "parallel worktree skill boundary is missing: $required_boundary"
+done
+
+
+bounded_policy="$repo_root/codex-config/.codex/policies/bounded-autonomy.md"
+for required_preflight in \
+  "prepared startup worktree" \
+  "physical startup root" \
+  "base ancestry" \
+  "fresh writer" \
+  "wrong root" \
+  "After compaction or resume"
+do
+  rg --fixed-strings --quiet "$required_preflight" "$bounded_policy" \
+    || fail "bounded-autonomy policy is missing preflight rule: $required_preflight"
+done
+
+harness_doc="$repo_root/docs/codex-harness-autonomy.md"
+for required_preflight in \
+  "prepared startup worktree" \
+  "physical startup root" \
+  "base ancestry" \
+  "fresh writer" \
+  "wrong root"
+do
+  rg --fixed-strings --quiet "$required_preflight" "$harness_doc" \
+    || fail "harness design is missing preflight rule: $required_preflight"
+done
+
+scenario_doc="$repo_root/tests/parallel-worktree-skill-scenarios.md"
+for scenario in \
+  "S9 — Prepared worktree reuse" \
+  "S10 — Resumed prepared worktree" \
+  "S11 — Wrong-root refusal" \
+  "S12 — Primary coordinator handoff" \
+  "S13 — ADR recall and provenance routing" \
+  "S14 — Explicit memory attribution" \
+  "S15 — MCP instructions and shared project scope"
+do
+  rg --fixed-strings --quiet "$scenario" "$scenario_doc" \
+    || fail "parallel-worktree scenarios are missing: $scenario"
+done
+
+memory_policy_script="$repo_root/scripts/codex-memory-policy.py"
+memory_policy_doc="$repo_root/docs/codex-memory-policy.md"
+[[ -f "$memory_policy_script" ]] \
+  || fail "native Codex memory-policy reconciler is missing"
+[[ -f "$memory_policy_doc" ]] \
+  || fail "Codex memory-policy documentation is missing"
+for required_memory_boundary in \
+  "model_instructions_file" \
+  "experimental_compact_prompt_file" \
+  'plugins."engram@engram".enabled' \
+  "mcp_servers.engram.enabled" \
+  "does not activate" \
+  "fresh session" \
+  "ADR-centric" \
+  "ctx" \
+  "mem_session_start" \
+  "session_id" \
+  "capture_prompt:false" \
+  "proactive"
+do
+  rg --fixed-strings --quiet "$required_memory_boundary" "$memory_policy_doc" \
+    || fail "memory-policy documentation is missing: $required_memory_boundary"
+done
+
+
+for required_memory_policy in \
+  "supplementary ADR" \
+  "Current repository code" \
+  "actual runtime thread ID" \
+  "physical startup directory" \
+  "explicit project" \
+  "not an ownership" \
+  "unknown or mismatched" \
+  "candidate durable learnings"
+do
+  if ! rg --fixed-strings --quiet "$required_memory_policy" \
+    "$global_agents" "$memory_policy_doc"; then
+    fail "tracked policy is missing the memory contract: $required_memory_policy"
+  fi
+done
+
+for forbidden_memory_policy in \
+  "disabling both the Engram plugin and Engram MCP" \
+  "both the plugin and MCP entry disabled" \
+  "written deliberately from a reconciled canonical checkout" \
+  "only after integration"
+do
+  if rg --fixed-strings --quiet "$forbidden_memory_policy" \
+    "$repo_root/README.md" "$repo_root/.Codex-context.md" \
+    "$global_agents" "$memory_policy_doc" "$skill_source"; then
+    fail "tracked policy retains a blanket Engram restriction: $forbidden_memory_policy"
+  fi
 done
 
 for required_shell_guard in \

@@ -76,9 +76,10 @@ before either writer edits.
 
 You resume a linked worktree whose existing descriptor has
 `session.schemaVersion = 1` and legacy `memory.sharedProject` and
-`memory.taskProject` keys. The recorded owner is valid, but Engram is disabled in
-the task profile and no `ENGRAM_PROJECT` variable exists. Explain whether the
-worktree is stranded and the exact recovery boundary.
+`memory.taskProject` keys. The recorded owner is valid, the Engram shell plugin
+is disabled while MCP remains available, and no `ENGRAM_PROJECT` variable
+exists. Explain whether the worktree is stranded and the exact recovery
+boundary.
 
 ### PASS criteria
 
@@ -157,3 +158,141 @@ and branch. Explain what you do next.
 3. Does not remove the worktree or branch without separate cleanup approval.
 4. Holds or explicitly hands off/releases ownership according to the approved
    next step rather than inferring cleanup permission.
+
+## S9 — Prepared worktree reuse
+
+### Prompt
+
+A bounded run's approved envelope names `/tmp/acme-repo/.worktrees/task-g`, and
+the current Codex session started in that already-prepared worktree. Its physical
+root, repository, task branch, base ancestry and revision, clean state, and owner
+all match the envelope. Explain whether you create another worktree and list the
+checks required before the first edit.
+
+### PASS criteria
+
+1. Validates and reuses the existing prepared startup worktree.
+2. Reconciles the physical root, repository, branch, base ancestry/revision,
+   dirty state, active task, and ownership against live evidence.
+3. Does not create a second or nested executor worktree.
+4. Runs guard and claim only if an explicit orchestration descriptor selected
+   that protocol.
+
+## S10 — Resumed prepared worktree
+
+### Prompt
+
+Codex resumes a bounded run in `/tmp/acme-repo/.worktrees/task-h` with an
+uncommitted allowlisted implementation diff. A summary says the run owns this
+checkout, and an explicit multi-writer descriptor is present. State the ordered
+checks before any further repository work.
+
+### PASS criteria
+
+1. Treats the summary only as a routing hint and revalidates live state.
+2. Reconciles the physical root, repository, branch, HEAD/base, allowed dirty
+   paths, task, descriptor, and current owner.
+3. Repeats orchestration guard and claim for the recorded owner.
+4. Reuses the worktree only on a complete match and returns `BLOCKED` on any
+   mismatch without resetting or rewriting the descriptor.
+
+## S11 — Wrong-root refusal
+
+### Prompt
+
+An approved bounded envelope names `/tmp/acme-repo/.worktrees/task-i`, but the
+current Codex session's physical startup root is the primary checkout at
+`/tmp/acme-repo`. The task branch is visible and clean. A teammate suggests using
+`git -C` to implement in the named worktree. Explain the next action.
+
+### PASS criteria
+
+1. Returns `BLOCKED` because the physical startup root does not match the
+   envelope.
+2. Does not implement through `git -C`, `workdir`, an absolute path, or a shell
+   `cd` into the other checkout.
+3. Does not reinterpret the clean primary checkout or visible branch as owner
+   authority.
+4. Requests a fresh writer session whose startup checkout is the prepared
+   worktree.
+
+## S12 — Primary coordinator handoff
+
+### Prompt
+
+A coordinator starts in `/tmp/acme-repo` and receives approval to prepare
+`/tmp/acme-repo/.worktrees/task-j` for a bounded implementation run. Describe the
+allowed preparation and how implementation begins.
+
+### PASS criteria
+
+1. The coordinator prepares exactly one isolated executor worktree from the
+   envelope's base and validates its descriptor or handoff data.
+2. The coordinator does not follow preparation with cross-root implementation.
+3. A fresh writer starts with the prepared worktree as its physical startup
+   checkout and performs its own live-state reconciliation.
+4. Guard and claim are required only if explicit multi-writer orchestration was
+   selected; no ownership is inferred from preparation alone.
+
+## S13 — ADR recall and provenance routing
+
+### Prompt
+
+You resume work on `/tmp/acme-repo/.worktrees/task-k` and need an accepted
+architecture decision plus the exact command that exposed an earlier regression.
+The repository contains a current ADR, Engram has a related durable decision,
+and ctx can search the original session. Explain what you consult and what
+controls the implementation.
+
+### PASS criteria
+
+1. Gives current repository code, tests, specifications, and accepted ADRs
+   authority over both memory systems.
+2. Uses project-scoped Engram as supplementary ADR/decision recall and ctx for
+   the original discussion, command, rejected approach, or source provenance.
+3. Treats unrelated project-wide recent sessions as history rather than current
+   task recovery, ownership, scope, or completion evidence.
+4. Does not create a per-task memory project or make memory availability a
+   general coding-startup gate.
+
+## S14 — Explicit memory attribution
+
+### Prompt
+
+After verifying a durable root cause in `/tmp/acme-repo/.worktrees/task-l`, an
+owner session may capture it. State the registration and write parameters, the
+response to an unknown session or mismatched project, and what a subagent does
+when it cannot independently verify its runtime identity.
+
+### PASS criteria
+
+1. Calls `mem_session_start` with the actual runtime thread ID and physical
+   startup directory and retains the returned canonical project.
+2. Passes that explicit `project` and `session_id` to `mem_save` and
+   `mem_session_summary`; prefers direct ADR capture with
+   `capture_prompt:false` and records source path and decision status.
+3. Stops the memory write on unknown or mismatched attribution without dropping
+   identifiers, selecting a latest session, or treating IDs as isolation.
+4. Has an unattributed subagent return candidate durable learnings to its owner
+   instead of manufacturing or inheriting a distinct identity.
+
+## S15 — MCP instructions and shared project scope
+
+### Prompt
+
+The Engram shell plugin and instruction-file overrides are disabled, but the
+Engram MCP server remains enabled with an agent-tool allowlist. A teammate calls
+this "manual-only, instruction-free, process-read-only memory." Explain the
+actual boundary and how shared topic keys should be handled.
+
+### PASS criteria
+
+1. Rejects the instruction-free/manual-only claim because MCP initialization may
+   advertise proactive durable saves and concise session summaries.
+2. Distinguishes disabled bulk prompt/recovery/passive hooks from available MCP
+   tools and does not invent a new mode, proxy, or wrapper.
+3. Recognizes that project-scoped ADR search is intentionally shared and that
+   explicit session attribution is not topic isolation or a security boundary.
+4. Requires existing decision authority before superseding conflicting
+   architecture and discloses unavailable memory as pending capture rather than
+   fake success.
