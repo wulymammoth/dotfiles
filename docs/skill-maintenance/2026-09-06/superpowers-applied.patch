@@ -1,0 +1,295 @@
+diff --git a/skills/finishing-a-development-branch/SKILL.md b/skills/finishing-a-development-branch/SKILL.md
+index fa8aecaf..0a948d5a 100644
+--- a/skills/finishing-a-development-branch/SKILL.md
++++ b/skills/finishing-a-development-branch/SKILL.md
+@@ -7,7 +7,7 @@ description: Use when implementation is complete, all tests pass, and you need t
+ 
+ ## Overview
+ 
+-**Core principle:** Verify tests → Detect environment → Present options → Execute choice → Clean up.
++**Core principle:** Verify tests → Detect environment → Continue approved delivery or request missing authorization → Execute authorized actions.
+ 
+ **Announce at start:** "I'm using the finishing-a-development-branch skill to complete this work."
+ 
+@@ -50,9 +50,12 @@ plan, the conversation, or the branch's upstream. If it is not already
+ known, ask: "This branch split from <your best guess> - is that correct?"
+ Confirm before merging: merging into the wrong base is expensive to undo.
+ 
+-## Step 4: Present Options
++## Step 4: Continue authorized delivery or present options
+ 
+-**Normal repo and named-branch worktree — present exactly these 3 options:**
++First read the accepted delivery plan. An existing approval for checkpoint commits, pushing the named task branch, and creating/updating its PR persists across these steps. Execute that bundle without repeating this menu. Ask only for missing authorization or a material scope/destination/risk change. Merge, deployment, release, destructive cleanup, and provider actions require their own explicit authority. Refresh the target base and prove current mergeability using repository policy before reporting ready.
++
++
++**When delivery authorization is missing, normal repo and named-branch worktree — present these 3 options:**
+ 
+ ```
+ Implementation complete. What would you like to do?
+@@ -64,7 +67,7 @@ Implementation complete. What would you like to do?
+ Which option?
+ ```
+ 
+-**Detached HEAD — present exactly these 2 options:**
++**When delivery authorization is missing, detached HEAD — present these 2 options:**
+ 
+ ```
+ Implementation complete. You're on a detached HEAD (externally managed workspace).
+@@ -83,8 +86,12 @@ is theirs.
+ 
+ ## Step 5: Execute Choice
+ 
++For every path below, including discard and cleanup, repository lifecycle and startup-checkout restrictions take precedence. If an operation needs another checkout and this session is restricted to its startup checkout, hand off there or obtain an explicit exception. Generic commands below never grant cross-root mutation authority. Use the repository merge or cleanup policy before generic examples.
++
+ ### Option 1: Merge Locally
+ 
++Explicit merge approval is required.
++
+ ```bash
+ # Get main repo root for CWD safety
+ MAIN_ROOT=$(git -C "$(git rev-parse --git-common-dir)/.." rev-parse --show-toplevel)
+@@ -103,8 +110,9 @@ If tests fail on the merged result: stop, leave the worktree and branch in
+ place, and investigate — nothing has been pushed, so the merge is local
+ and recoverable.
+ 
+-Once the merged result is green: clean up the worktree (Step 6), then
+-delete the branch:
++Once the merged result is green, preserve the worktree and branch unless
++cleanup and branch deletion are explicitly authorized. For authorized cleanup,
++follow Step 6; only then delete the specifically approved branch:
+ 
+ ```bash
+ git branch -d <feature-branch>
+@@ -118,10 +126,7 @@ git push -u origin <feature-branch>
+ # git push origin HEAD:refs/heads/<new-branch>
+ ```
+ 
+-Then create the pull/merge request against <base-branch> with the forge's
+-tooling — its CLI if one is available, or the creation URL most forges
+-print when you push — following the repo's PR template and conventions if
+-present, and report the URL to your human partner.
++Then create or update the authorized PR against <base-branch> with GitHub MCP (or the repository's chosen forge connector), following its template. Use local git for fetch/commit/push. Use `gh` only after a concrete MCP capability gap or failure; do not require gh authentication otherwise. Report the resulting URL.
+ 
+ Keep the worktree — your human partner iterates on PR feedback there.
+ 
+@@ -158,7 +163,7 @@ git branch -D <feature-branch>
+ 
+ ## Step 6: Cleanup Workspace
+ 
+-**Runs for Option 1 and confirmed discards.** Options 2 and 3 always
++**Runs only with explicit cleanup authorization after Option 1 or a confirmed discard.** Options 2 and 3 always
+ preserve the worktree. Both callers have already changed directory to the
+ main repo root — worktree removal must run from outside the worktree —
+ and use the `GIT_DIR`/`GIT_COMMON`/`WORKTREE_PATH` values captured in
+@@ -166,12 +171,15 @@ Step 2, from before that directory change.
+ 
+ **If `GIT_DIR == GIT_COMMON`:** Normal repo, no worktree to clean up. Done.
+ 
+-**If `WORKTREE_PATH` is under `.worktrees/` or `worktrees/`:** Superpowers
+-created this worktree — we own cleanup:
++**Only with verified session ownership and explicit cleanup authorization:**
++A `.worktrees/` or `worktrees/` directory name proves neither. Check live
++registrations, repository lifecycle rules, task ownership, and uncommitted
++artifacts before removal. Use the repository cleanup command when present.
++Only when generic cleanup is permitted, remove the specifically approved path:
+ 
+ ```bash
+ git worktree remove "$WORKTREE_PATH"
+-git worktree prune  # Self-healing: clean up any stale registrations
++# Do not prune unrelated registrations as an incidental cleanup step.
+ ```
+ 
+ **If removal is refused** (`contains modified or untracked files`): the
+@@ -204,7 +212,7 @@ place. If your platform provides a workspace-exit tool, use it.
+ 
+ | Option | Merge | Push | Keep Worktree | Cleanup Branch |
+ |--------|-------|------|---------------|----------------|
+-| 1. Merge locally | yes | - | - | yes |
++| 1. Merge locally | explicitly approved | - | yes unless cleanup approved | only if explicitly approved |
+ | 2. Create PR | - | yes | yes | - |
+ | 3. Keep as-is | - | - | yes | - |
+ | Discard (explicit request only) | - | - | - | yes (force) |
+@@ -214,11 +222,11 @@ place. If your platform provides a workspace-exit tool, use it.
+ | Excuse | Reality |
+ |--------|---------|
+ | "Tests passed earlier this session" | Run the suite on the tree you are about to integrate. A green run only proves the tree it ran on. |
+-| "They obviously want it merged" | Integration is your human partner's decision. Present the menu and wait. |
++| "They obviously want it merged" | Follow existing explicit delivery approval. Present options only when authorization is missing; never infer merge approval. |
+ | "They seem done with this feature — I'll offer to discard it" | The menu is complete as written. Discard happens only when your human partner asks for it in so many words. |
+ | "'Yeah, get rid of it' counts as confirmation" | Only the typed word `discard` authorizes deletion. |
+ | "The PR is up, so the worktree is clutter now" | PR feedback gets fixed in that worktree. It stays until the work lands. |
+-| "This other worktree looks stale — I'll clean it too" | Clean up only worktrees under `.worktrees/` or `worktrees/`. Everything else belongs to the host. |
++| "This other worktree looks stale — I'll clean it too" | Directory names do not establish ownership or cleanup authority. Preserve unrelated worktrees. |
+ | "Removal refused — `--force` is just finishing the cleanup" | The refusal means files exist only in that worktree. `--force` destroys them permanently. Show your human partner and ask. |
+ | "The merged-result failure is probably flaky" | A failing merged result stops everything. Branch and worktree stay put while you investigate. |
+ | "The base branch is obviously main" | Confirm the fork point or ask. Merging into the wrong base is expensive to undo. |
+diff --git a/skills/receiving-code-review/SKILL.md b/skills/receiving-code-review/SKILL.md
+index 950da7b7..96ae8126 100644
+--- a/skills/receiving-code-review/SKILL.md
++++ b/skills/receiving-code-review/SKILL.md
+@@ -202,4 +202,4 @@ You understand 1,2,3,6. Unclear on 4,5.
+ 
+ ## GitHub Thread Replies
+ 
+-When replying to inline review comments on GitHub, reply in the comment thread (`gh api repos/{owner}/{repo}/pulls/{pr}/comments/{id}/replies`), not as a top-level PR comment.
++When explicitly authorized to reply to GitHub review comments, use GitHub MCP to reply in the original thread. Use `gh` only after a concrete MCP capability gap or failure. Reading or addressing review feedback locally does not itself authorize posting.
+diff --git a/skills/using-git-worktrees/SKILL.md b/skills/using-git-worktrees/SKILL.md
+index 1381dacb..2ff6ba81 100644
+--- a/skills/using-git-worktrees/SKILL.md
++++ b/skills/using-git-worktrees/SKILL.md
+@@ -5,6 +5,10 @@ description: Use when starting feature work that needs isolation from current wo
+ 
+ # Using Git Worktrees
+ 
++## Repository authority
++
++Repository lifecycle commands and startup-checkout restrictions take precedence over the fallback examples below. A failed repository guard stops dependent writes; do not substitute generic Git commands. If policy requires restarting Codex in a new worktree, create it through the approved lifecycle, then hand off for a new session there. Do not implement across roots by changing workdir or using absolute paths. Ordinary single-task ownership does not imply multi-writer orchestration.
++
+ ## Overview
+ 
+ Ensure work happens in an isolated workspace. Prefer your platform's native worktree tools. Fall back to manual git worktrees only when no native tool is available.
+@@ -91,13 +95,13 @@ git check-ignore -q .worktrees 2>/dev/null || git check-ignore -q worktrees 2>/d
+ 
+ ```bash
+ # Determine path based on chosen location
+-path="$LOCATION/$BRANCH_NAME"
++worktree_path="$LOCATION/$BRANCH_NAME"
+ 
+-git worktree add "$path" -b "$BRANCH_NAME"
+-cd "$path"
++git worktree add "$worktree_path" -b "$BRANCH_NAME"
++cd "$worktree_path"
+ ```
+ 
+-**Sandbox fallback:** If `git worktree add` fails with a permission error (sandbox denial), tell the user the sandbox blocked worktree creation and you're working in the current directory instead. Then run setup and baseline tests in place.
++**Creation failure:** If required worktree creation fails, stop dependent writes and report the failure. Do not switch to in-place implementation or another creation route to bypass a guard or denial. Continue only after the required lifecycle succeeds or the human explicitly authorizes an applicable policy exception.
+ 
+ ## Step 2: Project Setup
+ 
+@@ -152,7 +156,7 @@ Ready to implement <feature-name>
+ | Both exist | Use `.worktrees/` |
+ | Neither exists | Check instruction file, then default `.worktrees/` |
+ | Directory not ignored | Add to .gitignore + commit |
+-| Permission error on create | Sandbox fallback, work in place |
++| Permission error on create | Stop dependent writes; report and resolve the failure |
+ | Tests fail during baseline | Report failures + ask |
+ | No package.json/Cargo.toml | Skip dependency install |
+ 
+diff --git a/skills/using-superpowers/SKILL.md b/skills/using-superpowers/SKILL.md
+index 7ab2eb67..558b887e 100644
+--- a/skills/using-superpowers/SKILL.md
++++ b/skills/using-superpowers/SKILL.md
+@@ -1,6 +1,6 @@
+ ---
+ name: using-superpowers
+-description: Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions
++description: Use when selecting a Superpowers workflow for substantive design, debugging, implementation, review, or delivery tasks.
+ ---
+ 
+ <SUBAGENT-STOP>
+@@ -8,7 +8,7 @@ If you were dispatched as a subagent to execute a specific task, ignore this ski
+ </SUBAGENT-STOP>
+ 
+ <EXTREMELY-IMPORTANT>
+-If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
++Use skills explicitly requested by the user or materially relevant to the actual task. Do not invoke workflows merely because of a keyword or a speculative chance of relevance.
+ 
+ IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
+ 
+@@ -17,7 +17,7 @@ This is not negotiable. You cannot rationalize your way out of this.
+ 
+ ## The Rule
+ 
+-**Invoke relevant or requested skills BEFORE any response or action** — including clarifying questions, exploring the codebase, or checking files. If it turns out wrong for the situation, you don't have to use it.
++Read relevant or requested skills before following their workflow. A brief acknowledgement or read-only context check may establish which workflow applies. Skip workflow overhead for self-contained trivial requests.
+ 
+ **Before entering plan mode:** if you haven't already brainstormed, invoke the brainstorming skill first.
+ 
+@@ -36,16 +36,16 @@ These thoughts mean STOP—you're rationalizing:
+ 
+ | Thought | Reality |
+ |---------|---------|
+-| "This is just a simple question" | Questions are tasks. Check for skills. |
+-| "I need more context first" | Skill check comes BEFORE clarifying questions. |
+-| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first. |
+-| "I can check git/files quickly" | Files lack conversation context. Check for skills. |
+-| "Let me gather information first" | Skills tell you HOW to gather information. |
+-| "This doesn't need a formal skill" | If a skill exists, use it. |
++| "This is just a simple question" | Use a skill only if requested or materially helpful. |
++| "I need more context first" | A targeted context check may establish relevance. |
++| "Let me explore the codebase first" | A bounded read-only check may establish context; use the relevant workflow before substantive work. |
++| "I can check git/files quickly" | Reconcile live Git and task context when relevant; do not add unrelated workflows. |
++| "Let me gather information first" | Use relevant research guidance; a context check can determine relevance. |
++| "This doesn't need a formal skill" | Use it when explicitly requested or materially relevant. |
+ | "I remember this skill" | Skills evolve. Read current version. |
+-| "This doesn't count as a task" | Action = task. Check for skills. |
+-| "The skill is overkill" | Simple things become complex. Use it. |
+-| "I'll just do this one thing first" | Check BEFORE doing anything. |
++| "This doesn't count as a task" | Judge the actual scope; trivial self-contained requests need no workflow overhead. |
++| "The skill is overkill" | Use proportionate guidance without skipping applicable requirements. |
++| "I'll just do this one thing first" | Context checks are allowed; do not start substantive work before its applicable workflow. |
+ | "This feels productive" | Undisciplined action wastes time. Skills prevent this. |
+ | "I know what that means" | Knowing the concept ≠ using the skill. Invoke it. |
+ 
+@@ -60,4 +60,4 @@ If your harness appears here, read its reference file for special instructions:
+ 
+ ## User Instructions
+ 
+-User instructions (CLAUDE.md, AGENTS.md, GEMINI.md, etc, direct requests) take precedence over skills, which in turn override default behavior. Only skip skill workflows or instructions when your human partner has explicitly told you to.
++User instructions (CLAUDE.md, AGENTS.md, GEMINI.md, etc, direct requests) take precedence over skills, which in turn override default behavior. Apply the relevance rule above. Once a workflow applies, follow its required gates unless higher-priority instructions override them. Design Lock still requires its approved PNG, governing written spec, writing-plans path, and final human acceptance.
+diff --git a/skills/using-superpowers/references/codex-tools.md b/skills/using-superpowers/references/codex-tools.md
+index e4488fb2..e10c7759 100644
+--- a/skills/using-superpowers/references/codex-tools.md
++++ b/skills/using-superpowers/references/codex-tools.md
+@@ -18,9 +18,10 @@ disagree.
+   `spawn_agent {fork_turns: "none"}`; the default `"all"` copies your
+   entire transcript into the child. On Codex 0.145+, role files under
+   `~/.codex/agents/` attach to isolated forks via `agent_type`.
+-  Full-history forks accept `model` and `reasoning_effort` overrides
+-  (only `agent_type` is refused there) — isolated forks are the SDD
+-  default for context hygiene, not because overrides require them.
++  Full-history forks inherit the parent model and effort and do not accept
++  overrides in the current runtime. For an authorized override, use
++  `fork_turns: "none"` or a supported positive turn count. Treat the live
++  tool schema as authoritative for roles and all other parameters.
+ - **Fix rounds:** resume the implementer with `followup_task` — it
+   delivers your message, triggers a turn, and transparently reloads a
+   child the harness evicted. Never dispatch a fresh implementer on the
+@@ -61,11 +62,10 @@ two-thirds of all wait calls were short polls that timed out.
+ 
+ ## Model routing on spawns
+ 
+-Every `spawn_agent` you issue — including when you are yourself a
+-spawned child running a fan-out — sets `model` AND `reasoning_effort`
+-explicitly, per the Model Selection rules of the skill you are
+-executing. Setting `model` alone is a trap: the child's effort
+-silently resets to that model's default, not to yours.
++Use model and reasoning-effort overrides only when authorized by the user
++or applicable instructions and accepted by the live tool schema. Full-history
++forks inherit both; omit overrides there. For an authorized isolated fork,
++select an available model and effort appropriate to the task.
+ 
+ Ask your human partner to add a machine-level backstop to
+ `~/.codex/config.toml` so any spawn that slips through still routes to
+@@ -90,16 +90,17 @@ BRANCH=$(git branch --show-current)
+ ```
+ 
+ - `GIT_DIR != GIT_COMMON` → already in a linked worktree (skip creation)
+-- `BRANCH` empty → detached HEAD (cannot branch/push/PR from sandbox)
++- `BRANCH` empty → detached HEAD; this alone proves no branch/push/PR restriction. Check the actual tool capabilities and permission results.
+ 
+ See `using-git-worktrees` Step 0 and `finishing-a-development-branch`
+ Step 1 for how each skill uses these signals.
+ 
+ ## Codex App Finishing
+ 
+-When the sandbox blocks branch/push operations (detached HEAD in an
+-externally managed worktree), the agent commits all work and informs
+-the user to use the App's native controls:
++When an actual sandbox or tool failure blocks an authorized branch/push
++operation, complete only the permitted, authorized local work. Offer the
++App's native controls if they are available; detached HEAD alone is not
++evidence of that failure:
+ 
+ - **"Create branch"** — names the branch, then commit/push/PR via App UI
+ - **"Hand off to local"** — transfers work to the user's local checkout

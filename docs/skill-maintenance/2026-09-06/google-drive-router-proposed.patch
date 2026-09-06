@@ -1,0 +1,11 @@
+--- a/skills/google-drive/SKILL.md
++++ b/skills/google-drive/SKILL.md
+@@ -35,7 +35,7 @@
+   - Deck -> Slides skill
+ - If the user wants to find a file and then edit it, do both in one flow: Drive for discovery, then the file-type skill for the edit.
+ - If the user wants a Google Workspace outcome but has not named a file type yet, start with Drive discovery instead of asking them to choose among separate Google plugins.
+-- If the user asks to create a new Google Doc, route to the Docs skill; it owns the mandatory local `.docx` -> native Google Docs import workflow and the explicit-user-override boundary. Do not create a blank Google Doc directly from this router.
++- If the user asks to create a new Google Doc, route to the Docs skill; it owns template-aware routing: preserve supplied native Google Docs templates and use local `.docx` -> native Google Docs import when no native-template constraint applies, respecting explicit user overrides. Do not create a blank Google Doc directly from this router.
+ - If the user asks to import a local `.docx` into Google Docs, route to the Docs skill and use its native conversion workflow. Preserve the source file type only when the user explicitly asks for that.
+ - If the user asks to create a new Google Sheet, route to the Sheets skill. The Sheets skill should prefer the `[@spreadsheets](plugin://spreadsheets@openai-primary-runtime)` plugin or `$Excel` skill to create a local `.xlsx`, then import it as native Google Sheets.
+ - If the user asks to import a local `.xlsx`, `.xls`, `.ods`, `.csv`, or `.tsv` into Google Sheets, route to the Sheets skill and use native Google Sheets conversion by default. Preserve the source file type only when the user explicitly asks for that.

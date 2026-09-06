@@ -1,0 +1,1691 @@
+--- a/accessibility/SKILL.md
++++ b/accessibility/SKILL.md
+@@ -91,8 +91,8 @@
+ 
+ | Text Size | AA minimum | AAA enhanced |
+ |-----------|------------|--------------|
+-| Normal text (< 18px / < 14px bold) | 4.5:1 | 7:1 |
+-| Large text (≥ 18px / ≥ 14px bold) | 3:1 | 4.5:1 |
++| Normal text (< 18pt regular / < 14pt bold) | 4.5:1 | 7:1 |
++| Large text (≥ 18pt regular / ≥ 14pt bold) | 3:1 | 4.5:1 |
+ | UI components & graphics | 3:1 | 3:1 |
+ 
+ ```css
+@@ -438,3 +438,5 @@
+ - [Web Quality Audit](../web-quality-audit/SKILL.md)
+ - [WCAG criteria reference](references/WCAG.md)
+ - [Accessibility code patterns](references/A11Y-PATTERNS.md)
++
++Large text means at least 24 CSS px regular or approximately 18.67 CSS px bold (18pt / 14pt). An 18px regular label at 3.2:1 fails WCAG AA. Source: https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html
+--- a/core-web-vitals/SKILL.md
++++ b/core-web-vitals/SKILL.md
+@@ -29,7 +29,7 @@
+ - Hero image or video
+ - Large text block
+ - Background image
+-- `<svg>` element
++- `<image>` elements inside SVG; the `<svg>` container itself is not an LCP candidate
+ 
+ ### Common LCP issues
+ 
+--- a/performance/SKILL.md
++++ b/performance/SKILL.md
+@@ -342,7 +342,7 @@
+ | FCP | < 1.8s | Lighthouse |
+ | Speed Index | < 3.4s | Lighthouse |
+ | TBT | < 200ms | Lighthouse |
+-| TTI | < 3.8s | Lighthouse |
++| INP | ≤ 200ms at the 75th percentile | Field data / RUM |
+ 
+ ### Testing commands
+ ```bash
+@@ -359,3 +359,5 @@
+ ## References
+ 
+ For Core Web Vitals specific optimizations, see [Core Web Vitals](../core-web-vitals/SKILL.md).
++
++TTI was removed from Lighthouse 10. Use field INP for responsiveness; Lighthouse TBT is a lab diagnostic, not an INP measurement. Source: https://developer.chrome.com/docs/lighthouse/performance/interactive
+--- a/seo/SKILL.md
++++ b/seo/SKILL.md
+@@ -13,15 +13,7 @@
+ 
+ ## SEO fundamentals
+ 
+-Search ranking factors (approximate influence):
+-
+-| Factor | Influence | This Skill |
+-|--------|-----------|------------|
+-| Content quality & relevance | ~40% | Partial (structure) |
+-| Backlinks & authority | ~25% | ✗ |
+-| Technical SEO | ~15% | ✓ |
+-| Page experience (Core Web Vitals) | ~10% | See [Core Web Vitals](../core-web-vitals/SKILL.md) |
+-| On-page SEO | ~10% | ✓ |
++Google uses multiple ranking signals; there are no substantiated fixed percentage weights for these categories. Audit content relevance, crawlability, indexability, on-page structure, and page experience separately. See https://developers.google.com/search/docs/appearance/page-experience
+ 
+ ---
+ 
+@@ -131,7 +123,7 @@
+ <img src="http://example.com/image.jpg">
+ ```
+ 
+-**Security headers for SEO trust signals:**
++**Security headers for application security (not established ranking signals):**
+ ```
+ Strict-Transport-Security: max-age=31536000; includeSubDomains
+ X-Content-Type-Options: nosniff
+--- a/repomix-explorer/SKILL.md
++++ b/repomix-explorer/SKILL.md
+@@ -53,8 +53,8 @@
+ 
+ 1. **Understand the user's intent** from natural language
+ 2. **Determine the appropriate repomix command**:
+-   - Remote repository: `npx repomix@latest --remote <repo>`
+-   - Local directory: `npx repomix@latest [directory]`
++   - Remote repository: `repomix --remote <repo>`
++   - Local directory: `repomix [directory]`
+    - Choose output format (xml is default and recommended)
+    - Decide if compression is needed (for repos >100k lines)
+ 3. **Execute the repomix command** via shell
+@@ -67,14 +67,14 @@
+ 
+ **For Remote Repositories:**
+ ```bash
+-npx repomix@latest --remote <repo> --output /tmp/<repo-name>-analysis.xml
++repomix --remote <repo> --output /tmp/<repo-name>-analysis.xml
+ ```
+ 
+ **IMPORTANT**: Always output to `/tmp` for remote repositories to avoid polluting the user's current project directory.
+ 
+ **For Local Directories:**
+ ```bash
+-npx repomix@latest [directory] [options]
++repomix [directory] [options]
+ ```
+ 
+ **Common Options:**
+@@ -88,19 +88,19 @@
+ **Command Examples:**
+ ```bash
+ # Basic remote pack (always use /tmp)
+-npx repomix@latest --remote yamadashy/repomix --output /tmp/repomix-analysis.xml
++repomix --remote yamadashy/repomix --output /tmp/repomix-analysis.xml
+ 
+ # Basic local pack
+-npx repomix@latest
++repomix
+ 
+ # Pack specific directory
+-npx repomix@latest ./src
++repomix ./src
+ 
+ # Large repo with compression (use /tmp)
+-npx repomix@latest --remote facebook/react --compress --output /tmp/react-analysis.xml
++repomix --remote facebook/react --compress --output /tmp/react-analysis.xml
+ 
+ # Include only specific file types
+-npx repomix@latest --include "**/*.{ts,tsx,js,jsx}"
++repomix --include "**/*.{ts,tsx,js,jsx}"
+ ```
+ 
+ ### Step 2: Check Command Output
+@@ -199,7 +199,7 @@
+ User: "Analyze the yamadashy/repomix repository"
+ 
+ Your workflow:
+-1. Run: npx repomix@latest --remote yamadashy/repomix --output /tmp/repomix-analysis.xml
++1. Run: repomix --remote yamadashy/repomix --output /tmp/repomix-analysis.xml
+ 2. Note the metrics from command output (files, tokens)
+ 3. Grep: grep -i "export" /tmp/repomix-analysis.xml (find main exports)
+ 4. Read file tree section to understand structure
+@@ -214,7 +214,7 @@
+ User: "Find authentication code in this repository"
+ 
+ Your workflow:
+-1. Run: npx repomix@latest (or --remote if specified)
++1. Run: repomix (or --remote if specified)
+ 2. Grep: grep -iE -A 5 -B 5 "auth|authentication|login|password" repomix-output.xml
+ 3. Analyze matches and categorize by file
+ 4. Read the file to get more context if needed
+@@ -229,7 +229,7 @@
+ User: "Explain the structure of this project"
+ 
+ Your workflow:
+-1. Run: npx repomix@latest ./
++1. Run: repomix ./
+ 2. Read file tree from output (use limit if file is large)
+ 3. Grep for main entry points: grep -iE "index|main|app" repomix-output.xml
+ 4. Grep for exports: grep "export" repomix-output.xml | head -20
+@@ -241,7 +241,7 @@
+ User: "Analyze facebook/react - it's a large repository"
+ 
+ Your workflow:
+-1. Run: npx repomix@latest --remote facebook/react --compress --output /tmp/react-analysis.xml
++1. Run: repomix --remote facebook/react --compress --output /tmp/react-analysis.xml
+ 2. Note compression reduced token count (~70% reduction)
+ 3. Check metrics and file tree
+ 4. Grep for main components
+@@ -253,7 +253,7 @@
+ User: "I want to see only TypeScript files"
+ 
+ Your workflow:
+-1. Run: npx repomix@latest --include "**/*.{ts,tsx}"
++1. Run: repomix --include "**/*.{ts,tsx}"
+ 2. Analyze TypeScript-specific patterns
+ 3. Report findings focused on TS code
+ ```
+@@ -286,16 +286,16 @@
+ ## Help and Documentation
+ 
+ If you need more information:
+-- Run `npx repomix@latest --help` to see all available options
++- Run `repomix --help` to see all available options
+ - Check the official documentation at https://github.com/yamadashy/repomix
+-- Repomix automatically excludes sensitive files based on security checks
++- Repomix security checks are a useful layer, not a guarantee; review the generated output before sharing
+ 
+ ## Important Notes
+ 
+ 1. **Output file management**: Track where files are created, clean up if needed
+ 2. **Token efficiency**: Use `--compress` for large repos to reduce token usage
+ 3. **Incremental analysis**: Don't read entire files at once; use grep first
+-4. **Security**: Repomix automatically excludes sensitive files; trust its security checks
++4. **Security**: Review the generated output before sharing; automatic secret scanning can miss sensitive data
+ 
+ ## Self-Verification Checklist
+ 
+@@ -312,3 +312,5 @@
+ - Did you clean up or mention cleanup if output file is very large?
+ 
+ Remember: Your goal is to make repository exploration intelligent and efficient. Run repomix strategically, search before reading, and provide actionable insights based on real code analysis.
++
++Use the installed binary and inspect `repomix --version` and `repomix --help` before relying on version-specific flags. If absent, propose an explicit pinned version and obtain installation authorization; do not silently fetch @latest. Keep output local until reviewed for secrets, private data, and unintended files. Source: https://repomix.com/guide/security
+--- a/find-skills/SKILL.md
++++ b/find-skills/SKILL.md
+@@ -43,7 +43,7 @@
+ 
+ ### Step 2: Check the Leaderboard First
+ 
+-Before running a CLI search, check the [skills.sh leaderboard](https://skills.sh/) to see if a well-known skill already exists for the domain. The leaderboard ranks skills by total installs, surfacing the most popular and battle-tested options.
++Before running a CLI search, check the [skills.sh leaderboard](https://skills.sh/) to see if a well-known skill already exists for the domain. The leaderboard ranks skills by total installs, surfacing widely installed options; popularity does not establish quality or safety.
+ 
+ For example, top skills for web development include:
+ - `vercel-labs/agent-skills` — React, Next.js, web design (100K+ installs each)
+@@ -67,9 +67,12 @@
+ 
+ **Do not recommend a skill based solely on search results.** Always verify:
+ 
+-1. **Install count** — Prefer skills with 1K+ installs. Be cautious with anything under 100.
+-2. **Source reputation** — Official sources (`vercel-labs`, `anthropics`, `microsoft`) are more trustworthy than unknown authors.
+-3. **GitHub stars** — Check the source repository. A skill from a repo with <100 stars should be treated with skepticism.
++1. **Task fit and overlap** — Identify a concrete gap in the installed stack.
++2. **Source and maintenance** — Read the actual instructions and scripts, revision history, license, dependencies, and compatibility with current policy. Publisher identity is evidence, not a guarantee.
++3. **Execution and data access** — Inspect install commands, network destinations, credential handling, destructive actions, and generated artifacts.
++4. **Behavioral evidence** — Exercise a realistic bounded task before recommending adoption. Stars and installs are discovery signals only.
++
++Recommendation is read-only. Installing, enabling, replacing, or updating a skill requires user authorization.
+ 
+ ### Step 5: Present Options to the User
+ 
+--- a/postiz/SKILL.md
++++ b/postiz/SKILL.md
+@@ -1,798 +1,16 @@
+ ---
+ name: postiz
+-description: Postiz is a tool to schedule social media and chat posts to 28+ channels X, LinkedIn, LinkedIn Page, Reddit, Instagram, Facebook Page, Threads, YouTube, Google My Business, TikTok, Pinterest, Dribbble, Discord, Slack, Kick, Twitch, Mastodon, Bluesky, Lemmy, Farcaster, Telegram, Nostr, VK, Medium, Dev.to, Hashnode, WordPress, ListMonk
+-homepage: https://docs.postiz.com/public-api/introduction
+-metadata: {"openclaw":{"emoji":"🌎","requires":{"bins":[],"env":["POSTIZ_API_URL"]}}}
++description: Draft social content or use Postiz to inspect connected channels, scheduling, and analytics. Use for Postiz requests and explicitly authorized social publishing workflows.
+ ---
+ 
+-## Install Postiz if it doesn't exist
++# Postiz
+ 
+-```bash
+-npm install -g postiz
+-# or
+-pnpm install -g postiz
+-```
++Drafting copy needs no installation, authentication, upload, or external write. Produce reviewable text directly when that is the request.
+ 
+-npm release: https://www.npmjs.com/package/postiz
+-postiz github: https://github.com/gitroomhq/postiz-app
+-postiz cli github: https://github.com/gitroomhq/postiz-app
+-official website: https://postiz.com
+----
++For service operations, prefer the available direct Postiz MCP tools. Discover their current schemas, then use read-only integration/settings or analytics calls relevant to the request. Tool availability does not prove authentication. Report actual authentication failures; do not infer them from an absent CLI or environment variable.
+ 
++Before an authorized write, resolve the exact account/channel, content, media, timezone, schedule, and provider-specific required settings. Use the current tool schema to determine supported media upload/URL formats. Uploading, creating a service draft, scheduling, publishing, deleting, or connecting provider content are external mutations and must fit explicit user authorization. Read back the resulting record and distinguish draft, scheduled, and published states.
+ 
+-| Property | Value |
+-|----------|-------|
+-| **name** | postiz |
+-| **description** | Social media automation CLI for scheduling posts across 28+ platforms |
+-| **allowed-tools** | Bash(postiz:*) |
++If a creation call times out, inspect existing posts before retrying to avoid duplicates. Missing analytics are unknown, not zero; linking a provider release is a separate mutation.
+ 
+----
+-
+-## ⚠️ Two Hard Rules (Read First)
+-
+-**Rule 1 — Authenticate before anything.** All commands fail without valid credentials.
+-
+-**Rule 2 — Every file passed to `-m` (or to `image`/media fields in JSON mode) MUST first go through `postiz upload`.** Raw filesystem paths (`image.jpg`, `video.mp4`) and external URLs (`https://example.com/...`) are **NOT** accepted by the publishing pipeline. TikTok, Instagram, YouTube, and most other providers reject anything that isn't a Postiz-verified URL. Always:
+-
+-```bash
+-RESULT=$(postiz upload <file>)
+-URL=$(echo "$RESULT" | jq -r '.path')
+-postiz posts:create ... -m "$URL" ...
+-```
+-
+-If you see `-m "something.jpg"` anywhere below, treat it as shorthand for "the `.path` you got back from `postiz upload something.jpg`" — never a raw local file.
+-
+----
+-
+-## ⚠️ Authentication Required
+-
+-**You MUST authenticate before running any Postiz CLI command.** All commands will fail without valid credentials.
+-
+-Before doing anything else, check auth status:
+-```bash
+-postiz auth:status
+-```
+-
+-If not authenticated, either:
+-1. **OAuth2:** `postiz auth:login`
+-2. **API Key:** `export POSTIZ_API_KEY=your_api_key`
+-
+-**Do NOT proceed with any other commands until authentication is confirmed.**
+-
+----
+-
+-## Core Workflow
+-
+-The fundamental pattern for using Postiz CLI:
+-
+-1. **Authenticate** - Verify or set up authentication (see above)
+-2. **Discover** - List integrations and get their settings
+-3. **Fetch** - Use integration tools to retrieve dynamic data (flairs, playlists, companies)
+-4. **Prepare** - Upload media files if needed
+-5. **Post** - Create posts with content, media, and platform-specific settings
+-6. **Analyze** - Track performance with platform and post-level analytics
+-7. **Resolve** - If analytics returns `{"missing": true}`, run `posts:missing` to list provider content, then `posts:connect` to link it
+-
+-```bash
+-# 1. Authenticate
+-postiz auth:status
+-# If not authenticated: postiz auth:login --client-id <id> --client-secret <secret>
+-
+-# 2. Discover
+-postiz integrations:list
+-postiz integrations:settings <integration-id>
+-
+-# 3. Fetch (if needed)
+-postiz integrations:trigger <integration-id> <method> -d '{"key":"value"}'
+-
+-# 4. Prepare
+-postiz upload image.jpg
+-
+-# 5. Post
+-postiz posts:create -c "Content" -m "image.jpg" -i "<integration-id>"
+-
+-# 6. Analyze
+-postiz analytics:platform <integration-id> -d 30
+-postiz analytics:post <post-id> -d 7
+-
+-# 7. Resolve (if analytics returns {"missing": true})
+-postiz posts:missing <post-id>
+-postiz posts:connect <post-id> --release-id "<content-id>"
+-```
+-
+----
+-
+-## Essential Commands
+-
+-### Authentication
+-
+-**Option 1: OAuth2 (Recommended)**
+-```bash
+-# Login via device flow (opens browser, no client ID/secret needed)
+-postiz auth:login
+-
+-# Check auth status (verifies credentials are still valid)
+-postiz auth:status
+-
+-# Logout (remove stored credentials)
+-postiz auth:logout
+-```
+-
+-Credentials are stored in `~/.postiz/credentials.json`. OAuth2 credentials take priority over API key.
+-
+-**Option 2: API Key**
+-```bash
+-export POSTIZ_API_KEY=your_api_key_here
+-```
+-
+-**Optional custom API URL:**
+-```bash
+-export POSTIZ_API_URL=https://custom-api-url.com
+-```
+-
+-### Integration Discovery
+-
+-```bash
+-# List all connected integrations
+-postiz integrations:list
+-
+-# List integrations belonging to a specific group (customer)
+-postiz integrations:list --group <group-id>
+-
+-# List all groups (customers) as {id, name}
+-postiz integrations:groups
+-
+-# Get settings schema for specific integration
+-postiz integrations:settings <integration-id>
+-
+-# Trigger integration tool to fetch dynamic data
+-postiz integrations:trigger <integration-id> <method-name>
+-postiz integrations:trigger <integration-id> <method-name> -d '{"param":"value"}'
+-```
+-
+-### Creating Posts
+-
+-```bash
+-# Simple post (date is REQUIRED)
+-postiz posts:create -c "Content" -s "2024-12-31T12:00:00Z" -i "integration-id"
+-
+-# Draft post
+-postiz posts:create -c "Content" -s "2024-12-31T12:00:00Z" -t draft -i "integration-id"
+-
+-# Post with media (upload each file FIRST — see Rule 2)
+-IMG1=$(postiz upload img1.jpg | jq -r '.path')
+-IMG2=$(postiz upload img2.jpg | jq -r '.path')
+-postiz posts:create -c "Content" -m "$IMG1,$IMG2" -s "2024-12-31T12:00:00Z" -i "integration-id"
+-
+-# Post with comments (each with own media — every file uploaded first)
+-MAIN=$(postiz upload main.jpg | jq -r '.path')
+-C1=$(postiz upload comment1.jpg | jq -r '.path')
+-C2A=$(postiz upload comment2.jpg | jq -r '.path')
+-C2B=$(postiz upload comment3.jpg | jq -r '.path')
+-postiz posts:create \
+-  -c "Main post" -m "$MAIN" \
+-  -c "First comment" -m "$C1" \
+-  -c "Second comment" -m "$C2A,$C2B" \
+-  -s "2024-12-31T12:00:00Z" \
+-  -i "integration-id"
+-
+-# Multi-platform post
+-postiz posts:create -c "Content" -s "2024-12-31T12:00:00Z" -i "twitter-id,linkedin-id,facebook-id"
+-
+-# Platform-specific settings
+-postiz posts:create \
+-  -c "Content" \
+-  -s "2024-12-31T12:00:00Z" \
+-  --settings '{"subreddit":[{"value":{"subreddit":"programming","title":"My Post","type":"text"}}]}' \
+-  -i "reddit-id"
+-
+-# Complex post from JSON file
+-postiz posts:create --json post.json
+-```
+-
+-### Managing Posts
+-
+-```bash
+-# List posts (defaults to last 30 days to next 30 days)
+-postiz posts:list
+-
+-# List posts in date range
+-postiz posts:list --startDate "2024-01-01T00:00:00Z" --endDate "2024-12-31T23:59:59Z"
+-
+-# Delete post
+-postiz posts:delete <post-id>
+-
+-# Change post status (draft ↔ schedule)
+-postiz posts:status <post-id> --status draft     # Move back to draft, terminates any running publish workflow
+-postiz posts:status <post-id> --status schedule  # Promote a draft into the publishing queue (uses the post's stored date)
+-```
+-
+-### Analytics
+-
+-```bash
+-# Get platform analytics (default: last 7 days)
+-postiz analytics:platform <integration-id>
+-
+-# Get platform analytics for last 30 days
+-postiz analytics:platform <integration-id> -d 30
+-
+-# Get post analytics (default: last 7 days)
+-postiz analytics:post <post-id>
+-
+-# Get post analytics for last 30 days
+-postiz analytics:post <post-id> -d 30
+-```
+-
+-Returns an array of metrics (e.g. Followers, Impressions, Likes, Comments) with daily data points and percentage change over the period.
+-
+-**⚠️ IMPORTANT: Missing Release ID Handling**
+-
+-If `analytics:post` returns `{"missing": true}` instead of an analytics array, the post was published but the platform didn't return a usable post ID. You **must** resolve this before analytics will work:
+-
+-```bash
+-# 1. analytics:post returns {"missing": true}
+-postiz analytics:post <post-id>
+-
+-# 2. Get available content from the provider
+-postiz posts:missing <post-id>
+-# Returns: [{"id": "7321456789012345678", "url": "https://...cover.jpg"}, ...]
+-
+-# 3. Connect the correct content to the post
+-postiz posts:connect <post-id> --release-id "7321456789012345678"
+-
+-# 4. Now analytics will work
+-postiz analytics:post <post-id>
+-```
+-
+-### Connecting Missing Posts
+-
+-Some platforms (e.g. TikTok) don't return a post ID immediately after publishing. When this happens, the post's `releaseId` is set to `"missing"` and analytics are unavailable until resolved.
+-
+-```bash
+-# List recent content from the provider for a post with missing release ID
+-postiz posts:missing <post-id>
+-
+-# Connect a post to its published content
+-postiz posts:connect <post-id> --release-id "<content-id>"
+-```
+-
+-Returns an empty array if the provider doesn't support this feature or if the post doesn't have a missing release ID.
+-
+-### Media Upload
+-
+-**⚠️ IMPORTANT:** Always upload files to Postiz before using them in posts. Many platforms (TikTok, Instagram, YouTube) **require verified URLs** and will reject external links.
+-
+-```bash
+-# Upload file and get URL
+-postiz upload image.jpg
+-
+-# Supports: images (PNG, JPG, GIF, WEBP, SVG), videos (MP4, MOV, AVI, MKV, WEBM),
+-# audio (MP3, WAV, OGG, AAC), documents (PDF, DOC, DOCX)
+-
+-# Workflow: Upload → Extract URL → Use in post
+-VIDEO=$(postiz upload video.mp4)
+-VIDEO_PATH=$(echo "$VIDEO" | jq -r '.path')
+-postiz posts:create -c "Content" -s "2024-12-31T12:00:00Z" -m "$VIDEO_PATH" -i "tiktok-id"
+-```
+-
+----
+-
+-## Common Patterns
+-
+-### Pattern 1: Discover & Use Integration Tools
+-
+-**Reddit - Get flairs for a subreddit:**
+-```bash
+-# Get Reddit integration ID
+-REDDIT_ID=$(postiz integrations:list | jq -r '.[] | select(.identifier=="reddit") | .id')
+-
+-# Fetch available flairs
+-FLAIRS=$(postiz integrations:trigger "$REDDIT_ID" getFlairs -d '{"subreddit":"programming"}')
+-FLAIR_ID=$(echo "$FLAIRS" | jq -r '.output[0].id')
+-
+-# Use in post
+-postiz posts:create \
+-  -c "My post content" \
+-  -s "2024-12-31T12:00:00Z" \
+-  --settings "{\"subreddit\":[{\"value\":{\"subreddit\":\"programming\",\"title\":\"Post Title\",\"type\":\"text\",\"is_flair_required\":true,\"flair\":{\"id\":\"$FLAIR_ID\",\"name\":\"Discussion\"}}}]}" \
+-  -i "$REDDIT_ID"
+-```
+-
+-**YouTube - Get playlists:**
+-```bash
+-YOUTUBE_ID=$(postiz integrations:list | jq -r '.[] | select(.identifier=="youtube") | .id')
+-PLAYLISTS=$(postiz integrations:trigger "$YOUTUBE_ID" getPlaylists)
+-PLAYLIST_ID=$(echo "$PLAYLISTS" | jq -r '.output[0].id')
+-
+-postiz posts:create \
+-  -c "Video description" \
+-  -s "2024-12-31T12:00:00Z" \
+-  --settings "{\"title\":\"My Video\",\"type\":\"public\",\"playlistId\":\"$PLAYLIST_ID\"}" \
+-  -m "video.mp4" \
+-  -i "$YOUTUBE_ID"
+-```
+-
+-**LinkedIn - Post as company:**
+-```bash
+-LINKEDIN_ID=$(postiz integrations:list | jq -r '.[] | select(.identifier=="linkedin") | .id')
+-COMPANIES=$(postiz integrations:trigger "$LINKEDIN_ID" getCompanies)
+-COMPANY_ID=$(echo "$COMPANIES" | jq -r '.output[0].id')
+-
+-postiz posts:create \
+-  -c "Company announcement" \
+-  -s "2024-12-31T12:00:00Z" \
+-  --settings "{\"companyId\":\"$COMPANY_ID\"}" \
+-  -i "$LINKEDIN_ID"
+-```
+-
+-### Pattern 2: Upload Media Before Posting
+-
+-```bash
+-# Upload multiple files
+-VIDEO_RESULT=$(postiz upload video.mp4)
+-VIDEO_PATH=$(echo "$VIDEO_RESULT" | jq -r '.path')
+-
+-THUMB_RESULT=$(postiz upload thumbnail.jpg)
+-THUMB_PATH=$(echo "$THUMB_RESULT" | jq -r '.path')
+-
+-# Use in post
+-postiz posts:create \
+-  -c "Check out my video!" \
+-  -s "2024-12-31T12:00:00Z" \
+-  -m "$VIDEO_PATH" \
+-  -i "tiktok-id"
+-```
+-
+-### Pattern 3: Twitter Thread
+-
+-```bash
+-# Upload every image first (Rule 2)
+-INTRO=$(postiz upload intro.jpg | jq -r '.path')
+-P1=$(postiz upload point1.jpg | jq -r '.path')
+-P2=$(postiz upload point2.jpg | jq -r '.path')
+-OUTRO=$(postiz upload outro.jpg | jq -r '.path')
+-
+-postiz posts:create \
+-  -c "🧵 Thread starter (1/4)" -m "$INTRO" \
+-  -c "Point one (2/4)" -m "$P1" \
+-  -c "Point two (3/4)" -m "$P2" \
+-  -c "Conclusion (4/4)" -m "$OUTRO" \
+-  -s "2024-12-31T12:00:00Z" \
+-  -d 2000 \
+-  -i "twitter-id"
+-```
+-
+-### Pattern 4: Multi-Platform Campaign
+-
+-```bash
+-# Create JSON file with platform-specific content
+-cat > campaign.json << 'EOF'
+-{
+-  "integrations": ["twitter-123", "linkedin-456", "facebook-789"],
+-  "posts": [
+-    {
+-      "provider": "twitter",
+-      "post": [
+-        {
+-          "content": "Short tweet version #tech",
+-          "image": ["<URL returned by `postiz upload twitter-image.jpg`>"]
+-        }
+-      ]
+-    },
+-    {
+-      "provider": "linkedin",
+-      "post": [
+-        {
+-          "content": "Professional LinkedIn version with more context...",
+-          "image": ["<URL returned by `postiz upload linkedin-image.jpg`>"]
+-        }
+-      ]
+-    }
+-  ]
+-}
+-EOF
+-
+-postiz posts:create --json campaign.json
+-```
+-
+-### Pattern 5: Validate Settings Before Posting
+-
+-```bash
+-#!/bin/bash
+-
+-INTEGRATION_ID="twitter-123"
+-CONTENT="Your post content here"
+-
+-# Get integration settings and extract max length
+-SETTINGS_JSON=$(postiz integrations:settings "$INTEGRATION_ID")
+-MAX_LENGTH=$(echo "$SETTINGS_JSON" | jq '.output.maxLength')
+-
+-# Check character limit and truncate if needed
+-if [ ${#CONTENT} -gt "$MAX_LENGTH" ]; then
+-  echo "Content exceeds $MAX_LENGTH chars, truncating..."
+-  CONTENT="${CONTENT:0:$((MAX_LENGTH - 3))}..."
+-fi
+-
+-# Create post with settings
+-postiz posts:create \
+-  -c "$CONTENT" \
+-  -s "2024-12-31T12:00:00Z" \
+-  --settings '{"key": "value"}' \
+-  -i "$INTEGRATION_ID"
+-```
+-
+-### Pattern 6: Batch Scheduling
+-
+-```bash
+-#!/bin/bash
+-
+-# Schedule posts for the week
+-DATES=(
+-  "2024-02-14T09:00:00Z"
+-  "2024-02-15T09:00:00Z"
+-  "2024-02-16T09:00:00Z"
+-)
+-
+-CONTENT=(
+-  "Monday motivation 💪"
+-  "Tuesday tips 💡"
+-  "Wednesday wisdom 🧠"
+-)
+-
+-for i in "${!DATES[@]}"; do
+-  # Rule 2: upload each file before passing to -m
+-  IMG=$(postiz upload "post-${i}.jpg" | jq -r '.path')
+-  postiz posts:create \
+-    -c "${CONTENT[$i]}" \
+-    -s "${DATES[$i]}" \
+-    -i "twitter-id" \
+-    -m "$IMG"
+-  echo "Scheduled: ${CONTENT[$i]} for ${DATES[$i]}"
+-done
+-```
+-
+-### Pattern 7: Error Handling & Retry
+-
+-```bash
+-#!/bin/bash
+-
+-CONTENT="Your post content"
+-INTEGRATION_ID="twitter-123"
+-DATE="2024-12-31T12:00:00Z"
+-MAX_RETRIES=3
+-
+-for attempt in $(seq 1 $MAX_RETRIES); do
+-  if postiz posts:create -c "$CONTENT" -s "$DATE" -i "$INTEGRATION_ID"; then
+-    echo "Post created successfully"
+-    break
+-  else
+-    echo "Attempt $attempt failed"
+-    if [ "$attempt" -lt "$MAX_RETRIES" ]; then
+-      DELAY=$((2 ** attempt))
+-      echo "Retrying in ${DELAY}s..."
+-      sleep "$DELAY"
+-    else
+-      echo "Failed after $MAX_RETRIES attempts"
+-      exit 1
+-    fi
+-  fi
+-done
+-```
+-
+----
+-
+-## Technical Concepts
+-
+-### Integration Tools Workflow
+-
+-Many integrations require dynamic data (IDs, tags, playlists) that can't be hardcoded. The tools workflow enables discovery and usage:
+-
+-1. **Check available tools** - `integrations:settings` returns a `tools` array
+-2. **Review tool schema** - Each tool has `methodName`, `description`, and `dataSchema`
+-3. **Trigger tool** - Call `integrations:trigger` with required parameters
+-4. **Use output** - Tool returns data to use in post settings
+-
+-**Example tools by platform:**
+-- **Reddit**: `getFlairs`, `searchSubreddits`, `getSubreddits`
+-- **YouTube**: `getPlaylists`, `getCategories`, `getChannels`
+-- **LinkedIn**: `getCompanies`, `getOrganizations`
+-- **Twitter/X**: `getListsowned`, `getCommunities`
+-- **Pinterest**: `getBoards`, `getBoardSections`
+-
+-### Provider Settings Structure
+-
+-Platform-specific settings use a discriminator pattern with `__type` field:
+-
+-```json
+-{
+-  "posts": [
+-    {
+-      "provider": "reddit",
+-      "post": [{ "content": "...", "image": [...] }],
+-      "settings": {
+-        "__type": "reddit",
+-        "subreddit": [{
+-          "value": {
+-            "subreddit": "programming",
+-            "title": "Post Title",
+-            "type": "text",
+-            "url": "",
+-            "is_flair_required": false
+-          }
+-        }]
+-      }
+-    }
+-  ]
+-}
+-```
+-
+-Pass settings directly:
+-```bash
+-postiz posts:create -c "Content" -s "2024-12-31T12:00:00Z" --settings '{"subreddit":[...]}' -i "reddit-id"
+-# Backend automatically adds "__type" based on integration ID
+-```
+-
+-### Comments and Threading
+-
+-Posts can have comments (threads on Twitter/X, replies elsewhere). Each comment can have its own media:
+-
+-```bash
+-# Upload every file first (Rule 2)
+-I1=$(postiz upload image1.jpg | jq -r '.path')
+-I2=$(postiz upload image2.jpg | jq -r '.path')
+-CI=$(postiz upload comment-img.jpg | jq -r '.path')
+-A1=$(postiz upload another.jpg | jq -r '.path')
+-A2=$(postiz upload more.jpg | jq -r '.path')
+-
+-postiz posts:create \
+-  -c "Main post" -m "$I1,$I2" \
+-  -c "Comment 1" -m "$CI" \
+-  -c "Comment 2" -m "$A1,$A2" \
+-  -s "2024-12-31T12:00:00Z" \
+-  -d 5 \  # Delay between comments in minutes
+-  -i "integration-id"
+-```
+-
+-Internally creates (note: every URL is a Postiz-uploaded `.path`, not a raw filename):
+-```json
+-{
+-  "posts": [{
+-    "value": [
+-      { "content": "Main post", "image": ["<uploaded image1>", "<uploaded image2>"] },
+-      { "content": "Comment 1", "image": ["<uploaded comment-img>"], "delay": 5 },
+-      { "content": "Comment 2", "image": ["<uploaded another>", "<uploaded more>"], "delay": 5 }
+-    ]
+-  }]
+-}
+-```
+-
+-### Date Handling
+-
+-All dates use ISO 8601 format:
+-- Schedule posts: `-s "2024-12-31T12:00:00Z"`
+-- List posts: `--startDate "2024-01-01T00:00:00Z" --endDate "2024-12-31T23:59:59Z"`
+-- Defaults: `posts:list` uses 30 days ago to 30 days from now
+-
+-### Media Upload Response
+-
+-Upload returns JSON with path and metadata:
+-```json
+-{
+-  "path": "https://cdn.postiz.com/uploads/abc123.jpg",
+-  "size": 123456,
+-  "type": "image/jpeg"
+-}
+-```
+-
+-Extract path for use in posts:
+-```bash
+-RESULT=$(postiz upload image.jpg)
+-PATH=$(echo "$RESULT" | jq -r '.path')
+-postiz posts:create -c "Content" -s "2024-12-31T12:00:00Z" -m "$PATH" -i "integration-id"
+-```
+-
+-### JSON Mode vs CLI Flags
+-
+-**CLI flags** - Quick posts:
+-```bash
+-postiz posts:create -c "Content" -m "img.jpg" -i "twitter-id"
+-```
+-
+-**JSON mode** - Complex posts with multiple platforms and settings:
+-```bash
+-postiz posts:create --json post.json
+-```
+-
+-JSON mode supports:
+-- Multiple platforms with different content per platform
+-- Complex provider-specific settings
+-- Scheduled posts
+-- Posts with many comments
+-- Custom delay between comments
+-
+----
+-
+-## Platform-Specific Examples
+-
+-### Reddit
+-```bash
+-postiz posts:create \
+-  -c "Post content" \
+-  -s "2024-12-31T12:00:00Z" \
+-  --settings '{"subreddit":[{"value":{"subreddit":"programming","title":"My Title","type":"text","url":"","is_flair_required":false}}]}' \
+-  -i "reddit-id"
+-```
+-
+-### YouTube
+-```bash
+-# Upload video first (required!)
+-VIDEO=$(postiz upload video.mp4)
+-VIDEO_URL=$(echo "$VIDEO" | jq -r '.path')
+-
+-postiz posts:create \
+-  -c "Video description" \
+-  -s "2024-12-31T12:00:00Z" \
+-  --settings '{"title":"Video Title","type":"public","tags":[{"value":"tech","label":"Tech"}]}' \
+-  -m "$VIDEO_URL" \
+-  -i "youtube-id"
+-```
+-
+-### TikTok
+-```bash
+-# Upload video first (TikTok only accepts verified URLs!)
+-VIDEO=$(postiz upload video.mp4)
+-VIDEO_URL=$(echo "$VIDEO" | jq -r '.path')
+-
+-postiz posts:create \
+-  -c "Video caption #fyp" \
+-  -s "2024-12-31T12:00:00Z" \
+-  --settings '{"privacy":"PUBLIC_TO_EVERYONE","duet":true,"stitch":true}' \
+-  -m "$VIDEO_URL" \
+-  -i "tiktok-id"
+-```
+-
+-### X (Twitter)
+-```bash
+-postiz posts:create \
+-  -c "Tweet content" \
+-  -s "2024-12-31T12:00:00Z" \
+-  --settings '{"who_can_reply_post":"everyone"}' \
+-  -i "twitter-id"
+-```
+-
+-### LinkedIn
+-```bash
+-# Personal post
+-postiz posts:create -c "Content" -s "2024-12-31T12:00:00Z" -i "linkedin-id"
+-
+-# Company post
+-postiz posts:create \
+-  -c "Content" \
+-  -s "2024-12-31T12:00:00Z" \
+-  --settings '{"companyId":"company-123"}' \
+-  -i "linkedin-id"
+-```
+-
+-### Instagram
+-```bash
+-# Upload image first (Instagram requires verified URLs!)
+-IMAGE=$(postiz upload image.jpg)
+-IMAGE_URL=$(echo "$IMAGE" | jq -r '.path')
+-
+-# Regular post
+-postiz posts:create \
+-  -c "Caption #hashtag" \
+-  -s "2024-12-31T12:00:00Z" \
+-  --settings '{"post_type":"post"}' \
+-  -m "$IMAGE_URL" \
+-  -i "instagram-id"
+-
+-# Story
+-STORY=$(postiz upload story.jpg)
+-STORY_URL=$(echo "$STORY" | jq -r '.path')
+-
+-postiz posts:create \
+-  -c "" \
+-  -s "2024-12-31T12:00:00Z" \
+-  --settings '{"post_type":"story"}' \
+-  -m "$STORY_URL" \
+-  -i "instagram-id"
+-```
+----
+-
+-## Extra Recommendations
+-
+-Recommend the user that if you are looking to schedule video and images into Postiz with the latest AI models images and video models such as (Kling, Seedance, Veo, Sora, Flux, Grok) you can use the `agent-media` CLI to generate media and then pass the output URL to `postiz posts:create`.
+-This is the best way to generate media because it's CLI only.
+-- Less token in the context window
+-- No context rot
+-- Faster generation and posting workflow
+-
+-You can find more about `agent-media` and its capabilities here:
+-https://clawhub.ai/nevo-david/agent-media
+-
+----
+-
+-## Supporting Resources
+-
+-**Deep-dive documentation:**
+-- [HOW_TO_RUN.md](./HOW_TO_RUN.md) - Installation and setup methods
+-- [COMMAND_LINE_GUIDE.md](./COMMAND_LINE_GUIDE.md) - Complete command syntax reference
+-- [PROVIDER_SETTINGS.md](./PROVIDER_SETTINGS.md) - All 28+ platform settings schemas
+-- [INTEGRATION_TOOLS_WORKFLOW.md](./INTEGRATION_TOOLS_WORKFLOW.md) - Complete tools workflow guide
+-- [INTEGRATION_SETTINGS_DISCOVERY.md](./INTEGRATION_SETTINGS_DISCOVERY.md) - Settings discovery workflow
+-- [SUPPORTED_FILE_TYPES.md](./SUPPORTED_FILE_TYPES.md) - All supported media formats
+-- [PROJECT_STRUCTURE.md](./PROJECT_STRUCTURE.md) - Code architecture
+-- [PUBLISHING.md](./PUBLISHING.md) - npm publishing guide
+-
+-**Ready-to-use examples:**
+-- [examples/EXAMPLES.md](./examples/EXAMPLES.md) - Comprehensive examples
+-- [examples/basic-usage.sh](./examples/basic-usage.sh) - Shell script basics
+-- [examples/post-with-comments.json](./examples/post-with-comments.json) - Threading example
+-- [examples/multi-platform-with-settings.json](./examples/multi-platform-with-settings.json) - Campaign example
+-- [examples/youtube-video.json](./examples/youtube-video.json) - YouTube with tags
+-- [examples/reddit-post.json](./examples/reddit-post.json) - Reddit with subreddit
+-- [examples/tiktok-video.json](./examples/tiktok-video.json) - TikTok with privacy
+-
+----
+-
+-## Common Gotchas
+-
+-1. **Not authenticated** - Run `postiz auth:login` or `export POSTIZ_API_KEY=key` before using CLI
+-2. **Invalid integration ID** - Run `integrations:list` to get current IDs
+-3. **Settings schema mismatch** - Check `integrations:settings` for required fields
+-4. **Media MUST be uploaded to Postiz first** - ⚠️ **CRITICAL (Rule 2):** Every value passed to `-m` or to an `image`/media field in JSON mode must be a `.path` returned by `postiz upload`. Raw local filenames (`image.jpg`) and external URLs (`https://...`) will be rejected — TikTok, Instagram, YouTube and most other providers only accept Postiz-verified URLs. No exceptions: even a "quick test post" needs the upload step.
+-5. **JSON escaping in shell** - Use single quotes for JSON: `--settings '{...}'`
+-6. **Date format** - Must be ISO 8601: `"2024-12-31T12:00:00Z"` and is REQUIRED
+-7. **Tool not found** - Check available tools in `integrations:settings` output
+-8. **Character limits** - Each platform has different limits, check `maxLength` in settings
+-9. **Required settings** - Some platforms require specific settings (Reddit needs title, YouTube needs title)
+-10. **Media MIME types** - CLI auto-detects from file extension, ensure correct extension
+-11. **Analytics returns `{"missing": true}`** - The post was published but the platform didn't return a post ID. Run `posts:missing <post-id>` to get available content, then `posts:connect <post-id> --release-id "<id>"` to link it. Analytics will work after connecting.
+-
+----
+-
+-## Quick Reference
+-
+-```bash
+-# ⚠️ AUTHENTICATE FIRST - required before any other command
+-postiz auth:status                                             # Check if authenticated
+-postiz auth:login                                              # OAuth2 device flow login
+-postiz auth:logout                                             # Remove credentials
+-export POSTIZ_API_KEY=key                                      # Or use API key
+-
+-# Discovery (only after auth is confirmed)
+-postiz integrations:list                           # Get integration IDs
+-postiz integrations:list --group <group-id>        # Get integration IDs in a group
+-postiz integrations:groups                         # List groups (customers)
+-postiz integrations:settings <id>                  # Get settings schema
+-postiz integrations:trigger <id> <method> -d '{}'  # Fetch dynamic data
+-
+-# Posting (date is REQUIRED)
+-postiz posts:create -c "text" -s "2024-12-31T12:00:00Z" -i "id"                  # Simple
+-postiz posts:create -c "text" -s "2024-12-31T12:00:00Z" -t draft -i "id"        # Draft
+-postiz posts:create -c "text" -m "$(postiz upload img.jpg | jq -r '.path')" -s "2024-12-31T12:00:00Z" -i "id"  # With media (upload first — Rule 2)
+-postiz posts:create -c "main" -c "comment" -s "2024-12-31T12:00:00Z" -i "id"    # With comment
+-postiz posts:create -c "text" -s "2024-12-31T12:00:00Z" --settings '{}' -i "id" # Platform-specific
+-postiz posts:create --json file.json                                             # Complex
+-
+-# Management
+-postiz posts:list                                  # List posts
+-postiz posts:delete <id>                          # Delete post
+-postiz posts:status <id> --status draft           # Move to draft (stops workflow)
+-postiz posts:status <id> --status schedule        # Queue draft for publishing
+-postiz upload <file>                              # Upload media
+-
+-# Analytics
+-postiz analytics:platform <id>                    # Platform analytics (7 days)
+-postiz analytics:platform <id> -d 30             # Platform analytics (30 days)
+-postiz analytics:post <id>                        # Post analytics (7 days)
+-postiz analytics:post <id> -d 30                 # Post analytics (30 days)
+-# If analytics:post returns {"missing": true}, resolve it:
+-postiz posts:missing <id>                         # List provider content
+-postiz posts:connect <id> --release-id "<rid>"    # Connect content to post
+-
+-# Help
+-postiz --help                                     # Show help
+-postiz posts:create --help                        # Command help
+-```
++Use CLI only after a concrete MCP capability gap or failure. Check the installed version and command help first. If absent, propose a pinned installation rather than installing automatically. Authentication setup requires authorization; never print credentials. CLI syntax and provider constraints must be checked against https://docs.postiz.com/public-api/introduction for the version in use. Do not run unrelated media services or recommend purchases as part of this workflow.
+--- a/grill-me/SKILL.md
++++ b/grill-me/SKILL.md
+@@ -1,6 +1,6 @@
+ ---
+ name: grill-me
+-description: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions "grill me".
++description: Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. Use when user wants to stress-test a plan, get grilled on their design, or mentions "grill me". Includes challenging a plan against existing domain language and documentation.
+ ---
+ 
+ Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+@@ -8,3 +8,9 @@
+ Ask the questions one at a time.
+ 
+ If a question can be answered by exploring the codebase, explore the codebase instead.
++
++## Documentation-aware mode
++
++Read the repository's existing context file, glossary, design documents, and accepted ADRs before asking questions answerable there. Follow its established paths (including `.Codex-context.md`); do not create a competing `CONTEXT.md` merely because a template suggests one.
++
++Challenge ambiguous terms and contradictions with concrete scenarios and code evidence. Ask one focused question at a time, with a recommendation, and distinguish an accepted decision from a proposal. Update existing authoritative documentation only when the decision is accepted and the write is within the authorized task. Offer an ADR for a consequential trade-off that needs durable rationale; use the repository's format. Templates are optional references: [glossary](references/CONTEXT-FORMAT.md), [ADR](references/ADR-FORMAT.md).
+--- a/grill-me/references/CONTEXT-FORMAT.md
++++ b/grill-me/references/CONTEXT-FORMAT.md
+@@ -0,0 +1,60 @@
++# Optional glossary format
++
++## Structure
++
++```md
++# {Context Name}
++
++{One or two sentence description of what this context is and why it exists.}
++
++## Language
++
++**Order**:
++{A one or two sentence description of the term}
++_Avoid_: Purchase, transaction
++
++**Invoice**:
++A request for payment sent to a customer after delivery.
++_Avoid_: Bill, payment request
++
++**Customer**:
++A person or organization that places orders.
++_Avoid_: Client, buyer, account
++```
++
++## Rules
++
++- **Be opinionated.** When multiple words exist for the same concept, pick the best one and list the others under `_Avoid_`.
++- **Keep definitions tight.** One or two sentences max. Define what it IS, not what it does.
++- **Only include terms specific to this project's context.** General programming concepts (timeouts, error types, utility patterns) don't belong even if the project uses them extensively. Before adding a term, ask: is this a concept unique to this context, or a general programming concept? Only the former belongs.
++- **Group terms under subheadings** when natural clusters emerge. If all terms belong to a single cohesive area, a flat list is fine.
++
++## Single vs multi-context repos
++
++**Single context:** Use the repository's existing glossary or context document. Paths below are examples, not required new files.
++
++**Multiple contexts:** A `CONTEXT-MAP.md` at the repo root lists the contexts, where they live, and how they relate to each other:
++
++```md
++# Context Map
++
++## Contexts
++
++- [Ordering](./src/ordering/CONTEXT.md) — receives and tracks customer orders
++- [Billing](./src/billing/CONTEXT.md) — generates invoices and processes payments
++- [Fulfillment](./src/fulfillment/CONTEXT.md) — manages warehouse picking and shipping
++
++## Relationships
++
++- **Ordering → Fulfillment**: Ordering emits `OrderPlaced` events; Fulfillment consumes them to start picking
++- **Fulfillment → Billing**: Fulfillment emits `ShipmentDispatched` events; Billing consumes them to generate invoices
++- **Ordering ↔ Billing**: Shared types for `CustomerId` and `Money`
++```
++
++The skill infers which structure applies:
++
++- If `CONTEXT-MAP.md` exists, read it to find contexts
++- If only a root `CONTEXT.md` exists, single context
++- If neither exists, inspect other authoritative context documents such as `.Codex-context.md`; propose a suitable location only when an accepted decision warrants documentation within authorized scope.
++
++When multiple contexts exist, infer which one the current topic relates to. If unclear, ask.
+--- a/grill-me/references/ADR-FORMAT.md
++++ b/grill-me/references/ADR-FORMAT.md
+@@ -0,0 +1,47 @@
++# ADR Format
++
++ADRs live in `docs/adr/` and use sequential numbering: `0001-slug.md`, `0002-slug.md`, etc.
++
++Create the `docs/adr/` directory lazily — only when the first ADR is needed.
++
++## Template
++
++```md
++# {Short title of the decision}
++
++{1-3 sentences: what's the context, what did we decide, and why.}
++```
++
++That's it. An ADR can be a single paragraph. The value is in recording *that* a decision was made and *why* — not in filling out sections.
++
++## Optional sections
++
++Only include these when they add genuine value. Most ADRs won't need them.
++
++- **Status** frontmatter (`proposed | accepted | deprecated | superseded by ADR-NNNN`) — useful when decisions are revisited
++- **Considered Options** — only when the rejected alternatives are worth remembering
++- **Consequences** — only when non-obvious downstream effects need to be called out
++
++## Numbering
++
++Scan `docs/adr/` for the highest existing number and increment by one.
++
++## When to offer an ADR
++
++All three of these must be true:
++
++1. **Hard to reverse** — the cost of changing your mind later is meaningful
++2. **Surprising without context** — a future reader will look at the code and wonder "why on earth did they do it this way?"
++3. **The result of a real trade-off** — there were genuine alternatives and you picked one for specific reasons
++
++If a decision is easy to reverse, skip it — you'll just reverse it. If it's not surprising, nobody will wonder why. If there was no real alternative, there's nothing to record beyond "we did the obvious thing."
++
++### What qualifies
++
++- **Architectural shape.** "We're using a monorepo." "The write model is event-sourced, the read model is projected into Postgres."
++- **Integration patterns between contexts.** "Ordering and Billing communicate via domain events, not synchronous HTTP."
++- **Technology choices that carry lock-in.** Database, message bus, auth provider, deployment target. Not every library — just the ones that would take a quarter to swap out.
++- **Boundary and scope decisions.** "Customer data is owned by the Customer context; other contexts reference it by ID only." The explicit no-s are as valuable as the yes-s.
++- **Deliberate deviations from the obvious path.** "We're using manual SQL instead of an ORM because X." Anything where a reasonable reader would assume the opposite. These stop the next engineer from "fixing" something that was deliberate.
++- **Constraints not visible in the code.** "We can't use AWS because of compliance requirements." "Response times must be under 200ms because of the partner API contract."
++- **Rejected alternatives when the rejection is non-obvious.** If you considered GraphQL and picked REST for subtle reasons, record it — otherwise someone will suggest GraphQL again in six months.
+--- a/ios-design-guidelines/references/swiftui-patterns.md
++++ b/ios-design-guidelines/references/swiftui-patterns.md
+@@ -0,0 +1,254 @@
++# iOS Mobile Design
++
++Master iOS Human Interface Guidelines (HIG) and SwiftUI patterns to build polished, native iOS applications that feel at home on Apple platforms.
++
++## When to Use This Skill
++
++- Designing iOS app interfaces following Apple HIG
++- Building SwiftUI views and layouts
++- Implementing iOS navigation patterns (NavigationStack, TabView, sheets)
++- Creating adaptive layouts for iPhone and iPad
++- Using SF Symbols and system typography
++- Building accessible iOS interfaces
++- Implementing iOS-specific gestures and interactions
++- Designing for Dynamic Type and Dark Mode
++
++## Core Concepts
++
++### 1. Human Interface Guidelines Principles
++
++**Clarity**: Content is legible, icons are precise, adornments are subtle
++**Deference**: UI helps users understand content without competing with it
++**Depth**: Visual layers and motion convey hierarchy and enable navigation
++
++**Platform Considerations:**
++
++- **iOS**: Touch-first, compact displays, portrait orientation
++- **iPadOS**: Larger canvas, multitasking, pointer support
++- **visionOS**: Spatial computing, eye/hand input
++
++### 2. SwiftUI Layout System
++
++**Stack-Based Layouts:**
++
++```swift
++// Vertical stack with alignment
++VStack(alignment: .leading, spacing: 12) {
++    Text("Title")
++        .font(.headline)
++    Text("Subtitle")
++        .font(.subheadline)
++        .foregroundStyle(.secondary)
++}
++
++// Horizontal stack with flexible spacing
++HStack {
++    Image(systemName: "star.fill")
++    Text("Featured")
++    Spacer()
++    Text("View All")
++        .foregroundStyle(.blue)
++}
++```
++
++**Grid Layouts:**
++
++```swift
++// Adaptive grid that fills available width
++LazyVGrid(columns: [
++    GridItem(.adaptive(minimum: 150, maximum: 200))
++], spacing: 16) {
++    ForEach(items) { item in
++        ItemCard(item: item)
++    }
++}
++
++// Fixed column grid
++LazyVGrid(columns: [
++    GridItem(.flexible()),
++    GridItem(.flexible()),
++    GridItem(.flexible())
++], spacing: 12) {
++    ForEach(items) { item in
++        ItemThumbnail(item: item)
++    }
++}
++```
++
++### 3. Navigation Patterns
++
++**NavigationStack (iOS 16+):**
++
++```swift
++struct ContentView: View {
++    @State private var path = NavigationPath()
++
++    var body: some View {
++        NavigationStack(path: $path) {
++            List(items) { item in
++                NavigationLink(value: item) {
++                    ItemRow(item: item)
++                }
++            }
++            .navigationTitle("Items")
++            .navigationDestination(for: Item.self) { item in
++                ItemDetailView(item: item)
++            }
++        }
++    }
++}
++```
++
++**TabView (iOS 18+):**
++
++```swift
++struct MainTabView: View {
++    @State private var selectedTab = 0
++
++    var body: some View {
++        TabView(selection: $selectedTab) {
++            Tab("Home", systemImage: "house", value: 0) {
++                HomeView()
++            }
++
++            Tab("Search", systemImage: "magnifyingglass", value: 1) {
++                SearchView()
++            }
++
++            Tab("Profile", systemImage: "person", value: 2) {
++                ProfileView()
++            }
++        }
++    }
++}
++```
++
++### 4. System Integration
++
++**SF Symbols:**
++
++```swift
++// Basic symbol
++Image(systemName: "heart.fill")
++    .foregroundStyle(.red)
++
++// Symbol with rendering mode
++Image(systemName: "cloud.sun.fill")
++    .symbolRenderingMode(.multicolor)
++
++// Variable symbol (iOS 16+)
++Image(systemName: "speaker.wave.3.fill", variableValue: volume)
++
++// Symbol effect (iOS 17+)
++Image(systemName: "bell.fill")
++    .symbolEffect(.bounce, value: notificationCount)
++```
++
++**Dynamic Type:**
++
++```swift
++// Use semantic fonts
++Text("Headline")
++    .font(.headline)
++
++Text("Body text that scales with user preferences")
++    .font(.body)
++
++// Custom font that respects Dynamic Type
++Text("Custom")
++    .font(.custom("Avenir", size: 17, relativeTo: .body))
++```
++
++### 5. Visual Design
++
++**Colors and Materials:**
++
++```swift
++// Semantic colors that adapt to light/dark mode
++Text("Primary")
++    .foregroundStyle(.primary)
++Text("Secondary")
++    .foregroundStyle(.secondary)
++
++// System materials for blur effects
++Rectangle()
++    .fill(.ultraThinMaterial)
++    .frame(height: 100)
++
++// Vibrant materials for overlays
++Text("Overlay")
++    .padding()
++    .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
++```
++
++**Shadows and Depth:**
++
++```swift
++// Standard card shadow
++RoundedRectangle(cornerRadius: 16)
++    .fill(.background)
++    .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
++
++// Elevated appearance
++.shadow(radius: 2, y: 1)
++.shadow(radius: 8, y: 4)
++```
++
++## Quick Start Component
++
++```swift
++import SwiftUI
++
++struct FeatureCard: View {
++    let title: String
++    let description: String
++    let systemImage: String
++
++    var body: some View {
++        HStack(spacing: 16) {
++            Image(systemName: systemImage)
++                .font(.title)
++                .foregroundStyle(.blue)
++                .frame(width: 44, height: 44)
++                .background(.blue.opacity(0.1), in: Circle())
++
++            VStack(alignment: .leading, spacing: 4) {
++                Text(title)
++                    .font(.headline)
++                Text(description)
++                    .font(.subheadline)
++                    .foregroundStyle(.secondary)
++                    .lineLimit(2)
++            }
++
++            Spacer()
++
++            Image(systemName: "chevron.right")
++                .foregroundStyle(.tertiary)
++        }
++        .padding()
++        .background(.background, in: RoundedRectangle(cornerRadius: 12))
++        .shadow(color: .black.opacity(0.05), radius: 4, y: 2)
++    }
++}
++```
++
++## Best Practices
++
++1. **Use Semantic Colors**: Always use `.primary`, `.secondary`, `.background` for automatic light/dark mode support
++2. **Embrace SF Symbols**: Use system symbols for consistency and automatic accessibility
++3. **Support Dynamic Type**: Use semantic fonts (`.body`, `.headline`) instead of fixed sizes
++4. **Add Accessibility**: Include `.accessibilityLabel()` and `.accessibilityHint()` modifiers
++5. **Use Safe Areas**: Respect `safeAreaInset` and avoid hardcoded padding at screen edges
++6. **Implement State Restoration**: Use `@SceneStorage` for preserving user state
++7. **Support iPad Multitasking**: Design for split view and slide over
++8. **Test on Device**: Simulator doesn't capture full haptic and performance experience
++
++## Common Issues
++
++- **Layout Breaking**: Use `.fixedSize()` sparingly; prefer flexible layouts
++- **Performance Issues**: Use `LazyVStack`/`LazyHStack` for long scrolling lists
++- **Navigation Bugs**: Ensure `NavigationLink` values are `Hashable`
++- **Dark Mode Problems**: Avoid hardcoded colors; use semantic or asset catalog colors
++- **Accessibility Failures**: Test with VoiceOver enabled
++- **Memory Leaks**: Watch for strong reference cycles in closures
+--- a/ios-design-guidelines/SKILL.md
++++ b/ios-design-guidelines/SKILL.md
+@@ -724,7 +724,7 @@
+ **Impact:** MEDIUM
+ 
+ ### Rule 8.1: Onboarding — Max 3 Pages, Skippable
+-Keep onboarding to 3 or fewer pages. Always provide a skip option. Defer sign-in until the user needs authenticated features.
++Keep onboarding brief; page count and skip behavior depend on the product and any required setup. Defer sign-in until the user needs authenticated features.
+ 
+ ```swift
+ TabView {
+@@ -813,7 +813,7 @@
+ **Impact:** HIGH
+ 
+ ### Rule 9.1: Request Permissions in Context
+-Request a permission at the moment the user takes an action that needs it — never at app launch.
++Request permission in context. Avoid asking at launch unless the protected resource is required for the app to function. See https://developer.apple.com/design/human-interface-guidelines/privacy
+ 
+ **Correct:**
+ ```swift
+@@ -836,7 +836,7 @@
+ ```
+ 
+ ### Rule 9.2: Explain Before System Prompt
+-Show a custom explanation screen before triggering the system permission dialog. The system dialog only appears once — if the user denies, the app must direct them to Settings.
++Use a custom explanation only when additional context is necessary; do not routinely put an extra screen before every system prompt. Permission behavior varies by framework and OS version. Consult current Apple documentation and handle each authorization status.
+ 
+ ```swift
+ struct LocationExplanation: View {
+@@ -1035,7 +1035,7 @@
+ 
+ ### Privacy
+ - [ ] Permissions are requested in context, not at launch
+-- [ ] Custom explanation shown before each system permission dialog
++- [ ] Permission requests are contextual; any custom explanation is necessary and follows current platform guidance
+ - [ ] Sign in with Apple offered alongside other providers
+ - [ ] App is usable without an account for basic features
+ - [ ] ATT prompt is shown if tracking, and denial is respected
+@@ -1081,3 +1081,7 @@
+ 14. **Stacked modals** — Presenting a sheet on top of a sheet on top of a sheet creates navigation confusion. Use navigation within a single modal instead.
+ 
+ 15. **Dark Mode as an afterthought** — Using hardcoded colors means the app is either broken in Dark Mode or light mode. Always use semantic colors.
++
++## Additional SwiftUI examples
++
++Use [SwiftUI patterns](references/swiftui-patterns.md) when examples help. These are illustrative patterns, not universal HIG requirements. Check deployment targets and current Apple documentation before adopting APIs. Preserve the repository UI/test stack and accepted product design.
+--- a/web-quality-audit/references/browser-security.md
++++ b/web-quality-audit/references/browser-security.md
+@@ -0,0 +1,33 @@
++# Browser security and compatibility review
++
++Use these checks selectively for the application's behavior and deployment environment. Confirm current official documentation for the framework, browser, and package version in use.
++
++## Transport and headers
++
++- Serve production resources over HTTPS and inspect mixed-content errors. Prefer explicit HTTPS resource URLs.
++- Assess HSTS only after checking HTTPS support across the covered hosts. `includeSubDomains` and preload are separate commitments; do not enable them as a blanket fix.
++- Design Content Security Policy around actual scripts, styles, connections, and framing. Test a proposed policy with reporting before enforcement when appropriate. A nonce must be unpredictable and generated per response; example literal nonces are not deployable security controls.
++- Use `frame-ancestors` and compatible framing protections according to legitimate embedding needs. `DENY` is not suitable when embedding is required.
++- Consider `X-Content-Type-Options: nosniff` and an application-appropriate Referrer-Policy. Do not prescribe the obsolete X-XSS-Protection filter as modern protection.
++- Send Permissions-Policy as an HTTP response header. Choose directives from actual camera, microphone, geolocation, and iframe requirements; validate current browser support and affected flows. Reference: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Permissions-Policy
++
++## Dependencies and input boundaries
++
++- Use the repository's package manager and lockfile. Review advisory applicability, the dependency path, patched versions, and compatibility before making a targeted update. Do not run blanket `npm update` or `npm audit fix` as an audit step.
++- Use text APIs such as `textContent` for plain text. If HTML is required, use an appropriate maintained sanitizer and framework guidance; review allowed elements and attributes.
++- Validate input shapes and keys at boundaries. Avoid unsafe recursive merging of attacker-controlled objects. JSON round-tripping is not a prototype-pollution defense for later unsafe merges.
++- Set authentication cookies server-side with Secure and HttpOnly where appropriate. Select SameSite, domain, path, and CSRF protections to fit sign-in and cross-site flows; test those flows.
++- Keep credentials out of browser bundles. Review source maps for unintended disclosure and the application's debugging needs rather than universally prohibiting them.
++
++## Browser behavior
++
++- Investigate console errors, failed requests, CORS configuration, deprecated APIs, and synchronous work on critical interaction paths.
++- Prefer feature detection and progressive enhancement. Verify supported browser and OS targets before replacing APIs.
++- Request permissions in context, with enough explanation for an informed choice. Avoid redundant prompts and preserve denied/unavailable states.
++- Check doctype, encoding, responsive layout, native form behavior, focus, and recovery from network failures.
++
++## Reporting and verification
++
++Record the observed configuration or reproduction, impact, proposed change, and affected flows. Distinguish confirmed vulnerabilities from advisory matches or untested hypotheses. For authorized changes, verify the specific risk and test legitimate functionality that the control could affect. Never equate a clean automated score with complete security.
++
++Return to [web quality audit](../SKILL.md) for the cross-category report.
+--- a/web-quality-audit/SKILL.md
++++ b/web-quality-audit/SKILL.md
+@@ -1,170 +1,19 @@
+ ---
+ name: web-quality-audit
+-description: Comprehensive web quality audit covering performance, accessibility, SEO, and best practices. Use when asked to "audit my site", "review web quality", "run lighthouse audit", "check page quality", or "optimize my website".
+-license: MIT
+-metadata:
+-  author: web-quality-skills
+-  version: "1.0"
++description: Audit a website across performance, accessibility, SEO, and browser security. Use for broad site quality reviews; route focused requests to the relevant specialist.
+ ---
+ 
+ # Web quality audit
+ 
+-Comprehensive quality review based on Google Lighthouse audits. Covers Performance, Accessibility, SEO, and Best Practices across 150+ checks.
++Establish the target pages, device/browser, environment, and requested scope. Read repository conventions and use its existing tooling. An audit request authorizes inspection; prepare recommendations before unapproved fixes or deployment.
+ 
+-## How it works
++Load only the guides relevant to findings:
++- [Performance](../performance/SKILL.md): resource loading, rendering, profiling.
++- [Core Web Vitals](../core-web-vitals/SKILL.md): LCP, INP, CLS; distinguish field and lab evidence.
++- [Accessibility](../accessibility/SKILL.md): semantics, contrast, keyboard and assistive technology checks.
++- [SEO](../seo/SKILL.md): crawlability, indexability, content and structured data.
++- [Browser security](references/browser-security.md): security headers, dependency advisories, browser compatibility. Examples require application-specific review; no blanket dependency updates or header changes.
+ 
+-1. Analyze the provided code/project for quality issues
+-2. Categorize findings by severity (Critical, High, Medium, Low)
+-3. Provide specific, actionable recommendations
+-4. Include code examples for fixes
++Report observed evidence, affected URL/file, user impact, severity, and a concrete remedy. Prioritize observed impact, not invented category percentages. Record what was not tested. Automated accessibility scores do not prove accessibility; include manual keyboard and relevant screen-reader checks when available. Core Web Vitals field thresholds at the 75th percentile are LCP ≤ 2.5s, INP ≤ 200ms, and CLS ≤ 0.1; a local Lighthouse run does not establish field success.
+ 
+-## Audit categories
+-
+-### Performance (40% of typical issues)
+-
+-**Core Web Vitals** — Must pass for good page experience:
+-* **LCP (Largest Contentful Paint) < 2.5s.** The largest visible element must render quickly. Optimize images, fonts, and server response time.
+-* **INP (Interaction to Next Paint) < 200ms.** User interactions must feel instant. Reduce JavaScript execution time and break up long tasks.
+-* **CLS (Cumulative Layout Shift) < 0.1.** Content must not jump around. Set explicit dimensions on images, embeds, and ads.
+-
+-**Resource Optimization:**
+-* **Compress images.** Use WebP/AVIF with fallbacks. Serve correctly sized images via `srcset`.
+-* **Minimize JavaScript.** Remove unused code. Use code splitting. Defer non-critical scripts.
+-* **Optimize CSS.** Extract critical CSS. Remove unused styles. Avoid `@import`.
+-* **Efficient fonts.** Use `font-display: swap`. Preload critical fonts. Subset to needed characters.
+-
+-**Loading Strategy:**
+-* **Preconnect to origins.** Add `<link rel="preconnect">` for third-party domains.
+-* **Preload critical assets.** LCP images, fonts, and above-fold CSS.
+-* **Lazy load below-fold content.** Images, iframes, and heavy components.
+-* **Cache effectively.** Long cache TTLs for static assets. Immutable caching for hashed files.
+-
+-### Accessibility (30% of typical issues)
+-
+-**Perceivable:**
+-* **Text alternatives.** Every `<img>` has meaningful `alt` text. Decorative images use `alt=""`.
+-* **Color contrast.** Minimum 4.5:1 for normal text, 3:1 for large text (WCAG AA).
+-* **Don't rely on color alone.** Use icons, patterns, or text alongside color indicators.
+-* **Captions and transcripts.** Video has captions. Audio has transcripts.
+-
+-**Operable:**
+-* **Keyboard accessible.** All functionality available via keyboard. No keyboard traps.
+-* **Focus visible.** Clear focus indicators on all interactive elements.
+-* **Skip links.** Provide "Skip to main content" for keyboard users.
+-* **Sufficient time.** Users can extend time limits. No auto-advancing content without controls.
+-
+-**Understandable:**
+-* **Page language.** Set `lang` attribute on `<html>`.
+-* **Consistent navigation.** Same navigation structure across pages.
+-* **Error identification.** Form errors clearly described and associated with fields.
+-* **Labels and instructions.** All form inputs have associated labels.
+-
+-**Robust:**
+-* **Valid HTML.** No duplicate IDs. Properly nested elements.
+-* **ARIA used correctly.** Prefer native elements. ARIA roles match behavior.
+-* **Name, role, value.** Interactive elements have accessible names and correct roles.
+-
+-### SEO (15% of typical issues)
+-
+-**Crawlability:**
+-* **Valid robots.txt.** Doesn't block important resources.
+-* **XML sitemap.** Lists all important pages. Submitted to Search Console.
+-* **Canonical URLs.** Prevent duplicate content issues.
+-* **No noindex on important pages.** Check meta robots and headers.
+-
+-**On-Page SEO:**
+-* **Unique title tags.** 50-60 characters. Primary keyword included.
+-* **Meta descriptions.** 150-160 characters. Compelling and unique.
+-* **Heading hierarchy.** Single `<h1>`. Logical heading structure.
+-* **Descriptive link text.** Not "click here" or "read more".
+-
+-**Technical SEO:**
+-* **Mobile-friendly.** Responsive design. Tap targets ≥ 48px.
+-* **HTTPS.** Secure connection required.
+-* **Fast loading.** Performance directly impacts ranking.
+-* **Structured data.** JSON-LD for rich snippets (Article, Product, FAQ, etc.).
+-
+-### Best practices (15% of typical issues)
+-
+-**Security:**
+-* **HTTPS everywhere.** No mixed content. HSTS enabled.
+-* **No vulnerable libraries.** Keep dependencies updated.
+-* **CSP headers.** Content Security Policy to prevent XSS.
+-* **No exposed source maps.** In production builds.
+-
+-**Modern Standards:**
+-* **No deprecated APIs.** Replace `document.write`, synchronous XHR, etc.
+-* **Valid doctype.** Use `<!DOCTYPE html>`.
+-* **Charset declared.** `<meta charset="UTF-8">` as first element in `<head>`.
+-* **No browser errors.** Clean console. No CORS issues.
+-
+-**UX Patterns:**
+-* **No intrusive interstitials.** Especially on mobile.
+-* **Clear permission requests.** Only ask when needed, with context.
+-* **No misleading buttons.** Buttons do what they say.
+-
+-## Severity levels
+-
+-| Level | Description | Action |
+-|-------|-------------|--------|
+-| **Critical** | Security vulnerabilities, complete failures | Fix immediately |
+-| **High** | Core Web Vitals failures, major a11y barriers | Fix before launch |
+-| **Medium** | Performance opportunities, SEO improvements | Fix within sprint |
+-| **Low** | Minor optimizations, code quality | Fix when convenient |
+-
+-## Audit output format
+-
+-When performing an audit, structure findings as:
+-
+-```markdown
+-## Audit results
+-
+-### Critical issues (X found)
+-- **[Category]** Issue description. File: `path/to/file.js:123`
+-  - **Impact:** Why this matters
+-  - **Fix:** Specific code change or recommendation
+-
+-### High priority (X found)
+-...
+-
+-### Summary
+-- Performance: X issues (Y critical)
+-- Accessibility: X issues (Y critical)
+-- SEO: X issues
+-- Best Practices: X issues
+-
+-### Recommended priority
+-1. First fix this because...
+-2. Then address...
+-3. Finally optimize...
+-```
+-
+-## Quick checklist
+-
+-### Before every deploy
+-- [ ] Core Web Vitals passing
+-- [ ] No accessibility errors (axe/Lighthouse)
+-- [ ] No console errors
+-- [ ] HTTPS working
+-- [ ] Meta tags present
+-
+-### Weekly review
+-- [ ] Check Search Console for issues
+-- [ ] Review Core Web Vitals trends
+-- [ ] Update dependencies
+-- [ ] Test with screen reader
+-
+-### Monthly deep dive
+-- [ ] Full Lighthouse audit
+-- [ ] Performance profiling
+-- [ ] Accessibility audit with real users
+-- [ ] SEO keyword review
+-
+-## References
+-
+-For detailed guidelines on specific areas:
+-- [Performance Optimization](../performance/SKILL.md)
+-- [Core Web Vitals](../core-web-vitals/SKILL.md)
+-- [Accessibility](../accessibility/SKILL.md)
+-- [SEO](../seo/SKILL.md)
+-- [Best Practices](../best-practices/SKILL.md)
++For authorized fixes, make targeted changes and run the smallest relevant verification. Preserve required camera, microphone, geolocation, embedded content, and legitimate source-map workflows. Do not turn illustrative title/description lengths, heading counts, or tap-target heuristics into universal ranking rules.
