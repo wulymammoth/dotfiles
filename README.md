@@ -85,8 +85,9 @@ codex -p parallel-work
 ```
 
 That sole owner does not need a session descriptor, claim, or per-task memory
-project. The task profile preserves the tracked model and service defaults,
-disables the Engram shell plugin and its bulk hooks, and keeps the Engram MCP
+project. The task profile inherits model and reasoning settings from the base
+Codex configuration, preserves its tracked service-tier override, disables the
+Engram shell plugin and its bulk hooks, and keeps the Engram MCP
 server available for ADR-centric decision memory. Codex transcript/resume, live
 Git, and committed task-local plans or notes carry the working context and
 remain authoritative for the current task.

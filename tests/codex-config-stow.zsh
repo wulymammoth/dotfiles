@@ -22,8 +22,8 @@ print -r -- "sentinel runtime state" >"$test_root/.codex/state.json"
 
 profile_source="$repo_root/codex-config/.codex/parallel-work.config.toml"
 [[ -f "$profile_source" ]] || fail "parallel-work profile is missing"
-[[ "$(<"$profile_source")" == $'service_tier = "default"\nmodel = "gpt-5.6-sol"\nmodel_reasoning_effort = "xhigh"\n[plugins."engram@engram"]\nenabled = false\n\n[mcp_servers.engram]\nenabled = true' ]] \
-  || fail "parallel-work profile must preserve model defaults, disable the Engram plugin, and retain Engram MCP"
+[[ "$(<"$profile_source")" == $'service_tier = "default"\n[plugins."engram@engram"]\nenabled = false\n\n[mcp_servers.engram]\nenabled = true' ]] \
+  || fail "parallel-work profile must inherit model and reasoning defaults, preserve the service tier, disable the Engram plugin, and retain Engram MCP"
 
 skill_source="$repo_root/codex-config/.codex/skills/orchestrating-parallel-worktrees/SKILL.md"
 helper_source="$repo_root/codex-config/.codex/skills/orchestrating-parallel-worktrees/scripts/worktree-session"

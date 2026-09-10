@@ -43,8 +43,8 @@ run_codex() {
   run_isolated "$codex_bin" -p parallel-work "$@"
 }
 [[ -f "$profile_source" ]] || fail "tracked parallel-work profile is missing"
-[[ "$(<"$profile_source")" == $'service_tier = "default"\nmodel = "gpt-5.6-sol"\nmodel_reasoning_effort = "xhigh"\n[plugins."engram@engram"]\nenabled = false\n\n[mcp_servers.engram]\nenabled = true' ]] \
-  || fail "parallel-work overlay must preserve model defaults, disable the Engram plugin, and retain Engram MCP"
+[[ "$(<"$profile_source")" == $'service_tier = "default"\n[plugins."engram@engram"]\nenabled = false\n\n[mcp_servers.engram]\nenabled = true' ]] \
+  || fail "parallel-work overlay must inherit model and reasoning defaults, preserve the service tier, disable the Engram plugin, and retain Engram MCP"
 
 cat >"$codex_home/config.toml" <<'TOML'
 model_instructions_file = "__MODEL_INSTRUCTIONS__"
