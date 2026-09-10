@@ -3,6 +3,14 @@ for file in ~/.{exports,exports_local,bashrc,profile,aliases,aliases_work,functi
   [ -r "$file" ] && [ -f "$file" ] && source "$file"
 done
 
+# Docker Desktop's user-installed CLI tools; retain existing command precedence.
+if [ -d "$HOME/.docker/bin" ]; then
+  case ":$PATH:" in
+    *":$HOME/.docker/bin:"*) ;;
+    *) export PATH="${PATH:+$PATH:}$HOME/.docker/bin" ;;
+  esac
+fi
+
 # Start the SSH agent if not running
 if [ -z "$SSH_AUTH_SOCK" ]; then
   eval "$(ssh-agent -s)"

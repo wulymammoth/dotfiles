@@ -6,6 +6,14 @@ case ":$PATH:" in
   *) export PATH="$HOME/.local/bin:$PATH" ;;
 esac
 
+# Docker Desktop's user-installed CLI tools; retain existing command precedence.
+if [ -d "$HOME/.docker/bin" ]; then
+  case ":$PATH:" in
+    *":$HOME/.docker/bin:"*) ;;
+    *) export PATH="${PATH:+$PATH:}$HOME/.docker/bin" ;;
+  esac
+fi
+
 # Keep installer-managed ctx upgrades opt-in in every zsh process.
 unset CTX_UPGRADE_OFF CTX_DISABLE_AUTO_UPGRADE
 export CTX_UPGRADE_AUTO=off
