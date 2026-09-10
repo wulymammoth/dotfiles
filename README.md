@@ -141,6 +141,16 @@ history, and do not delete or blindly merge it.
 Stow activation and provider-backed canary execution remain separate approval
 gates; installing these tracked files does not prove live multi-worker behavior.
 
+GSD is retired from this machine's Codex agent and hook discovery. Shared GSD
+skills remain disabled in Codex and available to other installations. Superpowers
+and Visual Companion/Design Lock remain the normal design workflow; see the
+[cleanup and restore record](docs/skill-maintenance/2026-09-10/README.md).
+
+[`scripts/codex-memory-policy.py`](scripts/codex-memory-policy.py) remains an
+on-demand repair utility for four Engram settings. It is not a startup step or a
+parallel-work prerequisite. Ordinary profile and Stow checks do not run repairs;
+the [dedicated maintenance suite](docs/codex-memory-policy.md) covers that workflow.
+
 ### Optional or machine-specific packages
 
 These packages are kept in the repo for selective use and are not part of the default `make stow-*` allow-list:

@@ -145,6 +145,20 @@ class AppServerClient:
         return self.request("config/read", {"includeLayers": True})
 
 
+class CodexMemoryPolicyDocumentationTests(unittest.TestCase):
+    def test_repair_tool_and_documented_safety_boundaries_are_retained(self):
+        self.assertTrue(SCRIPT.is_file())
+        policy = (REPO_ROOT / "docs/codex-memory-policy.md").read_text()
+        for boundary in (
+            "model_instructions_file", "experimental_compact_prompt_file",
+            'plugins."engram@engram".enabled', "mcp_servers.engram.enabled",
+            "does not activate", "fresh session", "ADR-centric", "ctx",
+            "mem_session_start", "session_id", "capture_prompt:false", "proactive",
+        ):
+            with self.subTest(boundary=boundary):
+                self.assertIn(boundary, policy)
+
+
 class CodexMemoryPolicyTests(unittest.TestCase):
     maxDiff = None
 

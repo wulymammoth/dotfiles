@@ -450,7 +450,7 @@ worker_bootstrap_prompt() {
     opening="Start"
   fi
 
-  print -r -- "$opening task $task_id in $descriptor_root using approved plan $task_plan_path. Invoke superpowers:orchestrating-parallel-worktrees. Before implementation, reconcile the physical startup root, branch, HEAD, dirty state, active task, and owned mutable artifacts; then run \"$helper_path\" guard and \"$helper_path\" claim. After every compaction or resume, repeat guard, claim, and live-state reconciliation before further repository work. Stop BLOCKED on any mismatch."
+  print -r -- "$opening task $task_id in $descriptor_root using approved plan $task_plan_path. Invoke orchestrating-parallel-worktrees. Before implementation, reconcile the physical startup root, branch, HEAD, dirty state, active task, and owned mutable artifacts; then run \"$helper_path\" guard and \"$helper_path\" claim. After every compaction or resume, repeat guard, claim, and live-state reconciliation before further repository work. Stop BLOCKED on any mismatch."
 }
 
 command_launch() {

@@ -62,6 +62,11 @@ decision relationship.
 
 ## Native reconciliation interface
 
+This is an on-demand maintenance operation when the four settings need repair.
+It is not required before ordinary work or parallel execution. Profile and Stow
+verification use the intended configuration directly; repair-specific assertions
+and native transactions stay in `tests/test_codex_memory_policy.py`.
+
 [`scripts/codex-memory-policy.py`](../scripts/codex-memory-policy.py) inspects and
 reconciles the four settings through Codex's native app-server configuration API.
 Run it with the same `HOME`, `CODEX_HOME`, and XDG roots whose user configuration
@@ -164,11 +169,22 @@ registration, explicit project/session saves and summaries, retrieval and shared
 ADR search, persisted attribution, and unknown-session/project-mismatch errors.
 It never touches production memory or asserts private per-task retrieval.
 
-Run the complete local checks with:
+For changes to the repair utility or its maintenance contract, run:
 
 ```sh
 python3 -B -m unittest discover -s tests -p 'test_codex_memory_policy.py' -v
+```
+
+For changes to the Engram attribution contract, use its separate fixture suite:
+
+```sh
 python3 -B -m unittest discover -s tests -p 'test_engram_memory_contract.py' -v
+```
+
+Ordinary profile, Stow, and affected worktree-helper checks are independent of
+the repair workflow:
+
+```sh
 zsh tests/parallel-work-profile.zsh
 zsh tests/codex-config-stow.zsh
 zsh tests/parallel-worktree-session.zsh

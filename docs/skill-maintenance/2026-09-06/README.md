@@ -1,5 +1,9 @@
 # Skill cleanup, 2026-09-06
 
+Follow-up: the [2026-09-10 Codex retirement](../2026-09-10/README.md) archives
+GSD agents, hooks, and Codex-owned runtime. The shared GSD skills described below
+remain disabled; this report records the earlier checkpoint.
+
 The user approved the audit recommendations. Local Codex discovery cleanup, personal skill revisions, and three consolidations are applied. The Superpowers source patch is also applied under the subsequently granted checkout exception; the installed Codex plugin has now been refreshed and verified. Other conditional work below remains pending. At the local-verification checkpoint, nothing had been committed or published. The user subsequently authorized commit, push, and installed-plugin refresh; delivery status is recorded below.
 
 ## Applied and verified

@@ -112,30 +112,7 @@ do
     || fail "parallel-worktree scenarios are missing: $scenario"
 done
 
-memory_policy_script="$repo_root/scripts/codex-memory-policy.py"
 memory_policy_doc="$repo_root/docs/codex-memory-policy.md"
-[[ -f "$memory_policy_script" ]] \
-  || fail "native Codex memory-policy reconciler is missing"
-[[ -f "$memory_policy_doc" ]] \
-  || fail "Codex memory-policy documentation is missing"
-for required_memory_boundary in \
-  "model_instructions_file" \
-  "experimental_compact_prompt_file" \
-  'plugins."engram@engram".enabled' \
-  "mcp_servers.engram.enabled" \
-  "does not activate" \
-  "fresh session" \
-  "ADR-centric" \
-  "ctx" \
-  "mem_session_start" \
-  "session_id" \
-  "capture_prompt:false" \
-  "proactive"
-do
-  rg --fixed-strings --quiet "$required_memory_boundary" "$memory_policy_doc" \
-    || fail "memory-policy documentation is missing: $required_memory_boundary"
-done
-
 
 for required_memory_policy in \
   "supplementary ADR" \
