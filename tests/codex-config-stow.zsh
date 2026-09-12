@@ -113,6 +113,7 @@ do
 done
 
 memory_policy_doc="$repo_root/docs/codex-memory-policy.md"
+engram_write_policy="$repo_root/codex-config/.codex/policies/engram-writes.md"
 
 for required_memory_policy in \
   "supplementary ADR" \
@@ -125,7 +126,7 @@ for required_memory_policy in \
   "candidate durable learnings"
 do
   if ! rg --fixed-strings --quiet "$required_memory_policy" \
-    "$global_agents" "$memory_policy_doc"; then
+    "$global_agents" "$memory_policy_doc" "$engram_write_policy"; then
     fail "tracked policy is missing the memory contract: $required_memory_policy"
   fi
 done
@@ -138,7 +139,7 @@ for forbidden_memory_policy in \
 do
   if rg --fixed-strings --quiet "$forbidden_memory_policy" \
     "$repo_root/README.md" "$repo_root/.Codex-context.md" \
-    "$global_agents" "$memory_policy_doc" "$skill_source"; then
+    "$global_agents" "$memory_policy_doc" "$engram_write_policy" "$skill_source"; then
     fail "tracked policy retains a blanket Engram restriction: $forbidden_memory_policy"
   fi
 done
@@ -161,6 +162,15 @@ stow --no-folding \
   --dir "$repo_root" \
   --target "$test_root" \
   codex-config
+
+for policy_name in github-media engram-writes elixir-phoenix; do
+  policy_source="$repo_root/codex-config/.codex/policies/$policy_name.md"
+  policy_link="$test_root/.codex/policies/$policy_name.md"
+  rg --fixed-strings --quiet "~/.codex/policies/$policy_name.md" "$global_agents" \
+    || fail "global AGENTS is missing a specialized policy route: $policy_name"
+  [[ -L "$policy_link" && "${policy_link:A}" == "$policy_source" ]] \
+    || fail "specialized policy must resolve to tracked source: $policy_name"
+done
 
 [[ -L "$test_root/.codex/parallel-work.config.toml" ]] \
   || fail "parallel-work.config.toml must be a symlink"

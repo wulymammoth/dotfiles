@@ -1,0 +1,30 @@
+--- a/expo-mobile-release-discipline/SKILL.md
++++ b/expo-mobile-release-discipline/SKILL.md
+@@ -1,6 +1,6 @@
+ ---
+ name: expo-mobile-release-discipline
+-description: Use when working on Expo or React Native mobile apps and the task mentions TestFlight, IPA, Transporter, EAS Build, EAS Update, expo-updates, build limits, App Store builds, simulator smoke, native runtime bugs, provider handoff, or whether a mobile fix needs a backend deploy.
++description: "Use when choosing or preparing an Expo/React Native release vehicle: EAS Update, native build, backend deployment, or store metadata. Apply to release-readiness decisions, not routine runtime debugging."
+ ---
+ 
+ # Expo Mobile Release Discipline
+--- a/expo-react-native-runtime-debugging/SKILL.md
++++ b/expo-react-native-runtime-debugging/SKILL.md
+@@ -1,6 +1,6 @@
+ ---
+ name: expo-react-native-runtime-debugging
+-description: Debug installed Expo and React Native mobile runtime regressions by mirroring the real client boundary before patching. Use when working on TestFlight, App Store, simulator, development-client, physical-device, deep link, native module, external app handoff, auth/session, fetch/API, provider handoff, push notification, file/media, or other mobile-only behavior where tests or web/local tooling may not match the actual app.
++description: "Use when diagnosing an installed Expo/React Native regression that web or unit tests may not reproduce, including native boundaries, deep links, or client requests."
+ ---
+ 
+ # Expo React Native Runtime Debugging
+--- a/ios-ui-regression-guard/SKILL.md
++++ b/ios-ui-regression-guard/SKILL.md
+@@ -1,6 +1,6 @@
+ ---
+ name: ios-ui-regression-guard
+-description: Enforce regression-test planning and verification for iOS UI changes. Use when Codex implements, reviews, or fixes SwiftUI, UIKit, Xcode project, iOS navigation, layout, accessibility, animation, design-system, view-model-to-view binding, screenshot, snapshot, or visual behavior changes; also use when a bug report mentions an iPhone/iPad visual or UI regression and needs XCUITest, snapshot, or behavior coverage before completion.
++description: "Use when choosing or implementing regression coverage for SwiftUI/UIKit behavior or visual changes, including iPhone/iPad UI bug fixes. Preserve the repository's test stack."
+ ---
+ 
+ # iOS UI Regression Guard

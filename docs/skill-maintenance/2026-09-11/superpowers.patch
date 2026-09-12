@@ -1,0 +1,633 @@
+diff --git a/skills/brainstorming/SKILL.md b/skills/brainstorming/SKILL.md
+index 58871a1e..e8d12690 100644
+--- a/skills/brainstorming/SKILL.md
++++ b/skills/brainstorming/SKILL.md
+@@ -1,23 +1,26 @@
+ ---
+ name: brainstorming
+-description: "You MUST use this before any creative work - creating features, building components, adding functionality, modifying behavior, or creating or finalizing design specifications and Visual Design Locks, including when a selected mockup or existing HTML winner is presented as ready to lock."
++description: Use when exploring a new feature or architecture, resolving material design choices, or creating, finalizing, or applying a visual Design Lock.
+ ---
+ 
+ # Brainstorming Ideas Into Designs
+ 
+ Help turn ideas into fully formed designs and specs through natural collaborative dialogue.
+ 
+-Start by classifying how much process the request needs, then work
+-through your path: understand the context, refine the idea, present a
+-design, and get your human partner's approval.
++Use this workflow when design decisions remain unresolved. For a mechanical
++nonvisual edit or implementation of an already approved nonvisual design, proceed with
++the authorized work and proportionate verification. Do not restart brainstorming.
++For approved visual work, reuse the design through the Design Lock route below.
+ 
+-<HARD-GATE>
+-Do NOT invoke any implementation skill, write any code, scaffold any
+-project, or take any implementation action until you have told your
+-human partner what you intend and they have approved it. This applies
+-to EVERY task on EVERY path below — the ceremony scales with the task;
+-the approval gate never does.
+-</HARD-GATE>
++## Authorization
++
++Before implementing an unresolved design, present the proposed behavior and
++obtain your human partner's approval. An explicit request that already specifies
++the intended change, or approval earlier in the conversation, supplies that
++authorization. Reuse it while scope, destination, risk, and outcome are unchanged.
++Ask again when a material decision is missing or those conditions change.
++Repository ownership and shipping boundaries still apply. Approval to implement
++does not replace the final human acceptance required by a visual Design Lock.
+ 
+ ## Three Paths
+ 
+@@ -30,142 +33,38 @@ no-document shortcut does not apply to this work. Throwaway visual exploration
+ may remain a spike, subject to the existing-UI authority and capture gates below;
+ exploration approval does not authorize visual implementation.
+ 
+-Before your first question, classify the request and say the
+-classification out loud — "this looks bounded, so I'll present a short
+-design here rather than write a spec" — so your human partner can
+-override it:
+-
+-- **Spike** — a feasibility question ("can we...", "is it possible...",
+-  "quick and dirty is fine") whose output is an answer, not code you
+-  keep. Present the question and what you'll try in 2-3 sentences, get
+-  a nod, then find out as cheaply as correctness allows. No design
+-  doc, no spec file. Report findings as a recommendation; anything you
+-  built stays labeled throwaway.
+-- **Bounded** — a well-scoped change to code that already exists in
+-  this repo: a new flag, a small endpoint, a one-file fix.
+-  Understanding the kind of app is not enough — bounded means the flow
+-  you are changing is already here to read. If there is no existing
+-  flow to change, the task is not bounded. Ask the clarifying
+-  questions that matter, present a short design IN CHAT (a few
+-  sentences to a few short paragraphs), and STOP. Implementation
+-  starts only after your human partner says yes to that design — a
+-  bounded task's approval is as hard a gate as an architectural
+-  one. No spec file, no implementation plan document.
+-- **Architectural** — new projects, new subsystems, changes that
+-  restructure how components fit together or alter interfaces others
+-  depend on. Follow the full process: questions, approaches, sectioned
+-  design, written spec, then the writing-plans skill.
+-
+-When in doubt between two paths, take the heavier one. The ratchet is
+-one-way: hidden complexity discovered mid-task upgrades the path —
+-stop, say so, and step up. Nothing downgrades mid-task.
+-
+-## Anti-Pattern: "Too Simple To Need Approval"
+-
+-Every path ends with your human partner approving your intent before
+-implementation. A todo list, a single-function utility, a config
+-change — the design may be two sentences in chat, but you MUST present
+-it and get approval. "Simple" tasks are where unexamined assumptions
+-cause the most wasted work. What scales with simplicity is the
+-artifact, never the approval.
+-
+-## Red Flags
+-
+-| Thought | Reality |
+-|---------|---------|
+-| "This is too simple to need a design" | Simple means a short design, not no design. Two sentences in chat, then approval. |
+-| "I'll call it bounded and skip the spec" | Reaching for a label to skip work IS the doubt — take the heavier path. |
+-| "It's bounded and the design is obvious — I'll start while they read it" | The gate is the approval, not the design's length. Present, then stop until you hear yes. |
+-| "I understand this kind of app, so it's bounded" | Bounded measures the repo, not your familiarity. A new project has no existing flow — it is architectural. |
+-| "The spike works, so I'll keep the code" | A spike's output is an answer. Keeping the code is a new request — classify it. |
+-| "It grew, but I'm almost done — no need to re-classify" | Hidden complexity upgrades the path mid-task. Stop and say so. |
+-| "They approved the spike, so the follow-up change is approved too" | Each task gets its own classification and its own approval. |
+-
+-## Checklist
+-
+-Classify first, announce the path, then create a task for each item on
+-your path and complete them in order.
+-
+-**Spike:**
+-1. **Explore project context** — enough to frame the probe
+-2. **Present question + probe plan** — 2-3 sentences
+-3. **Get approval** — a nod is enough
+-4. **Investigate** — as cheaply as correctness allows
+-5. **Report findings** — a recommendation; label anything built as throwaway
+-
+-**Bounded:**
+-1. **Explore project context** — check files, docs, recent commits
+-2. **Ask clarifying questions** — one at a time, the ones that matter
+-3. **Present short design in chat** — approach, files touched, testing
+-4. **Get approval** — STOP and wait for an explicit yes; presenting the design and starting in the same breath is skipping the gate
+-5. **Implement** — proceed with the normal development workflow (TDD applies); no plan document
+-
+-**Architectural:**
+-1. **Explore project context** — check files, docs, recent commits
+-2. **Offer the visual companion just-in-time** — NOT upfront. The first time a question would genuinely be clearer shown than described, offer it then (its own message); on approval its browser tab opens for you. If no visual question ever arises, never offer it. See the Visual Companion section below.
+-3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
+-4. **Propose 2-3 approaches** — with trade-offs and your recommendation
+-5. **Present design** — in sections scaled to their complexity, get user approval after each section
+-6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
+-7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
+-8. **User reviews written spec** — ask user to review the spec file before proceeding
+-9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
+-
+-## Process Flow
+-
+-```dot
+-digraph brainstorming {
+-    "Classify: spike / bounded / architectural" [shape=diamond];
+-    "Present question + probe (2-3 sentences)" [shape=box];
+-    "Ask clarifying questions (bounded)" [shape=box];
+-    "Present short design in chat" [shape=box];
+-    "Human approves?" [shape=diamond];
+-    "Investigate; report recommendation" [shape=doublecircle];
+-    "Implement via normal workflow (no plan doc)" [shape=doublecircle];
+-    "Explore project context" [shape=box];
+-    "Ask clarifying questions" [shape=box];
+-    "Propose 2-3 approaches" [shape=box];
+-    "Present design sections" [shape=box];
+-    "User approves design?" [shape=diamond];
+-    "Write design doc" [shape=box];
+-    "Spec self-review\n(fix inline)" [shape=box];
+-    "User reviews spec?" [shape=diamond];
+-    "Invoke writing-plans skill" [shape=doublecircle];
+-    "Hidden complexity? Upgrade path" [shape=box];
+-
+-    "Classify: spike / bounded / architectural" -> "Present question + probe (2-3 sentences)" [label="spike"];
+-    "Classify: spike / bounded / architectural" -> "Ask clarifying questions (bounded)" [label="bounded"];
+-    "Classify: spike / bounded / architectural" -> "Explore project context" [label="architectural"];
+-    "Present question + probe (2-3 sentences)" -> "Human approves?";
+-    "Ask clarifying questions (bounded)" -> "Present short design in chat";
+-    "Present short design in chat" -> "Human approves?";
+-    "Human approves?" -> "Investigate; report recommendation" [label="spike: yes"];
+-    "Human approves?" -> "Implement via normal workflow (no plan doc)" [label="bounded: yes"];
+-    "Hidden complexity? Upgrade path" -> "Classify: spike / bounded / architectural";
+-    "Explore project context" -> "Ask clarifying questions";
+-    "Ask clarifying questions" -> "Propose 2-3 approaches";
+-    "Propose 2-3 approaches" -> "Present design sections";
+-    "Present design sections" -> "User approves design?";
+-    "User approves design?" -> "Present design sections" [label="no, revise"];
+-    "User approves design?" -> "Write design doc" [label="yes"];
+-    "Write design doc" -> "Spec self-review\n(fix inline)";
+-    "Spec self-review\n(fix inline)" -> "User reviews spec?";
+-    "User reviews spec?" -> "Write design doc" [label="changes requested"];
+-    "User reviews spec?" -> "Invoke writing-plans skill" [label="approved"];
+-}
+-```
+-
+-**Terminal states are path-bound.** Architectural: the ONLY skill you
+-invoke after brainstorming is writing-plans — never frontend-design,
+-mcp-builder, or any other implementation skill. Bounded: after
+-approval, implementation proceeds directly through the normal
+-development workflow; no plan document. Spike: the terminal state is a
+-reported recommendation.
++Choose the path from the actual work:
++
++- **Spike:** Investigate a feasibility question and report evidence and limits.
++  State a short probe plan and proceed with authorized read-only or disposable
++  local work. Obtain approval for actions outside that scope. Keeping prototype
++  code as a product change requires implementation authorization.
++- **Bounded:** For unresolved behavior in an existing flow, inspect the relevant
++  code, ask only material questions, and present a short design with verification.
++  Obtain approval if the proposed change is not already authorized, then implement.
++  Nonvisual bounded work does not need a separate spec or plan document.
++- **Architectural:** For a new project, subsystem, or material interface change,
++  compare useful approaches, settle the design with your human partner, and write
++  the governing spec. Review it for gaps, obtain approval of unresolved decisions,
++  then use `superpowers:writing-plans`. Reuse an already approved governing spec.
++
++Hidden complexity warrants reassessing the plan. Pause dependent work when it
++introduces a material unapproved decision; continue independent authorized work.
++
++## Completion
++
++Carry the selected path through its outcome: an evidence-backed answer for a
++spike, verified implementation for approved bounded work, or an approved spec
++and implementation plan for architectural design. When implementation is already
++authorized, continue into its execution workflow without another approval.
++Continue through failures
++caused by the change within the authorized workflow. Report a concrete blocker
++or remaining approval boundary when completion is unavailable.
+ 
+ ## The Process
+ 
+ The subsections below serve the bounded and architectural paths (a
+-spike stops at "present the probe, get a nod"). Sections from
++spike ends with an evidence-backed recommendation). Sections from
+ **Exploring approaches** onward are architectural-path depth — for
+ bounded work, context plus a few questions plus a short in-chat design
+ is the whole process.
+@@ -175,9 +74,8 @@ is the whole process.
+ - Check out the current project state first (files, docs, recent commits)
+ - Before asking detailed questions, assess scope: if the request describes multiple independent subsystems (e.g., "build a platform with chat, file storage, billing, and analytics"), flag this immediately. Don't spend questions refining details of a project that needs to be decomposed first.
+ - If the project is too large for a single spec, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal design flow. Each sub-project gets its own spec → plan → implementation cycle.
+-- For appropriately-scoped projects, ask questions one at a time to refine the idea
++- Ask questions when the answer materially changes the design
+ - Prefer multiple choice questions when possible, but open-ended is fine too
+-- Only one question per message - if a topic needs more exploration, break it into multiple questions
+ - Focus on understanding: purpose, constraints, success criteria
+ 
+ **Exploring approaches:**
+@@ -191,7 +89,7 @@ is the whole process.
+ 
+ - Once you believe you understand what you're building, present the design
+ - Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
+-- Ask after each section whether it looks right so far
++- Ask for decisions on unresolved trade-offs; reuse approvals already given
+ - Cover: architecture, components, data flow, error handling, testing
+ - Be ready to go back and clarify if something doesn't make sense
+ 
+@@ -221,7 +119,8 @@ is the whole process.
+   - **Load-bearing properties** — 3–7 plain-language bullets per screenshot naming what must survive implementation
+   - **Approval statement** — confirmation that the saved PNG itself was presented and approved
+ - Use elements-of-style:writing-clearly-and-concisely skill if available
+-- Commit the design document to git, including approved PNG artifacts under `docs/superpowers/specs/assets/`
++- Include approved PNG artifacts under `docs/superpowers/specs/assets/`; commit
++  the design and artifacts when the delivery authorization includes commits.
+ 
+ **Spec Self-Review:**
+ After writing the spec document, look at it with fresh eyes:
+@@ -235,11 +134,11 @@ After writing the spec document, look at it with fresh eyes:
+ Fix any issues inline. No need to re-review — just fix and move on.
+ 
+ **User Review Gate:**
+-After the spec review loop passes, ask the user to review the written spec before proceeding:
+-
+-> "Spec written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the implementation plan."
+-
+-Wait for the user's response. If they request changes, make them and re-run the spec review loop. Only proceed once the user approves.
++Present the written spec for approval when its decisions have not already been
++approved. If your human partner requests changes, revise and check it again.
++An existing approved spec need not be approved again unless its scope or material
++decisions change. A newly finalized visual Design Lock still requires approval
++of the saved PNG itself and its governing spec.
+ 
+ **Implementation:**
+ 
+diff --git a/skills/test-driven-development/SKILL.md b/skills/test-driven-development/SKILL.md
+index 4320d887..6bd38aff 100644
+--- a/skills/test-driven-development/SKILL.md
++++ b/skills/test-driven-development/SKILL.md
+@@ -1,48 +1,28 @@
+ ---
+ name: test-driven-development
+-description: Use when implementing any feature or bugfix, before writing implementation code
++description: Use when adding or changing testable behavior or fixing a regression; choose coverage that detects the behavior at risk.
+ ---
+ 
+ # Test-Driven Development (TDD)
+ 
+-## Overview
++## Scope and evidence
+ 
+-Write the test first. Watch it fail. Write minimal code to pass.
++For testable behavior changes, write a focused failing test, implement the
++smallest fix, then refactor while preserving the behavior. The test must detect
++the requirement or regression rather than mirror implementation details.
+ 
+-**Core principle:** If you didn't watch the test fail, you don't know if it tests the right thing.
++For documentation, mechanical configuration edits, generated output, or a
++throwaway probe, use the relevant validation instead of inventing a unit test.
++Configuration that changes runtime behavior still needs an appropriate regression
++or integration check. State the verification chosen; an already authorized task
++needs no new approval merely because TDD is inapplicable.
+ 
+-**Violating the letter of the rules is violating the spirit of the rules.**
+-
+-## When to Use
+-
+-**Always:**
+-- New features
+-- Bug fixes
+-- Refactoring
+-- Behavior changes
+-
+-**Exceptions (ask your human partner):**
+-- Throwaway prototypes
+-- Generated code
+-- Configuration files
+-
+-Thinking "skip TDD just this once"? Stop. That's rationalization.
+-
+-## The Iron Law
+-
+-```
+-NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
+-```
+-
+-Write code before the test? Delete it. Start over.
+-
+-**No exceptions:**
+-- Don't keep it as "reference"
+-- Don't "adapt" it while writing tests
+-- Don't look at it
+-- Delete means delete
+-
+-Implement fresh from tests. Period.
++If implementation already exists without a regression test, preserve it. Add a
++test for the original requirement, demonstrate failure with only the relevant
++fix temporarily absent, restore the fix, and verify passing. Use a reversible
++local change or disposable fixture; never discard unrelated work. If the original
++failure cannot be reproduced safely, report that evidence gap. Do not describe
++this recovery as test-first development.
+ 
+ ## Red-Green-Refactor
+ 
+@@ -112,7 +92,8 @@ Vague name, tests mock not code
+ 
+ ### Verify RED - Watch It Fail
+ 
+-**MANDATORY. Never skip.**
++Run the test before implementing when using the test-first path. For existing
++implementation, use the recovery procedure and report any unavailable proof.
+ 
+ ```bash
+ npm test path/to/test.test.ts
+@@ -123,7 +104,8 @@ Confirm:
+ - Failure message is expected
+ - Fails because feature missing (not typos)
+ 
+-**Test passes?** You're testing existing behavior. Fix test.
++**Test passes?** Check whether the behavior already exists. For a regression
++added after implementation, use the recovery procedure above; do not weaken the assertion.
+ 
+ **Test errors?** Fix error, re-run until it fails correctly.
+ 
+@@ -175,12 +157,13 @@ npm test path/to/test.test.ts
+ 
+ Confirm:
+ - Test passes
+-- Other tests still pass
+-- Output pristine (no errors, warnings)
++- Affected existing checks still pass
++- Investigate relevant warnings and failures; distinguish pre-existing issues
+ 
+ **Test fails?** Fix code, not test.
+ 
+-**Other tests fail?** Fix now.
++**Other tests fail?** Fix failures caused by the change. Report unrelated failures
++without expanding the task silently.
+ 
+ ### REFACTOR - Clean Up
+ 
+@@ -209,39 +192,14 @@ When writing or changing any test, read [writing-good-tests.md](writing-good-tes
+ - Keep test-only code in test utilities, out of production classes
+ - Understand a dependency's side effects before mocking it
+ 
+-## Common Rationalizations
+-
+-| Excuse | Reality |
+-|--------|---------|
+-| "Too simple to test" | Simple code breaks. Test takes 30 seconds. |
+-| "I'll test after" | Tests written after pass immediately — which proves nothing. They may test the wrong thing, test the implementation instead of the behavior, or miss the edge case you forgot. You never watched it fail, so you never proved it can catch the bug. Test-first forces that failure. |
+-| "Tests after achieve same goals (spirit not ritual)" | Tests-after answer "what does this do?"; tests-first answer "what should this do?" Tests written after are biased by the code you already wrote — you verify the cases you remembered, not the ones you'd have discovered. Coverage without proof the tests work. |
+-| "Already manually tested" | Manual testing is ad-hoc: no record of what you covered, no way to re-run it when the code changes, easy to forget cases under pressure. "Worked when I tried it" ≠ comprehensive. Automated tests run the same way every time. |
+-| "Deleting X hours is wasteful" | Sunk cost fallacy — that time is already spent either way. The real choice: rewrite with TDD (high confidence) vs. keep it and bolt tests on after (low confidence, likely bugs). Keeping code you can't trust is the waste. |
+-| "Keep as reference, write tests first" | You'll adapt it. That's testing after. Delete means delete. |
+-| "Need to explore first" | Fine. Throw away exploration, start with TDD. |
+-| "Test hard = design unclear" | Listen to test. Hard to test = hard to use. |
+-| "TDD will slow me down" | TDD IS the pragmatic path: catches bugs before commit, prevents regressions, lets you refactor without fear. "Pragmatic" shortcuts mean debugging in production — slower, not faster. |
+-| "Manual test faster" | Manual doesn't prove edge cases. You'll re-test every change. |
+-| "Existing code has no tests" | You're improving it. Add tests for existing code. |
+-
+-## Red Flags - STOP and Start Over
+-
+-- Code before test
+-- Test after implementation
+-- Test passes immediately
+-- Can't explain why test failed
+-- Tests added "later"
+-- Rationalizing "just this once"
+-- "I already manually tested it"
+-- "Tests after achieve the same purpose"
+-- "It's about spirit not ritual"
+-- "Keep as reference" or "adapt existing code"
+-- "Already spent X hours, deleting is wasteful"
+-- "TDD is dogmatic, I'm being pragmatic"
+-- "This is different because..."
+-
+-**All of these mean: Delete code. Start over with TDD.**
++## Evidence gaps to resolve
++
++- A test passing only with the new implementation does not demonstrate it can
++  detect the regression. Exercise the failing condition too.
++- Manual inspection may validate appearance, but does not establish automated
++  regression coverage. Report each form of evidence accurately.
++- A hard-to-test behavior may expose a boundary problem. Use the established
++  test stack and make the smallest useful seam; avoid unrelated restructuring.
+ 
+ ## Example: Bug Fix
+ 
+@@ -280,41 +238,15 @@ PASS
+ **REFACTOR**
+ Extract validation for multiple fields if needed.
+ 
+-## Verification Checklist
++## Completion
+ 
+-Before marking work complete:
+-
+-- [ ] Every new function/method has a test
+-- [ ] Watched each test fail before implementing
+-- [ ] Each test failed for expected reason (feature missing, not typo)
+-- [ ] Wrote minimal code to pass each test
+-- [ ] All tests pass
+-- [ ] Output pristine (no errors, warnings)
+-- [ ] Tests use real code (mocks only if unavoidable)
+-- [ ] Edge cases and errors covered
+-
+-Can't check all boxes? You skipped TDD. Start over.
+-
+-## When Stuck
+-
+-| Problem | Solution |
+-|---------|----------|
+-| Don't know how to test | Write wished-for API. Write assertion first. Ask your human partner. |
+-| Test too complicated | Design too complicated. Simplify interface. |
+-| Must mock everything | Code too coupled. Use dependency injection. |
+-| Test setup huge | Extract helpers. Still complex? Simplify design. |
+-
+-## Debugging Integration
+-
+-Bug found? Write failing test reproducing it. Follow TDD cycle. Test proves fix and prevents regression.
+-
+-Never fix bugs without a test.
+-
+-## Final Rule
+-
+-```
+-Production code → test exists and failed first
+-Otherwise → not TDD
+-```
++- The changed behavior has proportionate coverage, or an explicit explanation
++  of the alternative validation and remaining gap.
++- Regression checks fail for the intended reason without the fix and pass with
++  it, where practical; setup errors are not regression proof.
++- Affected checks pass, and any unrelated failures are reported.
++- Tests assert observable behavior and relevant edge cases.
+ 
+-No exceptions without your human partner's permission.
++Reuse applicable observed results for unchanged code. Rerun affected checks after
++changes, failures, or new uncertainty. Follow repository-specific verification,
++ownership, and visual acceptance requirements.
+diff --git a/skills/verification-before-completion/SKILL.md b/skills/verification-before-completion/SKILL.md
+index e3c84161..f9fc7587 100644
+--- a/skills/verification-before-completion/SKILL.md
++++ b/skills/verification-before-completion/SKILL.md
+@@ -1,44 +1,42 @@
+ ---
+ name: verification-before-completion
+-description: Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always
++description: Use when reporting implementation complete, a bug fixed, or checks passing, and before an authorized commit or pull request.
+ ---
+ 
+ # Verification Before Completion
+ 
+-## Overview
+-
+-**Core principle:** Evidence before claims, always.
+-
+-**Violating the letter of this rule is violating the spirit of this rule.**
+-
+-## The Iron Law
+-
+-```
+-NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
+-```
+-
+-If you haven't run the verification command in this message, you cannot claim it passes.
+-
+-## The Gate Function
+-
+-```
+-BEFORE claiming any status or expressing satisfaction:
+-
+-1. IDENTIFY: What command proves this claim?
+-2. RUN: Execute the FULL command (fresh, complete)
+-3. READ: Full output, check exit code, count failures
+-4. VERIFY: Does output confirm the claim?
+-   - If NO: State actual status with evidence
+-   - If YES: State claim WITH evidence
+-5. ONLY THEN: Make the claim
+-
+-Skip any step = lying, not verifying
+-```
++Claims must match observed evidence for the code and environment being reported.
++
++## Evidence and scope
++
++1. Identify the smallest sufficient check for the claim and task risk. A focused
++   suite supports a focused claim; a full-suite claim needs the full suite.
++2. Run missing checks and inspect the completed output and exit status. Reuse
++   observed results while relevant code, inputs, dependencies, and environment
++   remain unchanged. A new message or unchanged checkpoint alone needs no rerun.
++3. Rerun affected checks after changes, failures, or new uncertainty. If state
++   cannot be established after resume, verify again rather than assume.
++4. Fix failures caused by the requested change within the authorized workflow.
++   Report unrelated failures or unavailable checks without claiming a pass.
++5. Report what passed, what it proves, and material gaps. Confirm the requested
++   outcome, not just test success. A disclosed gap does not satisfy a required
++   acceptance check; that outcome remains incomplete. Repository base/mergeability
++   checks still apply.
++
++A linter does not prove a build, a passing mock does not prove installed runtime,
++and an agent's success report does not replace inspecting its changes and evidence.
++For a bug fix, exercise the original symptom. Demonstrate the regression fails
++without the fix and passes with it when practical; preserve unrelated work while
++making any temporary reversal. State explicitly when that proof is unavailable.
++
++Existing authorization covers continuing through appropriate local verification;
++it does not authorize deployment, shared-runtime use, or other external actions.
+ 
+ ## Visual Completion Claims
+ 
+-When an approved Design Lock governs the work, fresh command output is necessary
+-but not sufficient. Before requesting acceptance:
++When an approved Design Lock governs the work, applicable observed command
++output is necessary but not sufficient. Evidence reuse follows the rules above.
++Before requesting acceptance:
+ 
+ 1. Confirm the human-approved governing spec and exact approved PNG are present.
+ 2. Confirm every changed path is inside the plan's visual file allowlist.
+@@ -51,87 +49,3 @@ explicitly accepted the final screenshot and diff. Until then, report the work
+ as awaiting visual acceptance even when every automated check passes. Any agent
+ success wording that bypasses this checkpoint is an unattended visual completion
+ claim and violates the gate.
+-
+-## Common Failures
+-
+-| Claim | Requires | Not Sufficient |
+-|-------|----------|----------------|
+-| Tests pass | Test command output: 0 failures | Previous run, "should pass" |
+-| Linter clean | Linter output: 0 errors | Partial check, extrapolation |
+-| Build succeeds | Build command: exit 0 | Linter passing, logs look good |
+-| Bug fixed | Test original symptom: passes | Code changed, assumed fixed |
+-| Regression test works | Red-green cycle verified | Test passes once |
+-| Agent completed | VCS diff shows changes | Agent reports "success" |
+-| Requirements met | Line-by-line checklist | Tests passing |
+-
+-## Red Flags - STOP
+-
+-- Using "should", "probably", "seems to"
+-- Expressing satisfaction before verification ("Great!", "Perfect!", "Done!", etc.)
+-- About to commit/push/PR without verification
+-- Trusting agent success reports
+-- Relying on partial verification
+-- Thinking "just this once"
+-- Tired and wanting work over
+-- **ANY wording implying success without having run verification**
+-
+-## Rationalization Prevention
+-
+-| Excuse | Reality |
+-|--------|---------|
+-| "Should work now" | RUN the verification |
+-| "I'm confident" | Confidence ≠ evidence |
+-| "Just this once" | No exceptions |
+-| "Linter passed" | Linter ≠ compiler |
+-| "Agent said success" | Verify independently |
+-| "I'm tired" | Exhaustion ≠ excuse |
+-| "Partial check is enough" | Partial proves nothing |
+-| "Different words so rule doesn't apply" | Spirit over letter |
+-
+-## Key Patterns
+-
+-**Tests:**
+-```
+-✅ [Run test command] [See: 34/34 pass] "All tests pass"
+-❌ "Should pass now" / "Looks correct"
+-```
+-
+-**Regression tests (TDD Red-Green):**
+-```
+-✅ Write → Run (pass) → Revert fix → Run (MUST FAIL) → Restore → Run (pass)
+-❌ "I've written a regression test" (without red-green verification)
+-```
+-
+-**Build:**
+-```
+-✅ [Run build] [See: exit 0] "Build passes"
+-❌ "Linter passed" (linter doesn't check compilation)
+-```
+-
+-**Requirements:**
+-```
+-✅ Re-read plan → Create checklist → Verify each → Report gaps or completion
+-❌ "Tests pass, phase complete"
+-```
+-
+-**Agent delegation:**
+-```
+-✅ Agent reports success → Check VCS diff → Verify changes → Report actual state
+-❌ Trust agent report
+-```
+-
+-## When To Apply
+-
+-**ALWAYS before:**
+-- ANY variation of success/completion claims
+-- ANY expression of satisfaction
+-- ANY positive statement about work state
+-- Committing, PR creation, task completion
+-- Moving to next task
+-- Delegating to agents
+-
+-**Rule applies to:**
+-- Exact phrases
+-- Paraphrases and synonyms
+-- Implications of success
+-- ANY communication suggesting completion/correctness

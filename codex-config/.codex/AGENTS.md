@@ -1,12 +1,10 @@
 ## Startup and authority
 
-For repository work, determine the current repository and branch. Inspect these
-files when present, reading only relevant sections of large files:
-
-- `README.md`
-- `<current branch name>.md`
-- `Codex.local.md`
-- `.Codex-context.md`
+For repository work, determine the current repository and branch. Read only the
+context needed for the task: `README.md` for unfamiliar setup or commands,
+`<current branch name>.md` for branch-specific work, `Codex.local.md` for local
+runtime setup, and `.Codex-context.md` for architecture or recurring regressions.
+A mechanical edit does not require reading the full documentation stack.
 
 Current repository code, tests, specifications, design documents, and accepted
 ADRs are authoritative over notes, ctx transcripts, and memories.
@@ -104,14 +102,8 @@ ADRs are authoritative over notes, ctx transcripts, and memories.
   merge, and push.
 - Use GitHub MCP for pull requests, issues, reviews, comments, labels, and
   GitHub-hosted metadata or mutations.
-- For committed image media embedded in GitHub issue or pull-request Markdown,
-  do not use `raw.githubusercontent.com` or tokenized download URLs in private
-  repositories. Use a commit-pinned repository-relative source:
-  `../blob/<full-commit-sha>/<repository-relative-path>?raw=true`.
-- Before publishing or updating GitHub Markdown with committed media, verify
-  each target exists at the pinned commit. After the mutation, re-read the
-  artifact and confirm the expected embed count, zero forbidden raw-host URLs,
-  and rendered visibility when an authenticated browser is available.
+- Before publishing or updating GitHub Markdown with committed images, read
+  `~/.codex/policies/github-media.md` for embed and verification requirements.
 - Do not check or require `gh` authentication when `git` and GitHub MCP cover
   the requested operation.
 - Use `gh` only as a fallback after GitHub MCP lacks the capability or returns
@@ -143,7 +135,12 @@ ADRs are authoritative over notes, ctx transcripts, and memories.
 5. Follow project conventions, SOLID design, and maintainable boundaries. Analyze
    performance and scalability when they are material to the task.
 6. After implementation, update affected tests and run the smallest sufficient
-   verification suite before claiming success.
+   verification suite before claiming success. Reuse observed results while the
+   relevant code, inputs, and environment remain unchanged; rerun affected checks
+   after changes, failures, or new uncertainty.
+   Within an authorized local workflow, fix failures caused by the change and
+   continue through verification without another approval. Stop at the agreed
+   completion boundary or a concrete blocker; report remaining proof gaps.
 7. Update context or design documents only when durable project knowledge or an
    accepted decision changed.
 8. Under an approved delivery plan, commit complete, verified checkpoints as
@@ -176,36 +173,13 @@ establishes current ownership, task scope, completion, or repository truth.
   Scope recall to the reconciled canonical project and current work; verify
   claims against source. Preserve history without broad recovery dumps, per-task
   Engram projects, or blind store merges.
-- An enabled Engram MCP can advertise proactive saves, summaries, and project
-  context even with shell-plugin hooks disabled. Do not describe it as manual-only
-  or instruction-free, or invent a new memory mode, proxy, or wrapper.
-- At the first memory write, call `mem_session_start` with the actual runtime
-  thread ID and physical startup directory, retain its returned canonical
-  project, and pass that explicit project and `session_id` to every `mem_save`
-  and `mem_session_summary`. Attribution is not an ownership, isolation, security,
-  readiness, or coding-startup boundary. Never manufacture an ID or treat a
-  parent's ID as a distinct subagent identity.
-- Prefer direct `mem_save(capture_prompt:false)` for established architecture,
-  policy, decision, root-cause, or verified-lesson records. Include the source path
-  and decision status; distinguish verified outcomes from pending work. Topic-key
-  upserts are project-shared, regardless of session identity.
-- An unknown or mismatched session/project stops that memory write. Do not retry
-  by dropping identifiers or selecting the latest session. Subagents without
-  verified identity return candidate durable learnings to their owner. Disclose
-  pending capture; memory unavailability does not block unrelated coding unless
-  a higher-priority requirement says to stop.
-
 For a durable architecture or product decision, update the appropriate ADR or
-design document in Git. When Engram capture is appropriate, use a stable topic
-key and record the authoritative path under `Where`; require existing explicit
-decision authority before recording a superseding or conflicting relationship
-between architecture, policy, or decision memories.
+design document in Git.
 
-## Elixir/Phoenix
+- Before an Engram write or diagnosing its startup/capture behavior, read
+  `~/.codex/policies/engram-writes.md`. Missing identity stops only the memory
+  write; memory availability never establishes coding readiness.
 
-- Prefer modern Elixir patterns such as `with/else`, explicit data contracts,
-  composable functions, and `Ecto.Multi` for transactional workflows.
-- Combine `@spec` and Dialyzer with runtime guards where layered correctness is
-  useful.
-- Use property-based tests for complex invariants and example-based tests for
-  specific behavior.
+## Language-specific guidance
+
+For Elixir/Phoenix changes, read `~/.codex/policies/elixir-phoenix.md`.
