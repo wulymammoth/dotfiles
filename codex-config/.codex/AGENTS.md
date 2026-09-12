@@ -169,6 +169,12 @@ establishes current ownership, task scope, completion, or repository truth.
   skill: concrete identifiers, small limits (normally 5), focused event windows,
   then broaden as needed. Use `--primary-only` for user-intent and decision
   provenance; retain primary-plus-subagent scope for implementation/test evidence.
+  Prefer configured ctx MCP history tools for Codex retrieval and event
+  inspection. If CLI access fails on sandboxed index locks or daemon state,
+  use a narrowly approved host lookup with `--refresh off`. Verify that access
+  path before diagnosing index corruption or rebuilding. When freshness matters,
+  check recent indexed events and the daemon heartbeat; `running` alone does
+  not establish that indexing is advancing.
 - Use Engram as supplementary ADR/decision memory and verified durable lessons.
   Scope recall to the reconciled canonical project and current work; verify
   claims against source. Preserve history without broad recovery dumps, per-task

@@ -68,6 +68,10 @@ automatic lexical indexing remains ctx's default. Activate the optional
 `opencode` package with `stow --no-folding opencode` so its skills root remains
 a real local directory where ctx can safely manage its own bundled skill.
 
+This machine's [macOS background indexing setup](docs/ctx-background-indexing.md)
+uses one user LaunchAgent to work around ctx 1.4.1's cold-start file limit.
+That runbook owns service restart, signed-update handoff, and freshness checks.
+
 The `codex-config` package follows the same state-adjacent pattern. `~/.codex`
 must remain a real local directory because it contains private, mutable runtime
 state. Stowing `codex-config` with `--no-folding` links tracked policy, profile,
