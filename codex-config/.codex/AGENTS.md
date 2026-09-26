@@ -141,6 +141,12 @@ ADRs are authoritative over notes, ctx transcripts, and memories.
    Within an authorized local workflow, fix failures caused by the change and
    continue through verification without another approval. Stop at the agreed
    completion boundary or a concrete blocker; report remaining proof gaps.
+   Before opening or updating a PR, inspect the diff for changes to CI workflows,
+   package scripts, build/test configuration, environment contracts, and artifact
+   paths. For affected contracts, identify and run the repository's corresponding
+   contract checks, applying the result-reuse rule above. Update expectations only
+   when the intended contract changed; never weaken checks merely to obtain a
+   pass. Report any checks that could not run.
 7. Update context or design documents only when durable project knowledge or an
    accepted decision changed.
 8. Under an approved delivery plan, commit complete, verified checkpoints as
