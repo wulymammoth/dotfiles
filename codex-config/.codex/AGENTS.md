@@ -74,6 +74,8 @@ ADRs are authoritative over notes, ctx transcripts, and memories.
 
 ## Tools and context
 
+### Tool selection
+
 - Prefer `fd` over `find` and `rg` over `grep`; use fallbacks when unavailable.
 - Use Context7 when current external library or framework documentation matters.
 - For Maestro-based native UI tests or explicit Expo/React Native harness
@@ -81,12 +83,23 @@ ADRs are authoritative over notes, ctx transcripts, and memories.
   stack; global tool availability does not authorize runtime or cloud actions.
 - Use the available planning/task tool for substantial multi-step work and keep
   its status current.
+
+### Shell and credential access
+
 - Write shell snippets for their declared interpreter. In zsh, the special
   parameters `status` (read-only) and `path` (tied to `PATH`) can terminate a
   wrapper or replace its executable search path. Use descriptive names such as
   `git_status_text` and `changed_paths_text`. Run
   Bash-specific multiline wrappers explicitly with `bash` rather than relying
   on the default shell.
+- When a credential-backed CLI fails inside the sandbox, distinguish host
+  credential access restrictions from invalid authentication before requesting
+  login, resetting credentials, or creating directory-specific credentials. Use
+  an approved, read-only host authentication check when available; any subsequent
+  host command still requires authorization for its full effects.
+
+### Context artifacts
+
 - Keep durable project knowledge in committed `.Codex-context.md`: architecture,
   dependencies, recurring regressions, root causes, and prevention strategies.
 - Keep machine-specific, non-secret setup in uncommitted `Codex.local.md`. Never
