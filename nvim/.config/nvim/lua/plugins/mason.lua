@@ -13,13 +13,4 @@ return {
     end,
   },
 
-  {
-    "jay-babu/mason-nvim-dap.nvim",
-    opts = {
-      ensure_installed = {
-        "python",
-      },
-      automatic_installation = true,
-    },
-  },
 }

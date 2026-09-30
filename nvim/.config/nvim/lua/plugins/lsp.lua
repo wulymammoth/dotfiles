@@ -1,16 +1,3 @@
-local function get_python_path()
-  local home = os.getenv("HOME")
-  local venv_path = os.getenv("VIRTUAL_ENV")
-
-  if venv_path then
-    -- If a virtual environment is activated, return the path to the Python executable
-    return venv_path .. "/bin/python"
-  else
-    -- Otherwise, fallback to system Python or another preferred interpreter
-    return home .. "/.asdf/shims/python"
-  end
-end
-
 return {
   {
     "neovim/nvim-lspconfig",
@@ -35,19 +22,12 @@ return {
       opts.servers = opts.servers or {}
 
       opts.servers.basedpyright = vim.tbl_deep_extend("force", opts.servers.basedpyright or {}, {
-        flags = {
-          debounce_text_changes = 150,
-          allow_incremental_sync = false,
-        },
         settings = {
           basedpyright = {
             analysis = {
               autoSearchPaths = true,
               diagnosticMode = "workspace",
             },
-          },
-          python = {
-            pythonPath = get_python_path(),
           },
         },
       })
@@ -68,16 +48,10 @@ return {
         },
       })
 
-      opts.servers.expert = vim.tbl_deep_extend("force", opts.servers.expert or {}, {
-        mason = false,
-        cmd = { vim.fn.expand("~/.local/share/nvim/mason/bin/expert") },
-        filetypes = { "elixir", "eelixir", "heex" },
-        root_markers = { "mix.exs", ".git" },
-      })
-
-      if opts.servers.ts_ls then
-        opts.servers.ts_ls.enabled = false
-      end
+      -- Inherit Expert's stdio command, filetypes and umbrella-root handling.
+      -- Keep ElixirLS available as an installed fallback, but never start both.
+      opts.servers.expert = opts.servers.expert or {}
+      opts.servers.elixirls = vim.tbl_deep_extend("force", opts.servers.elixirls or {}, { enabled = false })
     end,
   },
 }

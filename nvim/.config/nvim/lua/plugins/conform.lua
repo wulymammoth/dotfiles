@@ -8,13 +8,10 @@ return {
       elixir = { "mix" },
       heex = { "mix" },
       python = {
-        -- "ruff_fix",
-        "ruff_format",
         "ruff_organize_imports",
+        "ruff_format",
       },
       surface = { "mix" },
     },
-
-    timeout_ms = 1000,
   },
 }
