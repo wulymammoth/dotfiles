@@ -84,6 +84,17 @@ ADRs are authoritative over notes, ctx transcripts, and memories.
 - Use the available planning/task tool for substantial multi-step work and keep
   its status current.
 
+### Waiting and status checks
+
+- Do not poll for completion unless the user explicitly requests monitoring.
+  This includes repeated CI, test, build, deployment, or job status checks,
+  watch commands, and sleep/recheck loops, even at long intervals.
+- Check status once when needed. If work is still running, report that once
+  and yield to the user. Prefer an available completion notification; otherwise
+  wait for the user to say it has finished before checking again.
+- Retain existing approvals and resume the authorized next step after verifying
+  completion. Pending work does not justify repeated checks or status messages.
+
 ### Shell and credential access
 
 - Write shell snippets for their declared interpreter. In zsh, the special
