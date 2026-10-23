@@ -191,8 +191,25 @@ governs any separately authorized follow-on work.
 ## Decision and historical memory
 
 Use the active conversation, transcript/resume state, live Git, and task-local
-plans or notes as working context. Historical lookup is optional and never
-establishes current ownership, task scope, completion, or repository truth.
+plans or notes as working context. Historical context alone never establishes
+current ownership, task scope, completion, or repository truth.
+
+Before the first substantial recommendation in a new or resumed project session,
+search both ctx and Engram for the task, affected feature, and related completed
+work. Use small, targeted queries and inspect relevant results.
+
+Reconcile historical findings with current code, accepted decisions, committed
+evidence, and live task state. Before recommending implementation, postponement,
+replacement, or repeated validation, establish what is already implemented, what
+has already passed, and what specifically remains.
+
+Briefly state the historical sources checked and how they affect the
+recommendation. No search results do not establish that work was never done.
+If a source is unavailable, disclose the gap and qualify recommendations that
+depend on it.
+
+Reuse this assessment within the session unless scope changes or new evidence
+warrants another lookup. Trivial, self-contained requests are exempt.
 
 - Use ctx for original discussion, rejected approaches, regressions, exact prior
   commands, or source-session provenance when material. Follow its installed
