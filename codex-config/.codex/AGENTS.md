@@ -165,6 +165,15 @@ ADRs are authoritative over notes, ctx transcripts, and memories.
    Within an authorized local workflow, fix failures caused by the change and
    continue through verification without another approval. Stop at the agreed
    completion boundary or a concrete blocker; report remaining proof gaps.
+   For behavior changes to shared components, entry points, interfaces, or test
+   harnesses, search repository-wide for affected consumers and existing tests,
+   including references to replaced symbols and selectors. Before opening or
+   updating a PR, including drafts, update affected tests for intentional changes
+   and run the affected suites, including integration coverage where applicable.
+   If the impact cannot be confidently bounded, run the relevant package's full
+   local suite within the authorized environment. Preserve behavioral assertions,
+   reuse still-valid results, and report the verification scope and any checks
+   that could not run.
    Before opening or updating a PR, inspect the diff for changes to CI workflows,
    package scripts, build/test configuration, environment contracts, and artifact
    paths. For affected contracts, identify and run the repository's corresponding
