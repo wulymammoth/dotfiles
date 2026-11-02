@@ -1,6 +1,6 @@
 # Background ctx indexing on macOS
 
-This machine uses the official signed ctx 1.4.1 binary with one user-owned
+This machine uses the official signed ctx binary with one user-owned
 LaunchAgent, `local.ctx-history`. Launchd runs the full maintenance daemon
 independently of Codex and gives it a 4,096-file soft limit. There is no
 watchdog, scheduled importer, custom binary, or global resource-limit change.
@@ -21,10 +21,12 @@ maintained definition and replaces customizations. A one-time launch override
 also failed to survive a fresh MCP connection. Separating supervision from
 ctx's installer permits a stable per-service limit using standard launchd.
 
-The upstream FSEvents shutdown race in issue #957 / PR #964 is a separate
-known limitation awaiting a release after 1.4.1. This configuration does not
-patch that binary defect. Routine service restarts use launchd, and the
-acceptance record must show new publications, not merely a live PID.
+The original September setup used 1.4.1 and tracked the upstream FSEvents
+shutdown race in issue #957 / PR #964. That historical diagnosis is not a
+current-version claim. The October 30 maintenance installed signed 2.3.0;
+see `notes/main--2026-10-30.md` for the verification boundary. Routine service
+restarts use launchd, and acceptance must show recent full transcript evidence,
+not merely a live PID or newly indexed prompt history.
 
 ## Installed configuration
 
@@ -84,10 +86,16 @@ launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/local.ctx-history
 
 1. Unload `local.ctx-history` and verify its process has exited. Allow launchd
    to complete its bounded shutdown before proceeding.
-2. Use the normal signed workflow: `ctx upgrade check`,
-   `ctx upgrade --dry-run`, review the target, then `ctx upgrade`.
-3. Preserve manual mode and bootstrap the user-owned agent again.
-4. Verify PID ownership and automatic publication of new content.
+2. Preserve private rollback copies of the binary, install receipt, config, and
+   custom plist. Use `ctx daemon disable --prepare-uninstall --format=json` for
+   the supported installation handoff; require quiescence and released owner
+   lock/endpoint before replacing the executable.
+3. Use the normal signed workflow: `ctx upgrade check`,
+   `ctx upgrade --dry-run`, review the target, then `ctx upgrade`. Verify the
+   installed version and host-side `codesign --verify --strict` result.
+4. Preserve manual mode and bootstrap the user-owned agent again.
+5. Verify PID ownership and automatic publication of new content. Follow the
+   user's monitoring policy if an import is still running.
 
 Do not enable ctx-managed automatic mode while the custom agent is loaded.
 When a released ctx version fixes cold-start file limits and maintained-service

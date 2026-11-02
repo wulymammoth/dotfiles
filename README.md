@@ -69,7 +69,8 @@ automatic lexical indexing remains ctx's default. Activate the optional
 a real local directory where ctx can safely manage its own bundled skill.
 
 This machine's [macOS background indexing setup](docs/ctx-background-indexing.md)
-uses one user LaunchAgent to work around ctx 1.4.1's cold-start file limit.
+uses one user LaunchAgent introduced for ctx 1.4.1's cold-start file limit and
+retained through the signed 2.3.0 upgrade.
 That runbook owns service restart, signed-update handoff, and freshness checks.
 
 The `codex-config` package follows the same state-adjacent pattern. `~/.codex`

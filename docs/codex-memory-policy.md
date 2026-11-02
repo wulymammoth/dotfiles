@@ -60,6 +60,23 @@ work. Topic-key upserts are project-shared. Require existing explicit decision
 authority before saving a superseding or conflicting architecture, policy, or
 decision relationship.
 
+At completion of substantive work, assess whether it established a new durable
+decision, root cause, or reusable verified lesson. Capture qualifying knowledge
+through MCP even when the bulk shell hooks are disabled. Skip routine progress,
+duplicate summaries, and speculative conclusions. Engram's protocol is separate
+from the instructions for Codex's filesystem memory folder; an applicable write
+restriction still takes precedence. Report a warranted but blocked capture as
+pending instead of silently treating recall as capture.
+
+Read back the returned observation ID after saving and confirm the canonical
+project, session, source, and outcome. For cross-project maintenance, keep the
+actual startup session's canonical project; do not rebind it or invent another
+session to backfill an unrelated project. A project owner can capture that
+project's selected lessons in its own attributed session.
+
+The [retrieval checks](memory-retrieval-checks.md) distinguish process health,
+source freshness, capture persistence, and the relevance of returned evidence.
+
 ## Native reconciliation interface
 
 This is an on-demand maintenance operation when the four settings need repair.

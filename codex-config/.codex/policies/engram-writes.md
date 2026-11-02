@@ -13,6 +13,14 @@
   policy, decision, root-cause, or verified-lesson records. Include the source path
   and decision status; distinguish verified outcomes from pending work. Topic-key
   upserts are project-shared, regardless of session identity.
+- At completion of substantive work, assess whether new verified durable
+  knowledge warrants capture. Save that knowledge selectively; omit routine
+  progress, repeated summaries, and unverified hypotheses. Engram capture is
+  separate from editing Codex's filesystem memory folder; apply each store's
+  instructions independently and respect any applicable write restriction.
+- After a save, read the returned observation ID and confirm its canonical
+  project, session attribution, source, and outcome. A successful search or
+  healthy doctor result does not prove that a new capture was persisted.
 - An unknown or mismatched session/project stops that memory write. Do not retry
   by dropping identifiers or selecting the latest session. Subagents without
   verified identity return candidate durable learnings to their owner. Disclose
