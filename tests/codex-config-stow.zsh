@@ -163,7 +163,7 @@ stow --no-folding \
   --target "$test_root" \
   codex-config
 
-for policy_name in github-media engram-writes elixir-phoenix; do
+for policy_name in github-media engram-writes elixir-phoenix architecture; do
   policy_source="$repo_root/codex-config/.codex/policies/$policy_name.md"
   policy_link="$test_root/.codex/policies/$policy_name.md"
   rg --fixed-strings --quiet "~/.codex/policies/$policy_name.md" "$global_agents" \

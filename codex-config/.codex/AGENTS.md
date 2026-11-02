@@ -146,6 +146,14 @@ ADRs are authoritative over notes, ctx transcripts, and memories.
 
 ## Development workflow
 
+For changes to module responsibilities, interfaces, or dependency direction, use
+`codebase-design`. For a focused architecture assessment or refactoring-opportunity
+review, use `improve-codebase-architecture`. For React or React Native component
+APIs, boolean-prop proliferation, or composition/provider design, use
+`vercel-composition-patterns`. Read `~/.codex/policies/architecture.md` when any of
+these applies or when using dependency-cruiser. Mechanical edits do not trigger
+an architecture review; load only the relevant skills and references.
+
 1. Understand the problem, then inspect existing code, tests, and established
    patterns before proposing changes.
 2. Ask targeted questions only when ambiguity materially affects behavior,

@@ -151,6 +151,13 @@ skills remain disabled in Codex and available to other installations. Superpower
 and Visual Companion/Design Lock remain the normal design workflow; see the
 [cleanup and restore record](docs/skill-maintenance/2026-09-10/README.md).
 
+Architecture work uses `codebase-design`, `improve-codebase-architecture`, and
+`vercel-composition-patterns` selectively through the global
+[architecture policy](codex-config/.codex/policies/architecture.md).
+The global dependency-cruiser CLI supports bounded JS/TS import analysis;
+repository CI still needs repository-owned rules and a pinned development
+dependency. See the [installation and verification record](docs/skill-maintenance/2026-10-31/README.md).
+
 [`scripts/codex-memory-policy.py`](scripts/codex-memory-policy.py) remains an
 on-demand repair utility for four Engram settings. It is not a startup step or a
 parallel-work prerequisite. Ordinary profile and Stow checks do not run repairs;

@@ -1,0 +1,75 @@
+{
+  "verified_date": "2026-10-31",
+  "skills": [
+    {
+      "name": "codebase-design",
+      "source": "mattpocock/skills",
+      "revision": "a496f5513d4a4cf889bc48e189e579f4b0bdf6aa",
+      "source_directory": "skills/engineering/codebase-design",
+      "installation_method": "Codex skill-installer, pinned download",
+      "files_sha256": {
+        "DEEPENING.md": "f3dd099ce99289bd213914d8ee3e2429b78309c3957ca4583f7659551b1d53c1",
+        "DESIGN-IT-TWICE.md": "c222ab5a82e0405672eb9062d62496139a08828e45d07fc5f18e4952c10fac1a",
+        "SKILL.md": "2c20617f87ec8af6a434859f381b2f061a69b530444e74eb39e78bb016a6d1e2",
+        "agents/openai.yaml": "edebc9e4fcfe102114012575eaa9600b9b5fd08c311664f389c36e7bc717740f"
+      }
+    },
+    {
+      "name": "improve-codebase-architecture",
+      "source": "mattpocock/skills",
+      "revision": null,
+      "source_directory": "skills/engineering/improve-codebase-architecture",
+      "installation_method": "Existing enabled installation retained",
+      "files_sha256": {
+        "DEEPENING.md": "9577485f4fc32c0267639a9151bb41c8af0f8f6086e4bf8b84d5b236e30604e9",
+        "HTML-REPORT.md": "8a8bcdbb578066271efe6ff675c831a6a4c4c7fd2081d6b5c9bc2e5fabc741d5",
+        "INTERFACE-DESIGN.md": "678c3e34f1339015053212b3316bf0b676c70aa251050a0613667d4e755fb35e",
+        "LANGUAGE.md": "6feca2140439c54a774749e8367f18350899ff69c777144ed2248cd4407949fa",
+        "SKILL.md": "f00de04c7bb83cfd0ed1f97f3401a83838212c30856912ee44ba406649e6c749"
+      },
+      "existing_manager_record": {
+        "source": "mattpocock/skills",
+        "sourceType": "github",
+        "sourceUrl": "https://github.com/mattpocock/skills.git",
+        "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
+        "skillFolderHash": "688c17ec27fe9309d84987716aca37b5ce7f3a88",
+        "pluginName": "mattpocock-skills",
+        "installedAt": "2026-05-30T01:07:59.894Z",
+        "updatedAt": "2026-05-30T01:07:59.894Z"
+      }
+    },
+    {
+      "name": "vercel-composition-patterns",
+      "source": "vercel-labs/agent-skills",
+      "revision": "1a2c79d4e6c4a2283dc2c614b6538cbe1ed5ca62",
+      "source_directory": "skills/composition-patterns",
+      "installation_method": "Codex skill-installer, pinned download",
+      "files_sha256": {
+        "AGENTS.md": "89e3ddd58fcf99a53a50e25dfd21b8cde1be5f10b7df6bacd3dfa6796932f516",
+        "README.md": "85915a43a6f0b4efe525e3cf6398dd866166da2025837c4460468a24a940da94",
+        "SKILL.md": "e38e0eaa609316b10423a9a138ed95e35099accd3f735585295c8a8f165c28a3",
+        "metadata.json": "49262ed5cb4186f31ee980cf8d990be0170c51efed4908d0464a1cff9905bd05",
+        "rules/_sections.md": "a174213b87e6911e2b766995a2cbaf8d1534057076e82fb79fe3f0ecb38047df",
+        "rules/_template.md": "587f7d16b0660eb61fee4a4d3d7df2b3077d6835de170602c7d6e60bee559131",
+        "rules/architecture-avoid-boolean-props.md": "007555ebb020f4d552582a2c4db194db71a1fd33094012e5187bcfa4f8c392d5",
+        "rules/architecture-compound-components.md": "f246af13dc269b521cf20eb8ad99a0cb645beac381c8c9b117262c34612c8457",
+        "rules/patterns-children-over-render-props.md": "7c45a0d21b3c4126a32cba916ee31adeae195386ad1dbbe6634aedb7457aa0ad",
+        "rules/patterns-explicit-variants.md": "8c19e596e61807549d01ce8c6954c6358199f97a8511c0c02c625ec0efda8c0e",
+        "rules/react19-no-forwardref.md": "881830adb7534c4b2d70db426556646ad9837f5478f744f35641f635ada22227",
+        "rules/state-context-interface.md": "09e73afbf9285fa416679cc864a287b9e8b821d0969272ab784295386d8c9bc3",
+        "rules/state-decouple-implementation.md": "76a8c1eb29a70d8996ab3f71260345af2f7bc89deab815a421d6c87c6591a9c3",
+        "rules/state-lift-state.md": "74c54038a6c554c748fe31cec673b80861b5d920b7553cf78cdf10d18b4b759b"
+      }
+    }
+  ],
+  "dependency_cruiser": {
+    "version": "18.7.0",
+    "typescript": "6.0.3",
+    "npm_prefix": "~/.local",
+    "install_scripts": false,
+    "node_smoke_versions": [
+      "22.22.0",
+      "24.8.0"
+    ]
+  }
+}

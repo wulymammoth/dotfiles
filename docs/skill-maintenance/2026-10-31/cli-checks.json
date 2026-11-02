@@ -1,0 +1,48 @@
+[
+  {
+    "language": "javascript",
+    "case": "valid",
+    "gate_exit": 0,
+    "graph_exit": 0,
+    "modules": 2,
+    "errors": 0,
+    "rules": []
+  },
+  {
+    "language": "javascript",
+    "case": "violating",
+    "gate_exit": 2,
+    "graph_exit": 0,
+    "modules": 2,
+    "errors": 2,
+    "rules": [
+      "domain-does-not-import-ui",
+      "no-circular"
+    ]
+  },
+  {
+    "language": "typescript-tsx",
+    "case": "valid",
+    "gate_exit": 0,
+    "graph_exit": 0,
+    "modules": 2,
+    "errors": 0,
+    "rules": []
+  },
+  {
+    "language": "typescript-tsx",
+    "case": "violating",
+    "gate_exit": 2,
+    "graph_exit": 0,
+    "modules": 2,
+    "errors": 2,
+    "rules": [
+      "domain-does-not-import-ui",
+      "no-circular"
+    ]
+  },
+  {
+    "node": "24.8.0",
+    "cli_version": "18.7.0"
+  }
+]
