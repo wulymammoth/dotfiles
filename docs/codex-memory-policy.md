@@ -55,10 +55,10 @@ requires a stop.
 For ADRs, decisions, root causes, and verified lessons, prefer direct
 `mem_save(capture_prompt:false)` with a stable topic key. Include the
 authoritative source path under `Where` and the decision status in the content.
-Session summaries remain concise and distinguish verified outcomes from pending
-work. Topic-key upserts are project-shared. Require existing explicit decision
-authority before saving a superseding or conflicting architecture, policy, or
-decision relationship.
+Topic-key upserts are project-shared. Update the same key when an existing lesson
+changes; create a separate observation for a distinct lesson. Require existing
+explicit decision authority before saving a superseding or conflicting
+architecture, policy, or decision relationship.
 
 At completion of substantive work, assess whether it established a new durable
 decision, root cause, or reusable verified lesson. Capture qualifying knowledge
@@ -67,6 +67,16 @@ duplicate summaries, and speculative conclusions. Engram's protocol is separate
 from the instructions for Codex's filesystem memory folder; an applicable write
 restriction still takes precedence. Report a warranted but blocked capture as
 pending instead of silently treating recall as capture.
+
+Reserve `mem_session_summary` and summary-producing finalization for meaningful
+handoffs or completed workstreams, when they add useful context beyond the
+durable observations already saved. Keep summaries concise, distinguish verified
+outcomes from pending work, and link the authoritative task notes or sources.
+Keep ongoing progress, pending approvals, and changing execution state in
+task-local notes; ctx retains the original discussion. A final reply, checkpoint,
+compaction, or approval request alone does not warrant another summary. Generic
+MCP reminders to summarize before saying "done" are subject to this policy;
+do not create redundant records to satisfy a reminder.
 
 Read back the returned observation ID after saving and confirm the canonical
 project, session, source, and outcome. For cross-project maintenance, keep the

@@ -18,6 +18,17 @@
   progress, repeated summaries, and unverified hypotheses. Engram capture is
   separate from editing Codex's filesystem memory folder; apply each store's
   instructions independently and respect any applicable write restriction.
+- Reserve `mem_session_summary` and summary-producing finalization for a
+  meaningful handoff or completed workstream, and only when the summary adds
+  useful context beyond the durable observations already saved. Keep it concise
+  and include the authoritative task-note or source paths. A final reply,
+  checkpoint, compaction, or approval request alone does not warrant a summary.
+  Keep ongoing progress, pending approvals, and changing execution state in
+  task-local notes; ctx retains the original discussion.
+- When an existing durable lesson changes, update its stable topic key; create
+  a new observation for a distinct lesson. Generic MCP reminders to summarize
+  before saying "done" are subject to this selective-capture policy. Do not
+  create redundant records merely to satisfy a reminder.
 - After a save, read the returned observation ID and confirm its canonical
   project, session attribution, source, and outcome. A successful search or
   healthy doctor result does not prove that a new capture was persisted.

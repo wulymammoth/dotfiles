@@ -245,9 +245,12 @@ warrants another lookup. Trivial, self-contained requests are exempt.
   Engram projects, or blind store merges.
   At completion of substantive work, capture newly verified durable decisions,
   root causes, or reusable lessons through the attributed MCP write protocol.
-  Skip routine status, duplicate summaries, and speculative conclusions. Disabled
-  shell hooks do not disable selective MCP capture. If instructions or missing
-  identity prevent a warranted capture, report it as pending.
+  Reserve session summaries for meaningful handoffs or completed workstreams
+  that add useful context beyond saved lessons. Keep routine progress and pending
+  approvals in task-local notes; a final reply alone does not trigger a summary.
+  Skip duplicate summaries and speculative conclusions. Disabled shell hooks do
+  not disable selective MCP capture. If instructions or missing identity prevent
+  a warranted capture, report it as pending.
 For a durable architecture or product decision, update the appropriate ADR or
 design document in Git.
 
