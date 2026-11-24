@@ -98,6 +98,12 @@ test artifacts are safe to publish without inspection/redaction.
 
 ## Upgrade and rollback
 
+The current pin is **2.12.1**, including Xcode 27 simulator startup support.
+The 2.10.0 installation is retained locally for rollback. The privacy wrapper
+remains in force: 2.12.1 still starts asynchronous update checks and sends error
+reports through the configured API endpoint. Installation/doctor checks do not
+qualify native gestures; that proof belongs to the application harness.
+
 1. Review the official release, published ZIP checksum, relevant startup/privacy
    changes, and Java/Xcode requirements.
 2. Update the tracked version/digest together. No floating Homebrew formula or
@@ -114,9 +120,9 @@ deletes old versions, repairs unknown directories, or removes other packages.
 
 ## Sources and next application integration
 
-- [Maestro 2.10.0 release and checksums](https://github.com/mobile-dev-inc/Maestro/releases/tag/cli-2.10.0)
-- [Pinned startup/update behavior](https://github.com/mobile-dev-inc/Maestro/blob/14a408335e17a090df1e26bdbeaf80d8122a8fd8/maestro-cli/src/main/java/maestro/cli/App.kt)
-- [Pinned error reporting](https://github.com/mobile-dev-inc/Maestro/blob/14a408335e17a090df1e26bdbeaf80d8122a8fd8/maestro-cli/src/main/java/maestro/cli/util/ErrorReporter.kt)
+- [Maestro 2.12.1 release and checksums](https://github.com/mobile-dev-inc/Maestro/releases/tag/cli-2.12.1)
+- [Pinned startup/update behavior](https://github.com/mobile-dev-inc/Maestro/blob/cli-2.12.1/maestro-cli/src/main/java/maestro/cli/App.kt)
+- [Pinned error reporting](https://github.com/mobile-dev-inc/Maestro/blob/cli-2.12.1/maestro-cli/src/main/java/maestro/cli/util/ErrorReporter.kt)
 - [Expo Maestro guide](https://docs.expo.dev/eas/workflows/examples/e2e-tests/)
 
 SoundCoaster functional adoption maps to LEA-196; its LEA-211 native visual

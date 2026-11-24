@@ -39,9 +39,9 @@ class ToolchainTests(unittest.TestCase):
             if launcher:
                 info = zipfile.ZipInfo("maestro/bin/maestro")
                 info.external_attr = (stat.S_IFREG | 0o755) << 16
-                z.writestr(info, "#!/bin/sh\nprintf '2.10.0\\n'\n")
+                z.writestr(info, f"#!/bin/sh\nprintf '{self.pin['version']}\\n'\n")
             if jar:
-                z.writestr("maestro/lib/maestro-cli-2.10.0.jar", "fixture")
+                z.writestr(f"maestro/lib/maestro-cli-{self.pin['version']}.jar", "fixture")
             if extra:
                 z.writestr(*extra)
         self.pin["sha256"] = hashlib.sha256(self.archive.read_bytes()).hexdigest()
@@ -142,6 +142,8 @@ class ToolchainTests(unittest.TestCase):
     def test_real_wrapper_preserves_arguments_cwd_environment_and_exit_code(self):
         # The fake installed launcher exercises actual CLI process forwarding.
         real_pin = json.loads(PIN.read_text())
+        self.pin["version"] = real_pin["version"]
+        self.make_archive()
         binary = self.install()
         (binary.parents[2] / "receipt.json").write_text(json.dumps(real_pin))
         binary.write_text("#!/usr/bin/env python3\nimport json,os,sys\nprint(json.dumps([sys.argv[1:],os.getcwd(),os.environ['MAESTRO_CLI_NO_ANALYTICS'],os.environ['MAESTRO_API_URL']]))\nsys.exit(37)\n")
