@@ -22,18 +22,53 @@ Translate upstream `Skill`, `Agent`, and `Explore` references to this harness's
 skill-reading and available exploration tools; do not require unsupported tool
 names or agent roles. Keep exploration read-only until implementation is authorized.
 
+## Assessment during feature and refactor work
+
+Before a new feature or substantive refactor, identify:
+
+- **Responsibility and placement:** what behavior changes, which cohesive module
+  owns it, and why its existing responsibility fits. Compare credible alternatives
+  only when placement is a real choice.
+- **Interface and dependencies:** what callers must know, affected consumers,
+  dependency direction, and invariants that must remain inside the module.
+- **State and effects:** the owner of each changed lifecycle, values that can be
+  derived, and where I/O, cleanup, cancellation, and concurrency are handled.
+- **Verification and growth:** existing behavior/integration coverage, tests for
+  changed contracts, and whether the change expands a responsibility hotspot.
+  Assess performance and scalability when material.
+
+Keep this in the existing plan or proposal and summarize the outcome in the PR
+when one is requested. A routine cohesive feature may need only a paragraph;
+mechanical edits need no assessment. Do not add a separate document, invented
+alternatives, or human approval step. Before completion, compare the final diff
+with the assessment: identify changed ownership, duplicated state, leaked
+invariants, and added caller coordination, and fix in-scope problems. Surface
+material scope changes through the existing authorization policy.
+
 ## Design preferences
 
 Prefer cohesive modules with small, meaningful interfaces. Identify the behavior,
 state/lifecycle owner, side effects, callers, and tests before an extraction.
 Judge improvement by reduced caller knowledge and coordination, not file count,
-line count, or how many hooks were created.
+line count, or how many hooks were created. Organize around domain/feature
+responsibilities and separate presentation, business decisions, and external
+effects within them; a small module need not acquire extra layers or wrappers.
+
+When using object-oriented design, apply SOLID concretely: keep one cohesive
+reason to change; support demonstrated variation through composition or stable
+extension points; preserve behavioral substitutability; keep interfaces specific
+to their consumers; and make high-level policy independent of low-level details
+through explicit dependencies. Do not add inheritance, classes, dependency-
+injection containers, or interfaces solely to satisfy an acronym.
 
 Prefer pure business decisions with explicit inputs and returned results or
 commands. Keep networking, persistence, clocks, randomness, timers, and native
 resources in explicit adapters/controllers. An application still needs state:
 keep one owner for each lifecycle, derive redundant values, and make meaningful
-transitions explicit. Preserve cancellation, stale-result fencing, account or
+transitions explicit. Prefer immutable values and pure transformations where
+practical; avoid duplicated sources of truth and effects used only to synchronize
+derived state. Local encapsulated mutation can be appropriate when its invariants
+are clear. Preserve cancellation, stale-result fencing, account or
 environment epochs, transaction boundaries, and resource cleanup.
 
 Expose domain operations/events where invariants matter, rather than unrestricted
@@ -49,6 +84,30 @@ The upstream "replace, don't layer" advice does not authorize blanket deletion
 of existing unit tests: retire a test only when its behavior is intentionally
 removed or covered by verified replacement evidence. Retain distinct lifecycle,
 concurrency, adapter, and native-boundary assertions.
+
+## Advisory size review
+
+Use size to find potential cohesion problems, not as a quality score. Repository
+policy owns any thresholds or executable enforcement. Where no repository rule
+governs, use these provisional review signals for hand-written production code:
+
+- A new or materially expanded file above 500 physical lines merits inspection
+  for mixed responsibilities, wide interfaces, and state/effect ownership.
+- A new file above 1,000 physical lines needs a brief decomposition decision or
+  a concrete cohesion rationale in the existing assessment. The implementer and
+  reviewer resolve it within authorized scope; it is not a new human signoff.
+- In an existing hotspot, assess added responsibilities regardless of net line
+  count. Prefer a cohesive owner for new feature logic and keep composition glue
+  narrow. A bug fix does not require an unrelated rewrite of the whole file.
+
+Exclude generated/vendor code, fixtures, declarative data, and snapshots from
+these defaults; evaluate tests by behavior and readability separately. A physical
+line count includes comments and blanks, so explain relevant composition rather
+than manipulating formatting. Smaller files, giant replacement hooks, setter
+bags, or pass-through modules do not establish better separation of concerns.
+These are review defaults, not hard limits or a CI claim. Respect repository
+decisions that defer thresholds or automation; change those decisions explicitly
+before adding a reporter, baseline, or gate.
 
 ## dependency-cruiser
 

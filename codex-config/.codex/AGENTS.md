@@ -25,8 +25,10 @@ ADRs are authoritative over notes, ctx transcripts, and memories.
   For ordinary isolated work, create the worktree in the shell, `cd` into it,
   then start Codex there.
 - Ordinary single-task work has one owner in its startup checkout and does not require a descriptor or claim.
-  `Work on <TASK-ID or issue URL>` means resolve the task and propose its plan;
-  it does not select orchestration or authorize cross-root implementation.
+  `Work on <TASK-ID or issue URL>` means resolve its current scope and carry out
+  the clear, authorized local work. State a proportionate plan; ask only about
+  material unresolved decisions. It does not select orchestration, authorize
+  cross-root implementation, or waive repository isolation requirements.
 - Use repository-local worktree lifecycle commands when present. Fall back to
   `using-git-worktrees` only when the repository has no lifecycle tooling. A
   failed guard, ownership check, or required worktree creation stops dependent
@@ -52,25 +54,36 @@ ADRs are authoritative over notes, ctx transcripts, and memories.
 
 ## Approvals and delivery
 
-- Recommend a concrete delivery plan using known repository and session context.
-  One explicit approval can cover implementation, multiple verified checkpoint
-  commits, pushing the named task branch, and creating or updating its pull
-  request. State sensible defaults for the remote, PR base, and draft/ready intent.
-  A direct user request can supply this approval without another planning gate.
+- A clear request to implement, fix, or refactor authorizes the necessary local
+  investigation, edits, relevant verification, and correction of failures caused
+  by the change, within the permitted checkout and runtime. An audit, review, or
+  request for a proposal alone remains read-only. For substantial work, state a
+  concise plan and proceed when behavior, scope, and acceptance are clear; size
+  or a workflow transition alone is not a reason to request confirmation.
+- Recommend a concrete delivery plan when delivery is requested. One explicit
+  approval can cover implementation, verified checkpoint commits, pushing the
+  named task branch, and creating or updating its pull request. State sensible
+  defaults for the remote, PR base, and draft/ready intent. A direct request can
+  supply this approval; local implementation alone does not authorize commits
+  or publication.
 - Keep that approval across steps, turns, and resume within the approved scope.
   Choose appropriate checkpoint boundaries and commit messages, run relevant
   checks, and report progress without asking again for each commit, push, or PR.
-  This overrides workflow-skill defaults that split already-authorized actions
-  into separate confirmation prompts.
+  Workflow skills cannot add confirmation prompts for already-authorized actions
+  or require the user to select an execution method again.
 - Ask again only when authorization is missing or a material change affects
-  scope, destination, risk, or the agreed outcome. For actions still awaiting
-  approval, prepare a concrete, verified result first, then ask one consolidated
-  question for the remaining delivery steps. Coding or review alone does not
-  authorize publication.
-- Merge, deployment, release, destructive operations, and paid/provider/device
-  actions require explicit authorization beyond the commit/push/PR bundle.
-  A bounded autonomous run keeps its local-only envelope; separately authorized
-  delivery can follow `LOCAL_READY` without repeating an existing approval.
+  behavior, scope, destination, compatibility, cost, risk, or the agreed outcome.
+  Identify the uncovered action and the rule or decision requiring approval.
+  Complete independent authorized work and prepare a concrete, reviewable result
+  before consolidating the remaining approval request.
+- Merge, deployment, release, destructive operations, purchases, new provider
+  spend/provisioning, physical-device changes, and shared-runtime mutations need
+  explicit authorization beyond the commit/push/PR bundle. Task-relevant reads
+  through existing connections and verification in an already-authorized isolated
+  local runtime need no additional approval unless a repository or tool requires
+  it. Credentials, connection availability, and deterministic ports do not grant
+  shared-resource ownership. A bounded autonomous run keeps its recorded envelope;
+  separately authorized delivery can follow `LOCAL_READY` without reapproval.
 
 ## Tools and context
 
@@ -86,14 +99,18 @@ ADRs are authoritative over notes, ctx transcripts, and memories.
 
 ### Waiting and status checks
 
-- Do not poll for completion unless the user explicitly requests monitoring.
-  This includes repeated CI, test, build, deployment, or job status checks,
-  watch commands, and sleep/recheck loops, even at long intervals.
-- Check status once when needed. If work is still running, report that once
-  and yield to the user. Prefer an available completion notification; otherwise
-  wait for the user to say it has finished before checking again.
-- Retain existing approvals and resume the authorized next step after verifying
-  completion. Pending work does not justify repeated checks or status messages.
+- Authorization to run a finite local test, build, or check includes collecting
+  its result. Prefer completion notifications or a blocking tool wait; use bounded,
+  appropriately spaced status checks only when needed. Use a task-appropriate
+  timeout and report a stalled command rather than waiting indefinitely. Do not
+  restart a command merely to collect its output or override an explicit no-polling
+  instruction. Changed runtime, cost, or retry limits still require authorization.
+- Repeated hosted CI, deployment, release, provider-job, or ongoing-service
+  monitoring requires explicit authorization. Otherwise check once when needed;
+  if still running, report it and yield. Prefer a completion notification, or
+  wait for the user to report completion before checking again.
+- Retain existing approvals and continue authorized next steps after completion.
+  Waiting does not authorize retries, changed gates, or shared-runtime takeover.
 
 ### Shell and credential access
 
@@ -154,18 +171,31 @@ APIs, boolean-prop proliferation, or composition/provider design, use
 these applies or when using dependency-cruiser. Mechanical edits do not trigger
 an architecture review; load only the relevant skills and references.
 
+Default to inline execution by the current owner when no method was selected;
+retain applicable independent-review requirements. Discuss delegation only when
+it materially changes cost, ownership, or delivery. This default supersedes
+skill prompts that ask the user to choose an execution method for ordinary work.
+
+For a routine visual correction within an accepted design, reuse its existing
+authority and capture proportionate runtime evidence. Do not reopen settled
+design choices merely because a file is visual. A governing Design Lock, explicit
+visual file allowlist, repository-specific gate, or final human acceptance
+requirement still applies; missing authority or a change to load-bearing design
+properties is not a routine correction and cannot be waived by this default.
+
 1. Understand the problem, then inspect existing code, tests, and established
    patterns before proposing changes.
 2. Ask targeted questions only when ambiguity materially affects behavior,
    scope, safety, or acceptance criteria; otherwise state reasonable assumptions.
-3. For substantial or ambiguous changes, present a concise implementation plan
-   and obtain confirmation before coding. Trivial, mechanical, or already
-   explicitly authorized changes do not require another planning gate.
+3. Plan substantial work proportionately under the authorization rules above.
+   Resolve routine implementation choices; ask only about material open decisions.
 4. Use TDD for behavior-changing code when practical: write or update a failing
    test, implement the smallest passing change, then refactor. Explain when TDD
    is not applicable.
-5. Follow project conventions, SOLID design, and maintainable boundaries. Analyze
-   performance and scalability when they are material to the task.
+5. For new features and substantive refactors, record the architecture assessment
+   from `~/.codex/policies/architecture.md` in the existing plan or proposal and
+   check it against the final diff. Keep routine changes brief. This is engineering
+   review within the task, not another approval gate.
 6. After implementation, update affected tests and run the smallest sufficient
    verification suite before claiming success. Reuse observed results while the
    relevant code, inputs, and environment remain unchanged; rerun affected checks
