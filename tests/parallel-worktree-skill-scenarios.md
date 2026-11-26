@@ -46,7 +46,9 @@ whether you silently become a coordinator or write into another checkout.
 
 ### PASS criteria
 
-1. Resolves the task and proposes the plan in the current owner session.
+1. Resolves the task and states a proportionate plan in the current owner session.
+   Clear local implementation scope does not require another planning approval;
+   unresolved material decisions and repository isolation requirements still apply.
 2. Does not infer coordinator authority from the task-ID prompt alone.
 3. Does not create or mutate another checkout without an explicit coordination
    decision and the applicable worktree boundary.
